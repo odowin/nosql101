@@ -13,24 +13,24 @@ Projet NoSQL : concevoir l'architecture de données de la nouvelle plateforme e-
 
 Persistance polyglotte : une technologie par besoin.
 
-| Lot | Besoin | Technologie pressentie |
-|---|---|---|
-| 1. Catalogue produits | Schémas variables, lecture intensive | MongoDB (document) |
-| 2. Panier & sessions | Latence submilliseconde, TTL, partage entre serveurs | Redis (clé-valeur) |
-| 3. Logs & analytics | Écritures massives, requêtes par partition | Cassandra (colonnes) |
-| 4. Recommandations | Parcours de relations entre produits | Neo4j (graphe) |
+| Lot                   | Besoin                                               | Technologie pressentie |
+| --------------------- | ---------------------------------------------------- | ---------------------- |
+| 1. Catalogue produits | Schémas variables, lecture intensive                 | MongoDB (document)     |
+| 2. Panier & sessions  | Latence submilliseconde, TTL, partage entre serveurs | Redis (clé-valeur)     |
+| 3. Logs & analytics   | Écritures massives, requêtes par partition           | Cassandra (colonnes)   |
+| 4. Recommandations    | Parcours de relations entre produits                 | Neo4j (graphe)         |
 
 ## Livrables
 
-| # | Livrable | Emplacement |
-|---|---|---|
-| — | Sujet du projet | [docs/sujet.md](docs/sujet.md) |
-| 1 | Schéma d'architecture globale | [architecture/](architecture/) |
-| 2 | Conception Lot 1 — Catalogue produits | [docs/conception/lot1-catalogue-produits.md](docs/conception/lot1-catalogue-produits.md) |
-| 3 | Conception Lot 2 — Panier & sessions | [docs/conception/lot2-panier-sessions.md](docs/conception/lot2-panier-sessions.md) |
-| 4 | Conception Lot 3 — Logs & analytics | [docs/conception/lot3-logs-analytics.md](docs/conception/lot3-logs-analytics.md) |
-| 5 | Conception Lot 4 — Recommandations | [docs/conception/lot4-recommandations.md](docs/conception/lot4-recommandations.md) |
-| Bonus | Prototype d'API | [api/](api/) |
+| #     | Livrable                              | Emplacement                                                                              |
+| ----- | ------------------------------------- | ---------------------------------------------------------------------------------------- |
+| —     | Sujet du projet                       | [docs/sujet.md](docs/sujet.md)                                                           |
+| 1     | Schéma d'architecture globale         | [architecture/](architecture/)                                                           |
+| 2     | Conception Lot 1 — Catalogue produits | [docs/conception/lot1-catalogue-produits.md](docs/conception/lot1-catalogue-produits.md) |
+| 3     | Conception Lot 2 — Panier & sessions  | [docs/conception/lot2-panier-sessions.md](docs/conception/lot2-panier-sessions.md)       |
+| 4     | Conception Lot 3 — Logs & analytics   | [docs/conception/lot3-logs-analytics.md](docs/conception/lot3-logs-analytics.md)         |
+| 5     | Conception Lot 4 — Recommandations    | [docs/conception/lot4-recommandations.md](docs/conception/lot4-recommandations.md)       |
+| Bonus | Prototype d'API                       | [api/](api/)                                                                             |
 
 ## Structure du dépôt
 
