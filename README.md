@@ -1,6 +1,7 @@
 # nosql101
 
 ## Team members
+
 - Owen Dias
-- Romain Boris
+- Romain Bories
 - Lucas Magalhaes
