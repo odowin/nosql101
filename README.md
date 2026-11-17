@@ -9,23 +9,31 @@ Projet NoSQL : concevoir l'architecture de données de la nouvelle plateforme e-
 - Romain Bories
 - Lucas Magalhaes
 
-## Architecture (proposition, à valider)
+## Architecture
 
 Persistance polyglotte : une technologie par besoin.
 
-| Lot                   | Besoin                                               | Technologie pressentie |
-| --------------------- | ---------------------------------------------------- | ---------------------- |
-| 1. Catalogue produits | Schémas variables, lecture intensive                 | MongoDB (document)     |
-| 2. Panier & sessions  | Latence submilliseconde, TTL, partage entre serveurs | Redis (clé-valeur)     |
-| 3. Logs & analytics   | Écritures massives, requêtes par partition           | Cassandra (colonnes)   |
-| 4. Recommandations    | Parcours de relations entre produits                 | Neo4j (graphe)         |
+![Architecture globale](architecture/architecture-globale.drawio.svg)
+
+Nous sommes partis d'une première intuition par lot, puis nous l'avons confrontée aux contraintes du sujet et aux alternatives
+(démarche détaillée : [docs/choix-technologiques.md](docs/choix-technologiques.md)).
+
+| Lot                   | Besoin                                               | Technologie pressentie | Technologie retenue | Position CAP |
+| --------------------- | ---------------------------------------------------- | ---------------------- | ------------------- | ------------ |
+| 1. Catalogue produits | Schémas variables, lecture intensive                 | MongoDB (document)     | **MongoDB**         | CP           |
+| 2. Panier & sessions  | Latence submilliseconde, TTL, partage entre serveurs | Redis (clé-valeur)     | **Redis**           | AP           |
+| 3. Logs & analytics   | Écritures massives, requêtes par partition           | Cassandra (colonnes)   | **Cassandra**       | AP           |
+| 4. Recommandations    | Parcours de relations entre produits                 | Neo4j (graphe)         | **Neo4j**           | CP           |
+
+Hors périmètre : la prise de commande et le paiement restent dans une base relationnelle (transactions ACID).
 
 ## Livrables
 
 | #     | Livrable                              | Emplacement                                                                              |
 | ----- | ------------------------------------- | ---------------------------------------------------------------------------------------- |
 | —     | Sujet du projet                       | [docs/sujet.md](docs/sujet.md)                                                           |
-| 1     | Schéma d'architecture globale         | [architecture/](architecture/)                                                           |
+| —     | Démarche des choix technologiques     | [docs/choix-technologiques.md](docs/choix-technologiques.md)                             |
+| 1     | Schéma d'architecture globale         | [architecture/](architecture/README.md)                                                  |
 | 2     | Conception Lot 1 — Catalogue produits | [docs/conception/lot1-catalogue-produits.md](docs/conception/lot1-catalogue-produits.md) |
 | 3     | Conception Lot 2 — Panier & sessions  | [docs/conception/lot2-panier-sessions.md](docs/conception/lot2-panier-sessions.md)       |
 | 4     | Conception Lot 3 — Logs & analytics   | [docs/conception/lot3-logs-analytics.md](docs/conception/lot3-logs-analytics.md)         |
@@ -40,6 +48,7 @@ Persistance polyglotte : une technologie par besoin.
 ├── CONTRIBUTING.md         # workflow git de l'équipe
 ├── docs/
 │   ├── sujet.md            # énoncé du projet
+│   ├── choix-technologiques.md  # démarche de choix par lot
 │   └── conception/         # document de conception, un fichier par lot
 ├── architecture/           # schéma d'architecture globale
 └── api/                    # prototype d'API (bonus)
