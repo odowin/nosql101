@@ -2,16 +2,15 @@
 
 ## Branches
 
-| Branche | Rôle |
-|---|---|
-| `main` | Version rendue. |
-| `develop` | Branche d'intégration. Les branches de travail partent d'ici et y reviennent. |
-| `lot1/catalogue-produits` | Lot 1 — MongoDB |
-| `lot2/panier-sessions` | Lot 2 — Redis |
-| `lot3/logs-analytics` | Lot 3 — Cassandra |
-| `lot4/recommandations` | Lot 4 — Neo4j |
-| `architecture/schema-global` | Schéma d'architecture globale |
-| `bonus/api` | Prototype d'API (bonus) |
+| Branche                      | Rôle                                                                                      |
+| ---------------------------- | ----------------------------------------------------------------------------------------- |
+| `main`                       | Version rendue. Protégée : on n'y pousse jamais directement, uniquement via Pull Request. |
+| `develop`                    | Branche d'intégration. Les branches de travail partent d'ici et y reviennent.             |
+| `lot1/catalogue-produits`    | Lot 1 — MongoDB                                                                           |
+| `lot2/panier-sessions`       | Lot 2 — Redis                                                                             |
+| `lot3/logs-analytics`        | Lot 3 — Cassandra                                                                         |
+| `lot4/recommandations`       | Lot 4 — Neo4j                                                                             |
+| `architecture/schema-global` | Schéma d'architecture globale                                                             |
 
 Pour un nouveau sujet : `git switch develop && git pull && git switch -c <type>/<sujet>`.
 
