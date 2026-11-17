@@ -4,7 +4,7 @@
 
 | Branche | Rôle |
 |---|---|
-| `main` | Version rendue. Protégée : on n'y pousse jamais directement, uniquement via Pull Request. |
+| `main` | Version rendue. |
 | `develop` | Branche d'intégration. Les branches de travail partent d'ici et y reviennent. |
 | `lot1/catalogue-produits` | Lot 1 — MongoDB |
 | `lot2/panier-sessions` | Lot 2 — Redis |
@@ -20,7 +20,7 @@ Pour un nouveau sujet : `git switch develop && git pull && git switch -c <type>/
 1. Récupérer la branche à jour : `git switch lot1/catalogue-produits && git pull`.
 2. Commiter souvent, par petites étapes (l'historique est noté).
 3. Pousser : `git push`.
-4. Ouvrir une Pull Request **vers `develop`** et demander une relecture à un autre membre.
+4. Fusionner dans `develop` (merge direct ou Pull Request, au choix).
 5. Une fois `develop` stable, PR `develop` → `main` pour le rendu.
 
 ## Messages de commit
