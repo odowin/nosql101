@@ -37,9 +37,14 @@ Persistance polyglotte : une technologie par besoin.
 ```
 .
 ├── README.md
+├── CONTRIBUTING.md         # workflow git de l'équipe
 ├── docs/
 │   ├── sujet.md            # énoncé du projet
 │   └── conception/         # document de conception, un fichier par lot
 ├── architecture/           # schéma d'architecture globale
 └── api/                    # prototype d'API (bonus)
 ```
+
+## Contribuer
+
+Voir [CONTRIBUTING.md](CONTRIBUTING.md) : branches par lot, PR vers `develop`, conventions de commit.
