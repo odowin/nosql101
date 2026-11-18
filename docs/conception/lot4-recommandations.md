@@ -14,7 +14,31 @@
 
 ## Schéma de données
 
-_À compléter._
+| Élément | Propriétés | Rôle |
+|---|---|---|
+| `Product` | `sku` (unique), `name`, `price`, `category`, `brand` | nœud central (copie dénormalisée pour filtrer sans saut) |
+| `Category`, `Brand`, `Range` | `id`/`name` | similarité (même catégorie, marque, gamme) ; `CHILD_OF` pour l'arbre |
+| `Standard` | `id` (= clé de compat, ex. `socket:AM5`), `kind`, `name` | pivot de compatibilité |
+| `Customer` | `id` seulement (pseudonyme) | filtrage collaboratif |
+| `IN_CATEGORY`, `MADE_BY`, `IN_RANGE`, `USES`, `SUPPORTS` | — | structure catalogue (projection MongoDB) |
+| `PURCHASED` | `order_id`, `date`, `quantity` | historique d'achat |
+| `BOUGHT_WITH` | `count` | co-achat dans une même commande, pré-calculé ; stockée **une seule fois**, orientée du SKU le plus petit vers le plus grand (`a.sku < b.sku`), interrogée sans direction |
+
+```mermaid
+graph LR
+  C["Customer C0001"] -- PURCHASED --> CPU["Product CPU-AMD-R7-9800X3D"]
+  C -- PURCHASED --> MB["Product MB-MSI-X870-TOMAHAWK"]
+  CPU -- "BOUGHT_WITH {count}" --- MB
+  CPU -- USES --> AM5["Standard socket:AM5"]
+  MB -- SUPPORTS --> AM5
+  MB -- SUPPORTS --> DDR5["Standard memory:DDR5"]
+  RAM["Product RAM DDR5"] -- USES --> DDR5
+  CPU -- IN_CATEGORY --> CAT["Category cpu"] -- CHILD_OF --> COMP["Category composants"]
+  CPU -- MADE_BY --> AMD["Brand amd"]
+  CPU -- IN_RANGE --> R7["Range Ryzen 7"]
+```
+
+**Compatibilité par nœuds `Standard`.** A est compatible avec B si un standard S vérifie `(A)-[:USES]->(S)<-[:SUPPORTS]-(B)`, ou l'inverse. Un nouveau produit crée **une arête par standard** (2 à 4) au lieu de centaines d'arêtes produit↔produit (modèle N×M). La règle est déclarative et toujours à jour. Une carte mère et un ventirad qui *supportent* tous deux AM5 ne sont pas déclarés compatibles entre eux, grâce à `type(r1) <> type(r2)`.
 
 ## Requêtes types
 
