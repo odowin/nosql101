@@ -1,9 +1,13 @@
 import Link from "next/link";
-import { ChartNoAxesColumn, ChevronRight, UserRound } from "lucide-react";
-import { ProductCard } from "@/components/product-card";
+import { ChartNoAxesColumn, ChevronRight, LayoutGrid, Percent, Sparkles, ThumbsUp, UserRound, type LucideIcon } from "lucide-react";
+import { Carousel } from "@/components/carousel";
+import { FlashCard } from "@/components/flash-card";
+import { HeroCarousel, type Slide } from "@/components/hero-carousel";
+import { Newsletter } from "@/components/newsletter";
 import { SectionHeading } from "@/components/section-heading";
+import { buttonVariants } from "@/components/ui/button";
 import { getCategories, getTopProducts, listProducts } from "@/lib/api/client";
-import type { Category } from "@/lib/api/types";
+import type { Category, ProductSummary } from "@/lib/api/types";
 import { formatPeriod } from "@/lib/format";
 import { currentSession } from "@/lib/session";
 
@@ -12,66 +16,125 @@ const pill =
 const whitePill = `${pill} bg-white text-black hover:bg-white/85`;
 const leaves = (cats: Category[]): Category[] => cats.flatMap((c) => (c.children.length ? leaves(c.children) : [c]));
 const tile = "relative flex flex-col gap-4 overflow-hidden rounded-xl bg-header p-6 sm:p-8";
+const more = (href: string) => (
+  <Link href={href} className={buttonVariants({ variant: "info", size: "pill" })}>
+    Voir + <ChevronRight className="size-3.5" aria-hidden />
+  </Link>
+);
+
+/** Slide du hero : texte à gauche (titre serif bleu nuit, CTA pilule), visuel CSS à droite avec un grand arrondi bas-gauche. */
+function SlideBody({ kicker, title, text, href, cta, icon: Icon, visual }: {
+  kicker: string; title: string; text: string; href: string; cta: string; icon: LucideIcon; visual: string;
+}) {
+  return (
+    <div className="surface-light grid min-h-[240px] md:min-h-[400px] md:grid-cols-2 lg:min-h-[466px]">
+      <div className="flex flex-col items-start justify-center gap-4 p-6 md:p-12">
+        <p className="caps rounded-[15px] bg-ldlc-night px-3 py-1 text-xs font-bold tracking-[0.1em] text-white">{kicker}</p>
+        <h2 className="font-serif text-[clamp(2rem,4.5vw,3.75rem)] leading-[1.05] font-extrabold text-ldlc-night">{title}</h2>
+        <p className="max-w-[45ch] text-base text-ldlc-text max-md:hidden">{text}</p>
+        <Link href={href} className={buttonVariants({ variant: "navy", size: "pill" })}>
+          {cta} <ChevronRight className="size-3.5" aria-hidden />
+        </Link>
+      </div>
+      <div aria-hidden className={`grid place-items-center rounded-bl-[160px] max-md:hidden ${visual}`}>
+        <Icon className="size-40 text-white/85" strokeWidth={1} />
+      </div>
+    </div>
+  );
+}
+
+function ProductCarousel({ label, items }: { label: string; items: ProductSummary[] }) {
+  return (
+    <Carousel label={label}>
+      {items.map((p) => (
+        <FlashCard key={p._id} p={p} className="w-[240px] shrink-0 snap-start lg:w-[260px]" />
+      ))}
+    </Carousel>
+  );
+}
 
 export default async function Home() {
-  const [top, promos, categories, session] = await Promise.all([
+  const [top, promos, latest, categories, session] = await Promise.all([
     getTopProducts("day", 5).catch(() => null),
-    listProducts({ on_sale: true, limit: 8 }).catch(() => null),
+    listProducts({ on_sale: true, sort: "discount", limit: 10 }).catch(() => null),
+    listProducts({ limit: 10 }).catch(() => null),
     getCategories().catch(() => []),
     currentSession(),
   ]);
-  // La bannière reprend la première promo en cours renvoyée par l'API ; sans promo, un titre générique.
   const promo = promos?.items.find((p) => p.promo)?.promo;
+  const best = promos?.items[0]?.discount_percent;
   const customer = session?.customer_id || undefined;
   // Les produits ne sont rattachés qu'aux feuilles (cpu, gpu…) : filtrer sur une catégorie parente ne renvoie rien.
   const univers = leaves(categories);
 
-  const tabs = [
-    { href: "/promos", label: promo?.label ?? "Black Days" },
-    { href: "/analytics", label: "Les meilleures ventes" },
-    { href: "/produits", label: "Tout le catalogue" },
-    { href: "/panier", label: "Mon panier" },
-    { href: "/commandes", label: "Mes commandes" },
+  const slides: Slide[] = [
+    {
+      id: "promos",
+      tab: "Promos",
+      content: (
+        <SlideBody
+          kicker={promo ? formatPeriod(promo) : "Promos"}
+          title={promo?.label ?? "Black Days"}
+          text={`${promos?.total ?? 0} produits en promo${best ? `, jusqu'à −${best} %` : ""}. Prix recalculés à chaque lecture du catalogue.`}
+          href="/promos"
+          cta="Voir toutes les offres"
+          icon={Percent}
+          visual="hero-bg"
+        />
+      ),
+    },
+    {
+      id: "top",
+      tab: "Top des ventes",
+      content: (
+        <SlideBody
+          kicker="Top des ventes"
+          title={top?.items[0]?.name ?? "Les plus consultés"}
+          text="Le classement des fiches les plus vues, recalculé chaque jour à partir des événements de navigation."
+          href="/analytics"
+          cta="Voir le classement"
+          icon={ThumbsUp}
+          visual="bg-[linear-gradient(135deg,oklch(45%_0.12_233),oklch(25%_0.1_263))]"
+        />
+      ),
+    },
+    {
+      id: "nouveautes",
+      tab: "Nouveautés",
+      content: (
+        <SlideBody
+          kicker="Nouveautés"
+          title="Les dernières références"
+          text={`${latest?.total ?? 0} produits au catalogue, avec leurs caractéristiques techniques et les avis clients.`}
+          href="/produits"
+          cta="Tout le catalogue"
+          icon={Sparkles}
+          visual="bg-[linear-gradient(135deg,oklch(70%_0.15_61),oklch(45%_0.15_36))]"
+        />
+      ),
+    },
+    {
+      id: "univers",
+      tab: "Nos univers",
+      content: (
+        <SlideBody
+          kicker="Univers"
+          title="Composants, périphériques, logiciels"
+          text={`${univers.length} rayons, du processeur au clavier.`}
+          href={univers[0] ? `/produits?category=${encodeURIComponent(univers[0]._id)}` : "/produits"}
+          cta="Parcourir les rayons"
+          icon={LayoutGrid}
+          visual="bg-[linear-gradient(135deg,oklch(55%_0.13_160),oklch(30%_0.07_200))]"
+        />
+      ),
+    },
   ];
 
   return (
     <main className="theme-dark flex flex-col gap-10">
       <h1 className="sr-only">LDLC NoSQL : la boutique repensée sur quatre bases NoSQL</h1>
 
-      <section aria-labelledby="hero-title" className="overflow-hidden rounded-xl">
-        <div className="hero-bg flex min-h-[20rem] flex-col items-center justify-center gap-6 px-6 py-12 text-center sm:min-h-[26rem]">
-          {promo && (
-            <p className="caps tabular rounded-md border-2 border-[oklch(0.8_0.09_195)] px-3 py-1 text-sm font-bold tracking-[0.18em] text-[oklch(0.9_0.05_195)]">
-              {formatPeriod(promo)}
-            </p>
-          )}
-          <h2
-            id="hero-title"
-            className="max-w-[12ch] text-[clamp(3rem,11vw,8.5rem)] leading-[0.9] font-black tracking-[-0.04em] uppercase [text-shadow:0_0_40px_oklch(0.8_0.09_195/35%)]"
-          >
-            {promo?.label ?? "Black Days"}
-          </h2>
-          <Link href="/promos" className={whitePill}>
-            Voir toutes les offres <ChevronRight className="size-4" aria-hidden />
-          </Link>
-        </div>
-        <nav aria-label="Raccourcis" className="overflow-x-auto bg-white [scrollbar-width:thin]">
-          <ul className="flex min-w-max divide-x divide-black/10 md:min-w-0">
-            {tabs.map((t, i) => (
-              <li key={t.href} className="flex-1">
-                <Link
-                  href={t.href}
-                  className={`caps flex min-h-12 items-center justify-center px-5 text-sm whitespace-nowrap transition-colors ${
-                    i === 0 ? "bg-header text-white hover:bg-neutral-800" : "text-neutral-800 hover:bg-neutral-100 active:bg-neutral-200"
-                  }`}
-                >
-                  {t.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </section>
+      <HeroCarousel slides={slides} />
 
       <ul className="stagger grid gap-4 lg:grid-cols-[2fr_1fr_1fr]" aria-label="À la une">
         <li className={`${tile} sm:flex-row sm:items-center`}>
@@ -129,26 +192,20 @@ export default async function Home() {
 
       {promos && promos.items.length > 0 && (
         <section aria-labelledby="promos" className="flex flex-col gap-4">
-          <SectionHeading
-            id="promos"
-            title="Promos en cours"
-            sub="Prix effectifs calculés par l'API (MongoDB)"
-            action={
-              <Link href="/promos" className="inline-flex min-h-11 items-center gap-1 text-sm text-link underline-offset-4 hover:underline">
-                Toutes les promos <ChevronRight className="size-4" aria-hidden />
-              </Link>
-            }
-          />
-          <ul className="stagger grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {promos.items.map((p) => (
-              <ProductCard key={p._id} p={p} />
-            ))}
-          </ul>
+          <SectionHeading id="promos" title="Promos en cours" sub="Plus forte remise d'abord (MongoDB)" action={more("/promos")} />
+          <ProductCarousel label="Promos en cours" items={promos.items} />
+        </section>
+      )}
+
+      {latest && latest.items.length > 0 && (
+        <section aria-labelledby="nouveautes" className="flex flex-col gap-4">
+          <SectionHeading id="nouveautes" title="Nouveautés" sub="Les dernières références du catalogue" action={more("/produits")} />
+          <ProductCarousel label="Nouveautés" items={latest.items} />
         </section>
       )}
 
       <section aria-labelledby="top" className="flex flex-col gap-4">
-        <SectionHeading id="top" title="Top du jour" sub="Les fiches les plus vues aujourd'hui (Cassandra)" />
+        <SectionHeading id="top" title="Top du jour" sub="Les fiches les plus vues aujourd'hui (Cassandra)" action={more("/analytics")} />
         {!top ? (
           <p className="text-sm text-muted-foreground">Classement indisponible pour le moment.</p>
         ) : top.items.length === 0 ? (
@@ -173,6 +230,19 @@ export default async function Home() {
             ))}
           </ol>
         )}
+      </section>
+
+      {/* « Nous rejoindre » : carte blanche en 2 colonnes séparées par un filet ; newsletter factice, sans réseaux sociaux. */}
+      <section aria-labelledby="newsletter" className="surface-light grid gap-6 rounded-lg p-6 md:grid-cols-2 md:divide-x md:p-8">
+        <div className="flex flex-col gap-2 md:pr-8">
+          <h2 id="newsletter" className="font-serif text-[22px] font-extrabold tracking-normal text-ldlc-night">
+            Restez informé
+          </h2>
+          <p className="text-muted-foreground">Les nouvelles promos et les nouveautés du catalogue.</p>
+        </div>
+        <div className="md:pl-8">
+          <Newsletter />
+        </div>
       </section>
     </main>
   );

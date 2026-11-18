@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Breadcrumb } from "@/components/breadcrumb";
 import { SectionHeading } from "@/components/section-heading";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,19 +26,21 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
   const max = Math.max(1, ...(series ?? []).map((d) => d.views));
 
   return (
-    <main className="flex flex-col gap-8">
-      <header>
-        <SectionHeading as="h1" title="Meilleures ventes et analytics" sub="Cassandra" />
-        <p className="mt-2 max-w-[65ch] text-muted-foreground">
-          Compteurs de vues et de recherches agrégés par jour, alimentés par les événements de navigation.
-        </p>
-      </header>
+    <main>
+      <Breadcrumb items={[{ label: "Meilleures ventes et analytics" }]} />
+      <SectionHeading
+        as="h1"
+        inner
+        title="Meilleures ventes"
+        sub="Compteurs de vues et de recherches agrégés par jour dans Cassandra, alimentés par la navigation."
+      />
 
-      <div className="stagger grid gap-4 md:grid-cols-3">
+      {/* Les blocs gardent leurs 30 px de marge basse ; seule la gouttière horizontale vient de la grille. */}
+      <div className="stagger grid md:grid-cols-3 md:gap-x-[30px]">
         <TopTable title="Top produits du jour" data={today} />
         <TopTable title="Top produits de la semaine" data={week} />
-        <section className="min-w-0 rounded-lg bg-card p-4">
-          <h2 className="caps text-sm font-bold">Top recherches du jour</h2>
+        <section className="bloc min-w-0">
+          <h2 className="caps text-sm font-bold text-primary">Top recherches du jour</h2>
           {!searches ? (
             <Unavailable />
           ) : searches.length === 0 ? (
@@ -57,8 +60,8 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
         </section>
       </div>
 
-      <section aria-labelledby="daily" className="rounded-lg bg-card p-4">
-        <h2 id="daily" className="caps text-sm font-bold">Vues quotidiennes d&apos;un produit</h2>
+      <section aria-labelledby="daily" className="bloc">
+        <h2 id="daily" className="caps text-sm font-bold text-primary">Vues quotidiennes d&apos;un produit</h2>
         <form action="/analytics" className="mt-3 flex flex-wrap items-end gap-2">
           <label className="flex flex-col gap-1.5 text-sm font-medium">
             SKU
@@ -66,7 +69,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
           </label>
           <label className="flex flex-col gap-1.5 text-sm font-medium">
             Période
-            <select name="days" defaultValue={days} className="h-11 rounded-lg border border-input bg-transparent pl-3 pr-9">
+            <select name="days" defaultValue={days} className="h-11 rounded-lg border border-input bg-white pr-9 pl-3">
               {PERIODS.map((d) => (
                 <option key={d} value={d}>
                   {d} jours
@@ -74,7 +77,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
               ))}
             </select>
           </label>
-          <Button type="submit" className="min-h-11 px-4">
+          <Button type="submit" variant="navy" size="pill">
             Afficher
           </Button>
         </form>
@@ -110,8 +113,8 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
 
 function TopTable({ title, data }: { title: string; data: TopProducts | null }) {
   return (
-    <section className="min-w-0 rounded-lg bg-card p-4">
-      <h2 className="caps text-sm font-bold">{title}</h2>
+    <section className="bloc min-w-0">
+      <h2 className="caps text-sm font-bold text-primary">{title}</h2>
       {!data ? (
         <Unavailable />
       ) : data.items.length === 0 ? (
