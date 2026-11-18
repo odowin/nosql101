@@ -3,14 +3,14 @@ import Link from "next/link";
 import { LogOut, Package, Sparkles } from "lucide-react";
 import { logout } from "@/app/actions";
 import { LoginForm } from "@/components/login-form";
-import { Badge } from "@/components/ui/badge";
+import { SectionHeading } from "@/components/section-heading";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { formatTtl } from "@/lib/format";
 import { currentSession } from "@/lib/session";
 
 export const metadata: Metadata = { title: "Mon compte · LDLC NoSQL" };
 
-const card = "flex flex-col gap-4 rounded-xl bg-card p-6 ring-1 ring-foreground/10";
+const card = "flex flex-col gap-4 rounded-xl bg-header p-6 ring-1 ring-white/10";
 
 export default async function AccountPage() {
   const session = await currentSession();
@@ -19,9 +19,7 @@ export default async function AccountPage() {
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 py-4">
       <header>
-        <h1 className="flex items-center gap-2 text-3xl font-bold tracking-tight">
-          Mon compte <Badge variant="outline">Redis</Badge>
-        </h1>
+        <SectionHeading as="h1" title="Mon compte" sub="Session Redis, durée de vie glissante" />
       </header>
 
       {session && customer ? (

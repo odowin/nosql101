@@ -112,7 +112,7 @@ export default async function ProductPage({ params, searchParams }: Props) {
         <SectionHeading id="recos" title="Recommandations" sub="Graphe Neo4j" />
         <div className="stagger mt-3 grid gap-4 sm:grid-cols-2">
           {recos.map((r) => (
-            <Suspense key={r.kind} fallback={<Skeleton className="h-40 rounded-xl" />}>
+            <Suspense key={r.kind} fallback={<Skeleton className="h-72 rounded-xl" />}>
               <RecoSection title={r.title} items={getRecommendations(sku, r.kind)} />
             </Suspense>
           ))}
