@@ -15,7 +15,7 @@ curl localhost:8000/health          # 200 quand les 4 bases répondent
 - Tests : `docker compose exec -T api pytest -q`
 - Réinitialiser : `docker compose down -v`
 
-Au démarrage, un seed idempotent charge [data/catalog.json](data/catalog.json) (44 produits, avis, paniers types) dans MongoDB, génère des commandes et 14 jours de vues dans Cassandra, et projette le catalogue et les achats dans Neo4j. Les **mêmes** commandes alimentent Cassandra et Neo4j.
+Au démarrage, un seed idempotent charge [data/catalog.json](data/catalog.json) (44 produits dont 6 en promo, avis, paniers types) dans MongoDB ; les dates des promos sont recalculées à chaque démarrage (4 en cours, 1 à venir, 1 expirée), génère des commandes et 14 jours de vues dans Cassandra, et projette le catalogue et les achats dans Neo4j. Les **mêmes** commandes alimentent Cassandra et Neo4j.
 
 ## Scénario de démo
 
@@ -59,7 +59,7 @@ Attendu : l'étape 2 affiche `X-Cache: MISS` puis `X-Cache: HIT` ; l'étape 5 co
 | Lot | Routes |
 |---|---|
 | Santé | `GET /health` |
-| 1 — Catalogue | `GET /categories` · `GET /products` (filtres `category`, `brand`, `q`, `min_price`, `max_price`, `spec=k:v`, `limit`, `skip`) · `GET /products/{sku}` · `POST /products` · `GET` et `POST /products/{sku}/reviews` |
+| 1 — Catalogue | `GET /categories` · `GET /products` (filtres `category`, `brand`, `q`, `min_price`, `max_price`, `spec=k:v`, `on_sale`, `limit`, `skip`) · `GET /products/{sku}` · `POST /products` · `GET` et `POST /products/{sku}/reviews` |
 | 2 — Sessions et panier | `POST /sessions` · `GET` et `DELETE /sessions/{sid}` · `POST /sessions/{sid}/login` · `GET /cart` · `POST /cart/items` · `PUT` et `DELETE /cart/items/{sku}` · `POST /cart/checkout` (en-tête `X-Session-Id`) |
 | 3 — Logs et analytics | `POST /events` · `GET /analytics/sessions/{sid}/events` · `GET /analytics/products/{sku}/views` · `GET /analytics/products/{sku}/views/daily` · `GET /analytics/top-products` · `GET /analytics/top-searches` · `GET /customers/{id}/orders` · `GET /orders/{order_id}` |
 | 4 — Recommandations | `GET /recommendations/customers/{id}` · `GET /recommendations/{sku}/also-bought` · `/bought-together` · `/compatible` · `/similar` |

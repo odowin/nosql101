@@ -502,6 +502,12 @@
      "socket:AM5"
     ],
     "supports": []
+   },
+   "promo": {
+    "label": "Black Friday",
+    "percent": 15,
+    "start_days": -2,
+    "end_days": 9
    }
   },
   {
@@ -1284,6 +1290,12 @@
    "compat": {
     "uses": [],
     "supports": []
+   },
+   "promo": {
+    "label": "Black Friday",
+    "price": 799.95,
+    "start_days": -2,
+    "end_days": 9
    }
   },
   {
@@ -1404,6 +1416,12 @@
    "compat": {
     "uses": [],
     "supports": []
+   },
+   "promo": {
+    "label": "Black Friday",
+    "percent": 20,
+    "start_days": -2,
+    "end_days": 9
    }
   },
   {
@@ -1883,6 +1901,12 @@
    "compat": {
     "uses": [],
     "supports": []
+   },
+   "promo": {
+    "label": "Offre de la semaine",
+    "price": 139.95,
+    "start_days": -1,
+    "end_days": 6
    }
   },
   {
@@ -1987,6 +2011,12 @@
    "compat": {
     "uses": [],
     "supports": []
+   },
+   "promo": {
+    "label": "Rentrée",
+    "price": 129.95,
+    "start_days": -60,
+    "end_days": -30
    }
   },
   {
@@ -2096,6 +2126,12 @@
    "compat": {
     "uses": [],
     "supports": []
+   },
+   "promo": {
+    "label": "Cyber Monday",
+    "percent": 10,
+    "start_days": 5,
+    "end_days": 8
    }
   },
   {
