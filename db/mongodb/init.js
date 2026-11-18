@@ -28,7 +28,7 @@ db.createCollection('products', {
             properties: {
               k: { bsonType: 'string' },
               // valeur numérique jamais en chaîne avec unité : l'unité va dans u
-              v: { bsonType: ['string', 'int', 'double', 'bool', 'decimal'] },
+              v: { bsonType: ['string', 'int', 'double', 'bool', 'decimal', 'array'] }, // array : attribut multi-valué (sockets d'un ventirad)
               u: { bsonType: 'string' }
             }
           }
