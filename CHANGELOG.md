@@ -2,6 +2,23 @@
 
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), versions selon [SemVer](https://semver.org/lang/fr/).
 
+## [1.1.0] — 2026-11-18
+
+Ajout du prototype d'API (bonus) qui implémente les 4 lots (#16).
+
+### Ajouté
+
+- **Prototype d'API FastAPI** ([api/README.md](api/README.md)) : service `api` dans [docker-compose.yml](docker-compose.yml), Swagger sur `http://localhost:8000/docs`.
+  - Lot 1 : catalogue MongoDB (facettes, fiche avec cache-aside Redis, création libre de produit, avis subset + computed).
+  - Lot 2 : sessions et panier Redis (TTL glissant, fusion au login).
+  - Lot 3 : événements, compteurs, top produits, top recherches, historique des commandes (Cassandra).
+  - Lot 4 : recommandations Neo4j ; la validation du panier écrit dans Cassandra et Neo4j.
+- Jeu de démonstration ([api/data/catalog.json](api/data/catalog.json)) chargé par un seed idempotent ; 34 tests pytest exécutés contre la stack.
+
+### Corrigé
+
+- [db/mongodb/init.js](db/mongodb/init.js) et [Lot 1](docs/conception/lot1-catalogue-produits.md) : le validateur accepte les attributs multi-valués (tableaux dans `specs.v`, ex. `sockets`, `supported_form_factors`).
+
 ## [1.0.1] — 2026-11-18
 
 Relecture de cohérence entre les documents après la restructuration par lot (#13).
@@ -40,7 +57,8 @@ Première version rendue : architecture de données NoSQL de la refonte LDLC (pe
 
 ### Non inclus
 
-- Prototype d'API (bonus) : `api/` vide.
+- Prototype d'API (bonus) : `api/` vide (ajouté en 1.1.0).
 
+[1.1.0]: https://github.com/odowin/nosql101/releases/tag/v1.1.0
 [1.0.1]: https://github.com/odowin/nosql101/releases/tag/v1.0.1
 [1.0.0]: https://github.com/odowin/nosql101/releases/tag/v1.0.0
