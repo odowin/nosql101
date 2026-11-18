@@ -2,8 +2,10 @@
 import json
 import random
 import time
+from collections import Counter
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
+from itertools import combinations
 from pathlib import Path
 
 from bson import Decimal128, ObjectId
@@ -147,12 +149,66 @@ def seed_cassandra(data: dict):
     print(f"[seed] cassandra : {len(orders)} commandes, {len(by_day)} compteurs de vues")
 
 
+def seed_neo4j(data: dict):
+    """Projection du catalogue Mongo + commandes synthétiques dans Neo4j (ignoré si des produits existent)."""
+    driver = neo4j_driver()
+
+    def run_q(cypher, **params):
+        driver.execute_query(cypher, parameters_=params, database_="neo4j")
+
+    if driver.execute_query("MATCH (p:Product) RETURN p LIMIT 1", database_="neo4j").records:
+        print("[seed] neo4j déjà peuplé, ignoré")
+        return
+    db = mongo_db()
+    cats = [{"id": c["_id"], "name": c["name"], "parent": c.get("parent")} for c in db.categories.find()]
+    run_q("UNWIND $cats AS c MERGE (n:Category {id: c.id}) SET n.name = c.name", cats=cats)
+    run_q("""UNWIND $cats AS c WITH c WHERE c.parent IS NOT NULL
+             MATCH (a:Category {id: c.id}), (b:Category {id: c.parent}) MERGE (a)-[:CHILD_OF]->(b)""", cats=cats)
+    rows = []
+    for p in db.products.find():
+        compat = p.get("compat", {})
+        rows.append({
+            "sku": p["_id"], "name": p["name"], "price": float(p["price"].to_decimal()),
+            "category": p["category"]["_id"], "brand": p["brand"]["_id"], "brand_name": p["brand"]["name"],
+            "range": p.get("range"),
+            "uses": [{"id": k, "kind": k.split(":")[0]} for k in compat.get("uses", [])],
+            "supports": [{"id": k, "kind": k.split(":")[0]} for k in compat.get("supports", [])],
+        })
+    run_q("""UNWIND $rows AS r
+             MERGE (p:Product {sku: r.sku})
+             SET p.name = r.name, p.price = r.price, p.category = r.category, p.brand = r.brand
+             WITH p, r
+             MATCH (c:Category {id: r.category}) MERGE (p)-[:IN_CATEGORY]->(c)
+             MERGE (b:Brand {id: r.brand}) SET b.name = r.brand_name
+             MERGE (p)-[:MADE_BY]->(b)
+             FOREACH (_ IN CASE WHEN r.range IS NULL THEN [] ELSE [1] END |
+                 MERGE (g:Range {name: r.range}) MERGE (p)-[:IN_RANGE]->(g))
+             FOREACH (s IN r.uses |
+                 MERGE (st:Standard {id: s.id}) SET st.kind = s.kind, st.name = s.id MERGE (p)-[:USES]->(st))
+             FOREACH (s IN r.supports |
+                 MERGE (st:Standard {id: s.id}) SET st.kind = s.kind, st.name = s.id MERGE (p)-[:SUPPORTS]->(st))""",
+          rows=rows)
+    orders = synthetic_orders(data)
+    run_q("""UNWIND $rows AS r
+             MERGE (c:Customer {id: r.cid})
+             WITH c, r MATCH (p:Product {sku: r.sku})
+             MERGE (c)-[x:PURCHASED {order_id: r.oid}]->(p) SET x.date = r.date, x.quantity = r.qty""",
+          rows=[{"cid": o["customer_id"], "oid": o["order_id"], "sku": i["sku"], "date": o["order_date"],
+                 "qty": i["quantity"]} for o in orders for i in o["items"]])
+    pairs = Counter((a, b) for o in orders for a, b in combinations(sorted({i["sku"] for i in o["items"]}), 2))
+    run_q("""UNWIND $pairs AS r
+             MATCH (a:Product {sku: r.a}), (b:Product {sku: r.b})
+             MERGE (a)-[w:BOUGHT_WITH]->(b) SET w.count = r.count""",
+          pairs=[{"a": a, "b": b, "count": n} for (a, b), n in pairs.items()])
+    print(f"[seed] neo4j : {len(rows)} produits, {len(orders)} commandes, {len(pairs)} paires BOUGHT_WITH")
+
+
 def run():
     wait_for_dbs()
     data = load_catalog()
     seed_mongo(data)
     seed_cassandra(data)
-    # T6 : seed_neo4j(data)
+    seed_neo4j(data)
 
 
 if __name__ == "__main__":
