@@ -35,7 +35,7 @@ Cette intuition restait à confronter aux contraintes détaillées et aux altern
 
 | Alternative | Pourquoi écartée |
 |---|---|
-| PostgreSQL + JSONB | Gère les attributs variables, mais on reste sur le moteur relationnel que le sujet cherche à remplacer ; la montée en charge horizontale est plus difficile. |
+| PostgreSQL + JSONB | Crédible pour les attributs variables, mais la montée en charge reste verticale (le problème actuel) ; MongoDB offre réplication et sharding natifs, un validateur de schéma partiel et l'agrégation. |
 | Cassandra | Il faut connaître les requêtes à l'avance ; or le catalogue est filtré sur des attributs qui changent d'une catégorie à l'autre. |
 | **MongoDB** ✅ | Une fiche = un document, lue en une seule requête ; nouveaux attributs sans migration ; index secondaires sur les attributs filtrés ; lectures réparties sur les réplicas. |
 
@@ -53,7 +53,7 @@ Cette intuition restait à confronter aux contraintes détaillées et aux altern
 | Sessions en mémoire du serveur + *sticky sessions* | Pas de partage : si un serveur tombe, le client perd panier et session. |
 | Memcached | Rapide, mais pas de structures (hash, set), pas de persistance ni de réplication. |
 | MongoDB avec index TTL | La purge TTL tourne toutes les 60 s et les lectures passent par le disque : pas submilliseconde. |
-| **Redis** ✅ | En mémoire (< 1 ms), TTL natif par clé, structures adaptées (un panier = un hash), accessible par tous les serveurs web, réplication et persistance optionnelle (AOF). |
+| **Redis** ✅ | En mémoire (< 1 ms), TTL natif par clé, structures adaptées (un panier = un hash), accessible par tous les serveurs web, réplication et persistance optionnelle (AOF). Sert aussi de **cache des fiches produit** (cache-aside devant MongoDB, invalidé via `catalog-changes`). |
 
 **Compromis assumé** : la réplication Redis est asynchrone → en cas de panne du primaire, les dernières écritures peuvent être perdues. On privilégie la disponibilité : perdre un article du panier est acceptable, un site qui ne répond pas ne l'est pas.
 
@@ -70,8 +70,8 @@ Cette intuition restait à confronter aux contraintes détaillées et aux altern
 
 **Ce qu'il faudra traiter dans la conception** :
 - une **table par requête** (la donnée est dupliquée volontairement) ;
-- partitionner par jour (`(product_id, day)`) pour éviter les partitions trop grosses ;
-- Cassandra ne fait pas de `GROUP BY` / `ORDER BY` global → le « top produits de la semaine » doit être **pré-agrégé** (tables de compteurs ou job Spark batch) ;
+- partitionner par SKU avec `day` en clé de clustering (table `product_views_by_day`) pour éviter les partitions trop grosses ;
+- Cassandra ne fait pas de `GROUP BY` / `ORDER BY` global → le « top produits de la semaine » doit être **pré-agrégé** (compteurs répartis dans `daily_views_by_shard`, puis un job qui calcule le classement) ;
 - l'historique des commandes d'un client est un historique en ajout seul, lu par client → table `orders_by_customer`.
 
 ### Lot 4 — Recommandations
@@ -84,7 +84,7 @@ Cette intuition restait à confronter aux contraintes détaillées et aux altern
 | MongoDB `$graphLookup` | Fonctionne pour un seul type de relation et une faible profondeur, devient lent au-delà. |
 | **Neo4j** ✅ | Les relations sont stockées comme des pointeurs : un parcours coûte en fonction des voisins visités, pas de la taille de la base. Cypher exprime directement « acheté avec », « compatible avec ». |
 
-**Point d'architecture** : Neo4j n'est pas la source de vérité. Il est alimenté de façon asynchrone à partir du catalogue (MongoDB) et des commandes (Cassandra). Un léger retard sur les recommandations est sans conséquence.
+**Point d'architecture** : Neo4j n'est pas la source de vérité. Il est alimenté de façon asynchrone via Kafka : `catalog-changes` (Change Streams MongoDB) pour le catalogue et `order-events` (émis par le service commandes) pour les commandes, et non depuis Cassandra. Un léger retard sur les recommandations est sans conséquence.
 
 ## 4. Vue d'ensemble : où se place chaque base dans CAP
 
@@ -92,12 +92,12 @@ Cette intuition restait à confronter aux contraintes détaillées et aux altern
 |---|---|---|
 | MongoDB (catalogue) | **CP** par défaut (un primaire par replica set) ; lectures sur secondaires acceptées | Un prix ou une description en retard de quelques secondes est acceptable ; on gagne en débit de lecture. |
 | Redis (panier) | Plutôt **AP** (réplication asynchrone) | Disponibilité et latence priment sur la perte éventuelle d'une écriture. |
-| Cassandra (logs) | **AP**, cohérence réglable par requête (`ONE` pour écrire les logs, `QUORUM` si besoin) | Un clic perdu ou compté en retard ne change pas une statistique sur des millions d'événements. |
+| Cassandra (logs) | **AP**, cohérence réglable par requête (`LOCAL_ONE` pour écrire les logs, `LOCAL_QUORUM` si besoin) | Un clic perdu ou compté en retard ne change pas une statistique sur des millions d'événements. |
 | Neo4j (recos) | **CP** (un seul leader en écriture) | Données dérivées et reconstructibles : la cohérence forte ne coûte rien côté métier. |
 
 ## 5. Ce que nous ne mettons pas en NoSQL
 
-La **prise de commande et le paiement** exigent des transactions ACID (débit du client, décrément du stock, création de la commande : tout ou rien). Ce périmètre n'est pas dans les 4 lots ; nous le laissons dans une base relationnelle. Les commandes validées sont ensuite copiées vers Cassandra (historique) et Neo4j (« achetés ensemble »).
+La **prise de commande et le paiement** exigent des transactions ACID (débit du client, décrément du stock, création de la commande : tout ou rien). Ce périmètre n'est pas dans les 4 lots ; nous le laissons dans une base relationnelle. Les commandes validées sont ensuite publiées sur Kafka (`order-events`) puis copiées vers Cassandra (historique) et Neo4j (« achetés ensemble »).
 
 ## 6. Décision
 
@@ -105,7 +105,7 @@ La **prise de commande et le paiement** exigent des transactions ACID (débit du
 |---|---|---|---|
 | 1. Catalogue | MongoDB | **MongoDB** | Subset pattern pour les avis, Attribute pattern pour les specs |
 | 2. Panier & sessions | Redis | **Redis** | Hash par panier, TTL glissant, AOF pour limiter les pertes |
-| 3. Logs & analytics | Cassandra | **Cassandra** | Partition par jour, agrégats pré-calculés, historique des commandes inclus |
-| 4. Recommandations | Neo4j | **Neo4j** | Alimentation asynchrone depuis MongoDB et Cassandra |
+| 3. Logs & analytics | Cassandra | **Cassandra** | Partition par SKU et `day` en clustering, agrégats pré-calculés, historique des commandes inclus |
+| 4. Recommandations | Neo4j | **Neo4j** | Alimentation asynchrone via Kafka (`catalog-changes`, `order-events`) |
 
 Les quatre intuitions sont confirmées ; l'analyse a surtout fait apparaître les **points de conception** à traiter dans chaque lot.
