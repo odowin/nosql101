@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import { LoginForm } from "@/components/login-form";
 import { RecoSection } from "@/components/reco-section";
 import { SectionHeading } from "@/components/section-heading";
 import { Badge } from "@/components/ui/badge";
@@ -15,14 +15,7 @@ export const metadata: Metadata = { title: "Mes commandes · LDLC NoSQL" };
 
 export default async function OrdersPage() {
   const customer = (await currentSession())?.customer_id;
-  if (!customer)
-    return (
-      <main className="mx-auto flex max-w-sm flex-col gap-4 py-8">
-        <SectionHeading as="h1" title="Mes commandes" />
-        <p className="text-muted-foreground">Connectez-vous pour voir votre historique.</p>
-        <LoginForm />
-      </main>
-    );
+  if (!customer) redirect("/connexion?retour=/commandes");
 
   const orders = await getCustomerOrders(customer);
   return (
