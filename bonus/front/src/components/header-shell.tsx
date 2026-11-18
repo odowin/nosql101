@@ -130,9 +130,11 @@ export function HeaderShell({ customer, count, categories }: { customer?: string
             <Link href="/panier" className={icon}>
               <span className="relative">
                 <ShoppingBag className="size-7 lg:size-8" strokeWidth={1.5} aria-hidden />
-                <span className="tabular absolute -top-1.5 -right-2.5 flex size-5 min-w-5 items-center justify-center rounded-full bg-ldlc-yellow px-1 text-sm leading-none font-bold text-ldlc-strong">
-                  {count}
-                </span>
+                {count > 0 && (
+                  <span aria-hidden className="tabular absolute -top-1.5 -right-2.5 flex size-5 min-w-5 items-center justify-center rounded-full bg-ldlc-yellow px-1 text-sm leading-none font-bold text-ldlc-strong">
+                    {count}
+                  </span>
+                )}
               </span>
               <span className={label}>Panier</span>
               <span className="sr-only">

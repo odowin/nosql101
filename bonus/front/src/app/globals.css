@@ -38,7 +38,7 @@
   --promo: oklch(70% 0.18 48);
   --promo-foreground: oklch(17% 0 0);
   --promo-text: oklch(55% 0.17 42);
-  --success: oklch(52% 0.16 142); /* #32b414 assombri : 5,2:1 sur blanc, 4,5:1 sur #f0f0f0 */
+  --success: oklch(50% 0.16 142); /* #32b414 assombri : AA sur blanc, #f0f0f0 et le bleu pâle #d9eff4 */
   --warning: oklch(52% 0.12 70);
   --tile: oklch(100% 0 0);
   --tile-foreground: var(--ldlc-strong);
