@@ -85,18 +85,18 @@ Script complet, exécutable sur les données de démonstration (valeurs littéra
 - filtrer tôt sur `category`, dénormalisée sur `Product` ;
 - recalculer de nuit les scores lourds.
 
-**Synchronisation.** Neo4j est une **projection** du catalogue, pas une source de vérité.
+**Synchronisation.**
 - *Catalogue* (flux ⑥) : les Change Streams MongoDB (reprise sur `resumeToken`) alimentent `catalog-changes`. Le consommateur fait `MERGE (p:Product {sku})` + `SET`, puis remplace les arêtes `USES/SUPPORTS`.
 - *Commandes* (flux ④) : `MERGE (c)-[:PURCHASED {order_id}]->(p)`. Pour chaque paire de la commande, `MERGE (a)-[w:BOUGHT_WITH]->(b)` avec `a.sku < b.sku` (pas de doublon A→B / B→A), puis `count + 1`, appliqué seulement si `PURCHASED` vient d'être créée (`ON CREATE`). Le consommateur reste ainsi idempotent malgré l'*at-least-once*. Un recalcul complet (batch) pose `count` par `SET` à partir de l'historique, ce qui le rend idempotent par construction.
 
 **CAP.**
 - Écritures : primaires répliquées par **Raft** (CP), un commit exige la majorité.
 - Lectures de recommandations : **read replicas** asynchrones (EL). Les *bookmarks* donnent une cohérence causale (lire ses propres écritures) quand c'est utile.
-- Une recommandation périmée de quelques secondes est sans conséquence. Si Neo4j est indisponible, l'API se replie sur le top ventes Cassandra (`top_products_by_period`) : la page s'affiche toujours.
+- Une recommandation périmée de quelques secondes est sans conséquence. Si Neo4j est indisponible, l'API se replie sur le top des produits consultés (Cassandra, `top_products_by_period`) : la page s'affiche toujours.
 
 | Techno | CAP | PACELC | Réglage retenu | Risque accepté |
 |---|---|---|---|---|
-| Neo4j | CP (Raft) | PC/EC (primaires), EL (replicas) | lectures sur replicas, bookmarks si besoin | recommandations en retard de quelques secondes ; repli sur le top ventes |
+| Neo4j | CP (Raft) | PC/EC (primaires), EL (replicas) | lectures sur replicas, bookmarks si besoin | recommandations en retard de quelques secondes ; repli sur le top des produits consultés |
 
 **RGPD.** `Customer` ne porte qu'un identifiant pseudonyme, aucune donnée personnelle. L'effacement d'un client se fait par `DETACH DELETE`.
 

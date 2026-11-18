@@ -42,7 +42,7 @@ Cette intuition restait à confronter aux contraintes détaillées et aux altern
 **Ce qu'il faudra traiter dans la conception** :
 - les avis clients peuvent croître sans limite (risque de dépasser 16 Mo par document) → garder les N derniers dans la fiche (*Subset pattern*), le reste dans une collection `reviews` ;
 - les attributs variables → *Attribute pattern* (`[{k, v}]`) pour pouvoir les indexer de façon uniforme ;
-- les produits compatibles → références (ID) plutôt qu'embarqués, la relation complète vit dans Neo4j.
+- les produits compatibles → relation N×M qui évolue à chaque nouveau produit : la fiche porte des clés de compatibilité (`compat`) et un petit extrait embarqué pour l'affichage (≤ 5), la relation complète vit dans Neo4j.
 
 ### Lot 2 — Panier et sessions
 
