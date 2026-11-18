@@ -16,7 +16,7 @@ export async function RecoSection({ title, items: load }: { title: string; items
         <ul className="mt-2 divide-y">
           {items.slice(0, 5).map((r) => (
             <li key={r.sku}>
-              <Link href={`/produits/${encodeURIComponent(r.sku)}`} className="flex min-h-11 items-center justify-between gap-3 py-2 text-sm hover:text-primary">
+              <Link href={`/produits/${encodeURIComponent(r.sku)}`} className="flex min-h-11 items-center justify-between gap-3 py-2 text-sm hover:text-link">
                 <span>{r.name}</span>
                 <Price p={r} className="shrink-0 justify-end text-muted-foreground" />
               </Link>

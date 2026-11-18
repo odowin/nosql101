@@ -15,7 +15,7 @@ export function Price({ p, detailed, className }: { p: PriceInfo; detailed?: boo
           {v.was}
         </del>
       )}
-      {v.badge && <Badge variant="destructive" className="self-center">{v.badge}</Badge>}
+      {v.badge && <Badge variant="promo" className="self-center">{v.badge}</Badge>}
       {detailed && v.label && (
         <span className="basis-full text-sm font-normal text-muted-foreground">
           {v.label} · {v.until}

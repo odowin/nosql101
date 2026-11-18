@@ -48,7 +48,7 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
           {order.items.map((i) => (
             <tr key={i.sku}>
               <td className="py-2">
-                <Link href={`/produits/${encodeURIComponent(i.sku)}`} className="hover:text-primary">{i.name}</Link>
+                <Link href={`/produits/${encodeURIComponent(i.sku)}`} className="hover:text-link">{i.name}</Link>
               </td>
               <td className="py-2 text-right">{i.quantity}</td>
               <td className="py-2 text-right">{formatPrice(i.unit_price)}</td>

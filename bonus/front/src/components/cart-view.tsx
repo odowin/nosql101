@@ -42,7 +42,7 @@ export function CartView({ items, loggedIn }: { items: CartLine[]; loggedIn: boo
     return (
       <p className="rounded-xl border border-dashed p-8 text-center text-muted-foreground">
         Votre panier est vide.{" "}
-        <Link href="/produits" className="text-primary underline underline-offset-4">
+        <Link href="/produits" className="text-link underline underline-offset-4">
           Parcourir le catalogue
         </Link>
       </p>
@@ -54,7 +54,7 @@ export function CartView({ items, loggedIn }: { items: CartLine[]; loggedIn: boo
         {lines.map((l) => (
           <li key={l.sku} className="flex flex-wrap items-center gap-3 p-4">
             <div className="min-w-0 flex-1 basis-48">
-              <Link href={`/produits/${encodeURIComponent(l.sku)}`} className="font-medium hover:text-primary">
+              <Link href={`/produits/${encodeURIComponent(l.sku)}`} className="font-medium hover:text-link">
                 {l.name}
               </Link>
               <p className="text-sm text-muted-foreground">

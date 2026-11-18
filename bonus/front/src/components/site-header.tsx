@@ -25,7 +25,7 @@ export async function SiteHeader() {
     <header className="sticky top-0 z-10 border-b bg-background/90 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center gap-1 px-4">
         <Link href="/" className="mr-auto inline-flex min-h-11 items-center text-lg font-bold tracking-tight">
-          LDLC <span className="ml-1 text-primary">NoSQL</span>
+          LDLC <span className="ml-1 text-link">NoSQL</span>
         </Link>
         <nav aria-label="Navigation principale" className="flex items-center">
           {links.map((l) => (

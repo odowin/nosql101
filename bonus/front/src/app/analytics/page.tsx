@@ -48,7 +48,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
             <ol className="mt-2 divide-y text-sm">
               {searches.map((s) => (
                 <li key={s.search_query}>
-                  <Link href={`/produits?q=${encodeURIComponent(s.search_query)}`} className="flex min-h-11 items-center justify-between gap-2 hover:text-primary">
+                  <Link href={`/produits?q=${encodeURIComponent(s.search_query)}`} className="flex min-h-11 items-center justify-between gap-2 hover:text-link">
                     <span>{s.search_query}</span>
                     <span className="tabular text-muted-foreground">{s.searches}</span>
                   </Link>
@@ -122,7 +122,7 @@ function TopTable({ title, data }: { title: string; data: TopProducts | null }) 
         <ol className="mt-2 divide-y text-sm">
           {data.items.map((i) => (
             <li key={i.sku}>
-              <Link href={`/analytics?sku=${encodeURIComponent(i.sku)}`} className="flex min-h-11 items-center gap-2 hover:text-primary">
+              <Link href={`/analytics?sku=${encodeURIComponent(i.sku)}`} className="flex min-h-11 items-center gap-2 hover:text-link">
                 <span className="tabular w-5 text-muted-foreground">{i.rank}</span>
                 <span className="min-w-0 flex-1 truncate">{i.name ?? i.sku}</span>
                 <span className="tabular text-muted-foreground">{i.views}</span>

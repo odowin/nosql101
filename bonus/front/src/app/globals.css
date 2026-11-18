@@ -1,49 +1,37 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (@media (prefers-color-scheme: dark));
+/* Thème sombre unique : `dark:` s'applique toujours. */
+@custom-variant dark (&:where(html, html *));
 
+/* Contrastes vérifiés (WCAG AA) : texte clair / fond 16:1, muted / card ≥ 6:1, blanc / primary 4.8:1, link / fond 7:1. */
 :root {
-  --background: oklch(0.985 0.003 250);
-  --foreground: oklch(0.2 0.02 255);
-  --card: oklch(1 0 0);
-  --card-foreground: var(--foreground);
-  --popover: var(--card);
-  --popover-foreground: var(--foreground);
-  --primary: oklch(0.62 0.19 45);
-  --primary-foreground: oklch(0.99 0.01 60);
-  --secondary: oklch(0.96 0.006 250);
-  --secondary-foreground: oklch(0.25 0.02 255);
-  --muted: oklch(0.96 0.006 250);
-  --muted-foreground: oklch(0.5 0.02 255);
-  --accent: oklch(0.95 0.03 60);
-  --accent-foreground: oklch(0.3 0.05 45);
-  --destructive: oklch(0.55 0.22 27);
-  --border: oklch(0.91 0.008 250);
-  --input: oklch(0.88 0.01 250);
-  --ring: oklch(0.62 0.19 45);
-  --radius: 0.625rem;
-}
-
-@media (prefers-color-scheme: dark) {
-:root {
-  --background: oklch(0.17 0.015 255);
-  --foreground: oklch(0.96 0.005 250);
-  --card: oklch(0.22 0.015 255);
-  --primary: oklch(0.72 0.17 50);
-  --primary-foreground: oklch(0.2 0.03 45);
-  --secondary: oklch(0.27 0.015 255);
-  --secondary-foreground: oklch(0.96 0.005 250);
-  --muted: oklch(0.27 0.015 255);
-  --muted-foreground: oklch(0.72 0.015 250);
-  --accent: oklch(0.3 0.04 50);
-  --accent-foreground: oklch(0.95 0.02 60);
-  --destructive: oklch(0.68 0.2 25);
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 16%);
-  --ring: oklch(0.72 0.17 50);
   color-scheme: dark;
-}
+  --background: oklch(0.22 0 0);
+  --foreground: oklch(0.97 0 0);
+  --header: oklch(0 0 0);
+  --card: oklch(0.27 0 0);
+  --card-foreground: var(--foreground);
+  --popover: oklch(0.26 0 0);
+  --popover-foreground: var(--foreground);
+  --primary: oklch(0.55 0.12 240);
+  --primary-foreground: oklch(1 0 0);
+  --link: oklch(0.75 0.12 240);
+  --promo: oklch(0.7 0.18 48);
+  --promo-foreground: oklch(0.17 0 0);
+  --tile: oklch(1 0 0);
+  --tile-foreground: oklch(0.22 0 0);
+  --secondary: oklch(0.32 0 0);
+  --secondary-foreground: var(--foreground);
+  --muted: oklch(0.3 0 0);
+  --muted-foreground: oklch(0.76 0 0);
+  --accent: oklch(0.32 0.03 240);
+  --accent-foreground: var(--foreground);
+  --destructive: oklch(0.7 0.17 25);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 18%);
+  --ring: oklch(0.75 0.12 240);
+  --radius: 0.625rem;
 }
 
 @theme inline {
@@ -56,6 +44,12 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-header: var(--header);
+  --color-link: var(--link);
+  --color-promo: var(--promo);
+  --color-promo-foreground: var(--promo-foreground);
+  --color-tile: var(--tile);
+  --color-tile-foreground: var(--tile-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -75,13 +69,32 @@
 @layer base {
   * { @apply border-border outline-ring/50; }
   html { font-kerning: normal; }
-  body { @apply bg-background text-foreground font-sans antialiased; line-height: 1.5; }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    line-height: 1.5;
+    /* Texture unique et légère : grille de points carrés, quasi invisible derrière le contenu. */
+    background-image: radial-gradient(oklch(1 0 0 / 4%) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
   h1, h2, h3 { line-height: 1.2; text-wrap: balance; letter-spacing: -0.02em; }
   p { text-wrap: pretty; }
   :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
   .tabular { font-variant-numeric: tabular-nums; }
 }
 
+/* Petites capitales des libellés de navigation : capitales, corps réduit, interlettrage élargi. */
+@utility caps {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 500;
+}
+
+/* Marges latérales qui respectent encoches et coins arrondis. */
+@utility px-safe {
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
+}
+
 @media (prefers-reduced-motion: reduce) {
-  *, ::before, ::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+  *, ::before, ::after { animation-duration: 0.01ms !important; animation-delay: 0ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }

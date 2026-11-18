@@ -71,7 +71,7 @@ export default async function ProductPage({ params, searchParams }: Props) {
           <h1 className="mt-1 text-3xl font-bold">{p.name}</h1>
           <p className="mt-2 flex flex-wrap items-center gap-2 text-sm">
             <span className="tabular inline-flex items-center gap-1">
-              <Star className="size-4 fill-current text-primary" aria-hidden />
+              <Star className="size-4 fill-current text-promo" aria-hidden />
               {p.rating.count ? `${p.rating.avg.toFixed(1)} / 5 (${p.rating.count} avis)` : "Pas encore d'avis"}
             </span>
             <Badge variant="outline">MongoDB · cache Redis</Badge>
@@ -133,7 +133,7 @@ export default async function ProductPage({ params, searchParams }: Props) {
             {reviews.items.map((r) => (
               <li key={r._id} className="border-b pb-4">
                 <p className="tabular text-sm">
-                  <span className="font-semibold text-primary" aria-label={`Note ${r.rating} sur 5`}>
+                  <span className="font-semibold text-link" aria-label={`Note ${r.rating} sur 5`}>
                     {"★".repeat(r.rating)}
                     <span className="text-muted-foreground">{"★".repeat(5 - r.rating)}</span>
                   </span>{" "}

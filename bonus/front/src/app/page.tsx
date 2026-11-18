@@ -34,7 +34,7 @@ export default async function Home() {
         <section aria-labelledby="promos">
           <h2 id="promos" className="flex flex-wrap items-center gap-2 text-xl font-semibold">
             Promos en cours <Badge variant="outline">MongoDB</Badge>
-            <Link href="/produits?on_sale=true" className="ml-auto text-sm font-normal text-primary underline-offset-4 hover:underline">
+            <Link href="/produits?on_sale=true" className="ml-auto text-sm font-normal text-link underline-offset-4 hover:underline">
               Toutes les promos
             </Link>
           </h2>
@@ -58,7 +58,7 @@ export default async function Home() {
                 {l.title}
               </Link>
               <p className="text-sm text-muted-foreground">{l.text}</p>
-              <ArrowRight className="mt-auto size-4 text-primary" aria-hidden />
+              <ArrowRight className="mt-auto size-4 text-link" aria-hidden />
             </li>
           ))}
         </ul>
@@ -76,7 +76,7 @@ export default async function Home() {
           <ol className="mt-2 divide-y">
             {top.items.map((i) => (
               <li key={i.sku}>
-                <Link href={`/produits/${encodeURIComponent(i.sku)}`} className="flex min-h-11 items-center gap-3 hover:text-primary">
+                <Link href={`/produits/${encodeURIComponent(i.sku)}`} className="flex min-h-11 items-center gap-3 hover:text-link">
                   <span className="tabular w-5 text-muted-foreground">{i.rank}</span>
                   <span className="min-w-0 flex-1 truncate">{i.name ?? i.sku}</span>
                   <span className="tabular text-sm text-muted-foreground">
