@@ -1,12 +1,18 @@
 import "server-only";
 import { cookies } from "next/headers";
-import { ApiError, createSession } from "./api/client";
+import { ApiError, createSession, getSession } from "./api/client";
 
 const COOKIE = "sid";
 
 /** Lecture seule, utilisable dans un Server Component (qui ne peut pas écrire de cookie). */
 export async function readSessionId(): Promise<string | undefined> {
   return (await cookies()).get(COOKIE)?.value;
+}
+
+/** Session courante pour un Server Component, ou undefined (pas de cookie, expirée, API absente). */
+export async function currentSession() {
+  const sid = await readSessionId();
+  return sid ? getSession(sid).catch(() => undefined) : undefined;
 }
 
 /** Crée une session API et pose le cookie. Server Action ou route handler uniquement. */

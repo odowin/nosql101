@@ -85,5 +85,7 @@ export const getTopSearches = (limit = 10) =>
   call<T.TopSearch[]>(api.GET("/analytics/top-searches", { params: { query: { limit } }, ...live }));
 export const getDailyViews = (sku: string, days = 7) =>
   call<T.DailyViews>(api.GET("/analytics/products/{sku}/views/daily", { params: { path: { sku }, query: { days } }, ...live }));
+export const getOrder = (order_id: string) =>
+  call<T.Order>(api.GET("/orders/{order_id}", { params: { path: { order_id } }, ...live }));
 export const getCustomerOrders = (customer_id: string) =>
   call<T.Order[]>(api.GET("/customers/{customer_id}/orders", { params: { path: { customer_id } }, ...live }));
