@@ -22,7 +22,19 @@ Flux ② de l'[architecture globale](../../architecture/README.md) : API → Red
 
 ## Schéma de données
 
-_À compléter._
+**Modèle de clés (contrat).**
+
+| Clé | Type | TTL | Contenu |
+|---|---|---|---|
+| `session:{sid}` | Hash | 1 800 s glissant | `customer_id` ("" si anonyme), `cart_id`, `created_at`, `last_seen` |
+| `cart:{cart_id}` | Hash | 7 j anonyme / 30 j client, glissant | champ = SKU, valeur = quantité |
+| `product:{sku}` | String (JSON) | 300 s | cache-aside fiche produit |
+
+`cart_id` = `anon:{uuid4 hex}` ou `customer:{customer_id}`. Le panier d'un client connecté est donc indexé par client : il le retrouve sur un autre appareil.
+
+**Hash plutôt que JSON.** `HINCRBY` modifie une ligne en O(1) sans lire-modifier-réécrire tout le panier, donc sans course entre deux onglets. Les petits Hash sont encodés en *listpack*, très compacts. Le produit en cache reste une String JSON, parce qu'il est toujours lu et écrit d'un bloc.
+
+**TTL glissant.** Chaque accès repose `EXPIRE` : la session meurt après 30 min d'inactivité, le panier après 7 ou 30 jours. Aucun job de purge n'est nécessaire.
 
 ## Requêtes types
 
