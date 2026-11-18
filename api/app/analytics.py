@@ -71,7 +71,7 @@ class Event(BaseModel):
 
 @router.post("/events", status_code=202)
 def post_event(e: Event):
-    """Collecte un événement (écritures `ONE`) et met à jour les compteurs."""
+    """Collecte un événement (écritures `LOCAL_ONE`) et met à jour les compteurs."""
     if e.event_type == EventType.product_view and not e.sku:
         raise HTTPException(422, "sku requis pour product_view")
     if e.event_type == EventType.search and not e.search_query:
@@ -79,7 +79,7 @@ def post_event(e: Event):
     event_id = uuid.uuid1()
     now = datetime.now(timezone.utc)
     day = now.date()
-    one = ConsistencyLevel.ONE
+    one = ConsistencyLevel.LOCAL_ONE
     _run("INSERT INTO events_by_hour (day, hour, shard, event_id, event_type, session_id, customer_id, sku, url, search_query) "
          "VALUES (?,?,?,?,?,?,?,?,?,?)",
          (day, now.hour, shard_of(e.session_id), event_id, e.event_type.value, e.session_id,
@@ -189,7 +189,7 @@ def order_detail(order_id: str):
 
 
 def record_order(order: dict):
-    """Écrit une commande dans les 2 tables (BATCH loggé, QUORUM).
+    """Écrit une commande dans les 2 tables (BATCH loggé, LOCAL_QUORUM).
 
     order : customer_id, order_id, order_date (datetime UTC), status, total, items[{sku, name, quantity, unit_price}].
     """
@@ -197,7 +197,7 @@ def record_order(order: dict):
     vals = (order["order_id"], order["customer_id"], order["order_date"], order["status"],
             Decimal(str(order["total"])), items)
     cql = "INSERT INTO {} (order_id, customer_id, order_date, status, total, items) VALUES (?,?,?,?,?,?)"
-    batch = BatchStatement(BatchType.LOGGED, consistency_level=ConsistencyLevel.QUORUM)
+    batch = BatchStatement(BatchType.LOGGED, consistency_level=ConsistencyLevel.LOCAL_QUORUM)
     batch.add(prepared(cql.format("orders_by_customer")), vals)
     batch.add(prepared(cql.format("orders_by_id")), vals)
     cassandra_session().execute(batch)
