@@ -2,6 +2,12 @@
 
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), versions selon [SemVer](https://semver.org/lang/fr/).
 
+## [Non publié]
+
+### Ajouté
+
+- Front Next.js (`front/`) : catalogue, fiche produit, panier optimiste, commandes, analytics ; service `front` dans `docker-compose.yml` (port 3000).
+
 ## [1.0.1] — 2026-11-18
 
 Relecture de cohérence entre les documents après la restructuration par lot (#13).
