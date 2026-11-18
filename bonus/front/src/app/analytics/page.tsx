@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
+import { Breadcrumb } from "@/components/breadcrumb";
+import { SectionHeading } from "@/components/section-heading";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getDailyViews, getTopProducts, getTopSearches } from "@/lib/api/client";
@@ -25,21 +26,21 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
   const max = Math.max(1, ...(series ?? []).map((d) => d.views));
 
   return (
-    <main className="flex flex-col gap-8">
-      <header>
-        <h1 className="flex items-center gap-2 text-3xl font-bold">
-          Analytics <Badge variant="outline">Cassandra</Badge>
-        </h1>
-        <p className="mt-1 max-w-[65ch] text-muted-foreground">
-          Compteurs de vues et de recherches agrégés par jour, alimentés par les événements de navigation.
-        </p>
-      </header>
+    <main>
+      <Breadcrumb items={[{ label: "Meilleures ventes et analytics" }]} />
+      <SectionHeading
+        as="h1"
+        inner
+        title="Meilleures ventes"
+        sub="Compteurs de vues et de recherches agrégés par jour dans Cassandra, alimentés par la navigation."
+      />
 
-      <div className="grid gap-4 md:grid-cols-3">
+      {/* Les blocs gardent leurs 30 px de marge basse ; seule la gouttière horizontale vient de la grille. */}
+      <div className="stagger grid md:grid-cols-3 md:gap-x-[30px]">
         <TopTable title="Top produits du jour" data={today} />
         <TopTable title="Top produits de la semaine" data={week} />
-        <section className="rounded-xl bg-card p-4 ring-1 ring-foreground/10">
-          <h2 className="font-semibold">Top recherches du jour</h2>
+        <section className="bloc min-w-0">
+          <h2 className="caps text-sm font-bold text-primary">Top recherches du jour</h2>
           {!searches ? (
             <Unavailable />
           ) : searches.length === 0 ? (
@@ -48,7 +49,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
             <ol className="mt-2 divide-y text-sm">
               {searches.map((s) => (
                 <li key={s.search_query}>
-                  <Link href={`/produits?q=${encodeURIComponent(s.search_query)}`} className="flex min-h-11 items-center justify-between gap-2 hover:text-primary">
+                  <Link href={`/produits?q=${encodeURIComponent(s.search_query)}`} className="flex min-h-11 items-center justify-between gap-2 hover:text-link">
                     <span>{s.search_query}</span>
                     <span className="tabular text-muted-foreground">{s.searches}</span>
                   </Link>
@@ -59,8 +60,8 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
         </section>
       </div>
 
-      <section aria-labelledby="daily" className="rounded-xl bg-card p-4 ring-1 ring-foreground/10">
-        <h2 id="daily" className="font-semibold">Vues quotidiennes d&apos;un produit</h2>
+      <section aria-labelledby="daily" className="bloc">
+        <h2 id="daily" className="caps text-sm font-bold text-primary">Vues quotidiennes d&apos;un produit</h2>
         <form action="/analytics" className="mt-3 flex flex-wrap items-end gap-2">
           <label className="flex flex-col gap-1.5 text-sm font-medium">
             SKU
@@ -68,7 +69,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
           </label>
           <label className="flex flex-col gap-1.5 text-sm font-medium">
             Période
-            <select name="days" defaultValue={days} className="h-11 rounded-lg border border-input bg-transparent px-2">
+            <select name="days" defaultValue={days} className="h-11 rounded-lg border border-input bg-white pr-9 pl-3">
               {PERIODS.map((d) => (
                 <option key={d} value={d}>
                   {d} jours
@@ -76,7 +77,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
               ))}
             </select>
           </label>
-          <Button type="submit" className="min-h-11 px-4">
+          <Button type="submit" variant="navy" size="pill">
             Afficher
           </Button>
         </form>
@@ -112,8 +113,8 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
 
 function TopTable({ title, data }: { title: string; data: TopProducts | null }) {
   return (
-    <section className="rounded-xl bg-card p-4 ring-1 ring-foreground/10">
-      <h2 className="font-semibold">{title}</h2>
+    <section className="bloc min-w-0">
+      <h2 className="caps text-sm font-bold text-primary">{title}</h2>
       {!data ? (
         <Unavailable />
       ) : data.items.length === 0 ? (
@@ -122,8 +123,8 @@ function TopTable({ title, data }: { title: string; data: TopProducts | null }) 
         <ol className="mt-2 divide-y text-sm">
           {data.items.map((i) => (
             <li key={i.sku}>
-              <Link href={`/analytics?sku=${encodeURIComponent(i.sku)}`} className="flex min-h-11 items-center gap-2 hover:text-primary">
-                <span className="tabular w-5 text-muted-foreground">{i.rank}</span>
+              <Link href={`/analytics?sku=${encodeURIComponent(i.sku)}`} className="flex min-h-11 items-center gap-2 hover:text-link">
+                <span className="tabular w-5 font-bold text-promo-text">{i.rank}</span>
                 <span className="min-w-0 flex-1 truncate">{i.name ?? i.sku}</span>
                 <span className="tabular text-muted-foreground">{i.views}</span>
               </Link>

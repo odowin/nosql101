@@ -32,7 +32,7 @@
           "Lot 1 — Catalogue (MongoDB)"
         ],
         "summary": "List Products",
-        "description": "Liste filtrée (projection légère : sans specs ni avis). `min_price`/`max_price` portent sur le prix de référence.",
+        "description": "Liste filtrée et triée (projection légère : sans specs ni avis). `min_price`/`max_price` portent sur le prix de référence.",
         "operationId": "list_products_products_get",
         "parameters": [
           {
@@ -56,16 +56,15 @@
             "in": "query",
             "required": false,
             "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Marque, répétable (l'une ou l'autre)",
+              "default": [],
               "title": "Brand"
-            }
+            },
+            "description": "Marque, répétable (l'une ou l'autre)"
           },
           {
             "name": "q",
@@ -149,6 +148,43 @@
               "title": "On Sale"
             },
             "description": "Seulement les promos en cours"
+          },
+          {
+            "name": "in_stock",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Seulement les produits expédiables (en stock ou stock faible)",
+              "default": false,
+              "title": "In Stock"
+            },
+            "description": "Seulement les produits expédiables (en stock ou stock faible)"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "price_asc",
+                    "price_desc",
+                    "name",
+                    "rating",
+                    "discount"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Tri ; par défaut par SKU. Les tris prix et remise portent sur le prix effectif",
+              "title": "Sort"
+            },
+            "description": "Tri ; par défaut par SKU. Les tris prix et remise portent sur le prix effectif"
           },
           {
             "name": "limit",

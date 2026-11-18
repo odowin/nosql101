@@ -1,6 +1,6 @@
 import "server-only";
 import { cookies } from "next/headers";
-import { ApiError, createSession, getSession } from "./api/client";
+import { ApiError, createSession, deleteSession, getSession } from "./api/client";
 
 const COOKIE = "sid";
 
@@ -46,4 +46,13 @@ export async function withSession<R>(fn: (sid: string) => Promise<R>): Promise<R
     if (!isSessionExpired(e)) throw e;
     return fn(await newSessionId());
   }
+}
+
+/** Déconnexion : supprime la session Redis puis le cookie. Server Action uniquement. */
+export async function endSession(): Promise<void> {
+  const jar = await cookies();
+  const sid = jar.get(COOKIE)?.value;
+  // API absente : la session Redis expirera seule (TTL 30 min), la déconnexion locale suffit.
+  if (sid) await deleteSession(sid).catch(() => {});
+  jar.delete(COOKIE);
 }
