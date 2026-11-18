@@ -2,11 +2,43 @@
 
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), versions selon [SemVer](https://semver.org/lang/fr/).
 
-## [Non publié]
+## [1.2.0] — 2026-11-18
+
+Front Next.js du prototype et promotions sur le catalogue (#18, #19).
 
 ### Ajouté
 
-- Front Next.js (`bonus/front/`) : catalogue, fiche produit, panier optimiste, commandes, analytics ; service `front` dans `docker-compose.yml` (port 3000).
+- **Front Next.js** ([bonus/front/README.md](bonus/front/README.md)) : service `front` dans [docker-compose.yml](docker-compose.yml) sur `http://localhost:3000`, qui consomme uniquement l'API.
+  - Lot 1 : catalogue à facettes (filtres dans l'URL), fiche produit, avis.
+  - Lot 2 : session en cookie httpOnly, panier optimiste avec retour arrière, connexion client et fusion du panier, commande.
+  - Lot 3 : vues du jour, top produits et recherches, vues quotidiennes, historique des commandes.
+  - Lot 4 : recommandations compatibles, achetés ensemble, ont aussi acheté, similaires, personnalisées.
+  - Stack : Next.js 16.4, React 19.3, TypeScript, Tailwind 4, shadcn ; types générés depuis l'OpenAPI de l'API.
+- **Promotions** (#19), réintroduites depuis la première version du Lot 1 :
+  - [Lot 1](docs/conception/lot1-catalogue-produits.md) : sous-document `promo` embarqué (pourcentage ou prix fixe, période `[starts_at, ends_at)`), validateur `oneOf`, index partiel `promo.ends_at`, requête « promos en cours » ([db/mongodb/](db/mongodb/)).
+  - API : prix effectif calculé à la lecture (exact malgré le cache Redis) et recalculé au paiement, filtre `GET /products?on_sale=true`, promos dans le jeu de démonstration.
+  - Front : prix barré, badge de remise, filtre « En promo », section « Promos en cours ».
+
+### Corrigé
+
+- Healthcheck du conteneur `front` en IPv4 (`127.0.0.1`).
+
+## [1.1.0] — 2026-11-18
+
+Ajout du prototype d'API (bonus) qui implémente les 4 lots (#16).
+
+### Ajouté
+
+- **Prototype d'API FastAPI** ([api/README.md](api/README.md)) : service `api` dans [docker-compose.yml](docker-compose.yml), Swagger sur `http://localhost:8000/docs`.
+  - Lot 1 : catalogue MongoDB (facettes, fiche avec cache-aside Redis, création libre de produit, avis subset + computed).
+  - Lot 2 : sessions et panier Redis (TTL glissant, fusion au login).
+  - Lot 3 : événements, compteurs, top produits, top recherches, historique des commandes (Cassandra).
+  - Lot 4 : recommandations Neo4j ; la validation du panier écrit dans Cassandra et Neo4j.
+- Jeu de démonstration ([api/data/catalog.json](api/data/catalog.json)) chargé par un seed idempotent ; 34 tests pytest exécutés contre la stack.
+
+### Corrigé
+
+- [db/mongodb/init.js](db/mongodb/init.js) et [Lot 1](docs/conception/lot1-catalogue-produits.md) : le validateur accepte les attributs multi-valués (tableaux dans `specs.v`, ex. `sockets`, `supported_form_factors`).
 
 ## [1.0.1] — 2026-11-18
 
@@ -46,7 +78,9 @@ Première version rendue : architecture de données NoSQL de la refonte LDLC (pe
 
 ### Non inclus
 
-- Prototype d'API (bonus) : `api/` vide.
+- Prototype d'API (bonus) : `api/` vide (ajouté en 1.1.0).
 
+[1.2.0]: https://github.com/odowin/nosql101/releases/tag/v1.2.0
+[1.1.0]: https://github.com/odowin/nosql101/releases/tag/v1.1.0
 [1.0.1]: https://github.com/odowin/nosql101/releases/tag/v1.0.1
 [1.0.0]: https://github.com/odowin/nosql101/releases/tag/v1.0.0
