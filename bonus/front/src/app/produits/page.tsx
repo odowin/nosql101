@@ -72,7 +72,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: Prom
         </label>
         <label className={field}>
           Catégorie
-          <select name="category" defaultValue={query.category ?? ""} className={cn(control, "rounded-lg border border-input bg-transparent px-2")}>
+          <select name="category" defaultValue={query.category ?? ""} className={cn(control, "rounded-lg border border-input bg-transparent pl-3 pr-9")}>
             <option value="">Toutes</option>
             {flatten(categories).map((c) => (
               <option key={c.id} value={c.id}>
@@ -83,7 +83,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: Prom
         </label>
         <label className={field}>
           Marque
-          <select name="brand" defaultValue={query.brand ?? ""} className={cn(control, "rounded-lg border border-input bg-transparent px-2")}>
+          <select name="brand" defaultValue={query.brand ?? ""} className={cn(control, "rounded-lg border border-input bg-transparent pl-3 pr-9")}>
             <option value="">Toutes</option>
             {[...brands].map(([id, name]) => (
               <option key={id} value={id}>

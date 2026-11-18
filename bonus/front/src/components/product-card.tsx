@@ -18,7 +18,7 @@ export function ProductCard({ p }: { p: ProductSummary }) {
       </Link>
       <div className="mt-auto flex items-end justify-between gap-2 pt-2">
         <Price p={p} className="text-lg" />
-        <span className="tabular inline-flex items-center gap-1 text-sm text-muted-foreground">
+        <span className="tabular inline-flex shrink-0 items-center gap-1 text-sm whitespace-nowrap text-muted-foreground">
           <Star className="size-4 fill-current text-promo" aria-hidden />
           <span className="sr-only">Note</span>
           {p.rating.count ? `${p.rating.avg.toFixed(1)} (${p.rating.count})` : "—"}

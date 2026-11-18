@@ -66,7 +66,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
           </label>
           <label className="flex flex-col gap-1.5 text-sm font-medium">
             Période
-            <select name="days" defaultValue={days} className="h-11 rounded-lg border border-input bg-transparent px-2">
+            <select name="days" defaultValue={days} className="h-11 rounded-lg border border-input bg-transparent pl-3 pr-9">
               {PERIODS.map((d) => (
                 <option key={d} value={d}>
                   {d} jours

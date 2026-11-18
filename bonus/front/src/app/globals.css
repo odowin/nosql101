@@ -73,7 +73,7 @@
 }
 
 @layer base {
-  * { @apply border-border outline-ring/50; }
+  * { @apply border-border outline-ring; }
   html { font-kerning: normal; }
   body {
     @apply bg-background text-foreground font-sans antialiased;
@@ -86,6 +86,13 @@
   p { text-wrap: pretty; }
   :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
   .tabular { font-variant-numeric: tabular-nums; }
+  /* Flèche native collée au bord sous Chrome : chevron dessiné, la marge droite vient de pr-9. */
+  select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23c4c4c4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+  }
 }
 
 /* Petites capitales des libellés de navigation : capitales, corps réduit, interlettrage élargi. */
