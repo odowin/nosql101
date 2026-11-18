@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="995px" height="606px" viewBox="-0.5 -0.5 995 606" content='&lt;mxfile host="app.diagrams.net"&gt;&lt;diagram id="archi-globale" name="Architecture globale"&gt;&lt;mxGraphModel dx="1000" dy="650" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0"&gt;&lt;root&gt;&lt;mxCell id="0"/&gt;&lt;mxCell id="1" parent="0"/&gt;&lt;mxCell id="client" value="&amp;lt;b&amp;gt;Clients&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;navigateur · app mobile" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1"&gt;&lt;mxGeometry x="395" y="20" width="200" height="44" as="geometry"/&gt;&lt;/mxCell&gt;&lt;mxCell id="lb" value="&amp;lt;b&amp;gt;Load balancer&amp;lt;/b&amp;gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" vertex="1" parent="1"&gt;&lt;mxGeometry x="395" y="94" width="200" height="40" as="geometry"/&gt;&lt;/mxCell&gt;&lt;mxCell id="web" value="&amp;lt;b&amp;gt;Serveurs web ×N&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;sans état (stateless)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"&gt;&lt;mxGeometry x="370" y="164" width="250" height="44" as="geometry"/&gt;&lt;/mxCell&gt;&lt;mxCell id="api" value="&amp;lt;b&amp;gt;API / services métier&amp;lt;/b&amp;gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"&gt;&lt;mxGeometry x="370" y="238" width="250" height="44" as="geometry"/&gt;&lt;/mxCell&gt;&lt;mxCell id="mongo" value="&amp;lt;b&amp;gt;MongoDB&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;Lot 1 — Catalogue&amp;lt;br&amp;gt;Document · CP&amp;lt;br&amp;gt;replica set,&amp;lt;br&amp;gt;lectures sur secondaires" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"&gt;&lt;mxGeometry x="20" y="360" width="175" height="112" as="geometry"/&gt;&lt;/mxCell&gt;&lt;mxCell id="redis" value="&amp;lt;b&amp;gt;Redis&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;Lot 2 — Panier &amp;amp; sessions&amp;lt;br&amp;gt;Clé-valeur en mémoire&amp;lt;br&amp;gt;TTL · &amp;lt; 1 ms&amp;lt;br&amp;gt;partagé entre serveurs" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1"&gt;&lt;mxGeometry x="215" y="360" width="175" height="112" as="geometry"/&gt;&lt;/mxCell&gt;&lt;mxCell id="cass" value="&amp;lt;b&amp;gt;Cassandra&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;Lot 3 — Logs &amp;amp; analytics&amp;lt;br&amp;gt;Colonnes · AP&amp;lt;br&amp;gt;écritures massives,&amp;lt;br&amp;gt;rétention par TTL" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1"&gt;&lt;mxGeometry x="410" y="360" width="175" height="112" as="geometry"/&gt;&lt;/mxCell&gt;&lt;mxCell id="neo" value="&amp;lt;b&amp;gt;Neo4j&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;Lot 4 — Recommandations&amp;lt;br&amp;gt;Graphe · CP&amp;lt;br&amp;gt;données dérivées,&amp;lt;br&amp;gt;reconstructibles" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1"&gt;&lt;mxGeometry x="605" y="360" width="175" height="112" as="geometry"/&gt;&lt;/mxCell&gt;&lt;mxCell id="sql" value="&amp;lt;b&amp;gt;SGBDR existant&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;Commandes &amp;amp; paiement&amp;lt;br&amp;gt;ACID&amp;lt;br&amp;gt;hors périmètre&amp;lt;br&amp;gt;des 4 lots" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#999999;dashed=1;" vertex="1" parent="1"&gt;&lt;mxGeometry x="800" y="360" width="175" height="112" as="geometry"/&gt;&lt;/mxCell&gt;&lt;mxCell id="jobs" value="&amp;lt;b&amp;gt;Traitements asynchrones&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;change streams MongoDB · jobs Spark batch · export des commandes" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;dashed=1;" vertex="1" parent="1"&gt;&lt;mxGeometry x="20" y="540" width="955" height="46" as="geometry"/&gt;&lt;/mxCell&gt;&lt;mxCell id="e1" value="" style="html=1;endArrow=block;endFill=1;edgeStyle=none;" edge="1" parent="1" source="client" target="lb"&gt;&lt;mxGeometry relative="1" as="geometry"&gt;&lt;mxPoint x="495" y="64" as="sourcePoint"/&gt;&lt;mxPoint x="495" y="94" as="targetPoint"/&gt;&lt;/mxGeometry&gt;&lt;/mxCell&gt;&lt;mxCell id="e2" value="" style="html=1;endArrow=block;endFill=1;edgeStyle=none;" edge="1" parent="1" source="lb" target="web"&gt;&lt;mxGeometry relative="1" as="geometry"&gt;&lt;mxPoint x="495" y="134" as="sourcePoint"/&gt;&lt;mxPoint x="495" y="164" as="targetPoint"/&gt;&lt;/mxGeometry&gt;&lt;/mxCell&gt;&lt;mxCell id="e3" value="" style="html=1;endArrow=block;endFill=1;edgeStyle=none;" edge="1" parent="1" source="web" target="api"&gt;&lt;mxGeometry relative="1" as="geometry"&gt;&lt;mxPoint x="495" y="208" as="sourcePoint"/&gt;&lt;mxPoint x="495" y="238" as="targetPoint"/&gt;&lt;/mxGeometry&gt;&lt;/mxCell&gt;&lt;mxCell id="e4" value="" style="html=1;endArrow=block;endFill=1;edgeStyle=none;" edge="1" parent="1" source="api" target="mongo"&gt;&lt;mxGeometry relative="1" as="geometry"&gt;&lt;mxPoint x="495" y="282" as="sourcePoint"/&gt;&lt;mxPoint x="107" y="360" as="targetPoint"/&gt;&lt;/mxGeometry&gt;&lt;/mxCell&gt;&lt;mxCell id="e5" value="" style="html=1;endArrow=block;endFill=1;edgeStyle=none;" edge="1" parent="1" source="api" target="redis"&gt;&lt;mxGeometry relative="1" as="geometry"&gt;&lt;mxPoint x="495" y="282" as="sourcePoint"/&gt;&lt;mxPoint x="302" y="360" as="targetPoint"/&gt;&lt;/mxGeometry&gt;&lt;/mxCell&gt;&lt;mxCell id="e6" value="" style="html=1;endArrow=block;endFill=1;edgeStyle=none;" edge="1" parent="1" source="api" target="cass"&gt;&lt;mxGeometry relative="1" as="geometry"&gt;&lt;mxPoint x="495" y="282" as="sourcePoint"/&gt;&lt;mxPoint x="497" y="360" as="targetPoint"/&gt;&lt;/mxGeometry&gt;&lt;/mxCell&gt;&lt;mxCell id="e7" value="" style="html=1;endArrow=block;endFill=1;edgeStyle=none;" edge="1" parent="1" source="api" target="neo"&gt;&lt;mxGeometry relative="1" as="geometry"&gt;&lt;mxPoint x="495" y="282" as="sourcePoint"/&gt;&lt;mxPoint x="692" y="360" as="targetPoint"/&gt;&lt;/mxGeometry&gt;&lt;/mxCell&gt;&lt;mxCell id="e8" value="" style="html=1;endArrow=block;endFill=1;edgeStyle=none;" edge="1" parent="1" source="api" target="sql"&gt;&lt;mxGeometry relative="1" as="geometry"&gt;&lt;mxPoint x="495" y="282" as="sourcePoint"/&gt;&lt;mxPoint x="887" y="360" as="targetPoint"/&gt;&lt;/mxGeometry&gt;&lt;/mxCell&gt;&lt;mxCell id="j1" value="catalogue" style="html=1;endArrow=block;endFill=1;edgeStyle=none;dashed=1;" edge="1" parent="1" source="mongo" target="jobs"&gt;&lt;mxGeometry relative="1" as="geometry"&gt;&lt;mxPoint x="107" y="472" as="sourcePoint"/&gt;&lt;mxPoint x="107" y="540" as="targetPoint"/&gt;&lt;/mxGeometry&gt;&lt;/mxCell&gt;&lt;mxCell id="j2" value="commandes" style="html=1;endArrow=block;endFill=1;edgeStyle=none;dashed=1;" edge="1" parent="1" source="sql" target="jobs"&gt;&lt;mxGeometry relative="1" as="geometry"&gt;&lt;mxPoint x="887" y="472" as="sourcePoint"/&gt;&lt;mxPoint x="887" y="540" as="targetPoint"/&gt;&lt;/mxGeometry&gt;&lt;/mxCell&gt;&lt;mxCell id="j3" value="agrégats + historique" style="html=1;endArrow=block;endFill=1;edgeStyle=none;dashed=1;" edge="1" parent="1" source="jobs" target="cass"&gt;&lt;mxGeometry relative="1" as="geometry"&gt;&lt;mxPoint x="497" y="540" as="sourcePoint"/&gt;&lt;mxPoint x="497" y="472" as="targetPoint"/&gt;&lt;/mxGeometry&gt;&lt;/mxCell&gt;&lt;mxCell id="j4" value="graphe" style="html=1;endArrow=block;endFill=1;edgeStyle=none;dashed=1;" edge="1" parent="1" source="jobs" target="neo"&gt;&lt;mxGeometry relative="1" as="geometry"&gt;&lt;mxPoint x="692" y="540" as="sourcePoint"/&gt;&lt;mxPoint x="692" y="472" as="targetPoint"/&gt;&lt;/mxGeometry&gt;&lt;/mxCell&gt;&lt;/root&gt;&lt;/mxGraphModel&gt;&lt;/diagram&gt;&lt;/mxfile&gt;'>
+<defs/>
+<rect x="0" y="0" width="995" height="606" fill="#ffffff"/>
+<g font-family="Helvetica, Arial, sans-serif" text-anchor="middle">
+<path d="M 495 64 L 495.0 85.0" fill="none" stroke="#333333"/>
+<path d="M 495 94 L 491.0 85.0 L 499.0 85.0 Z" fill="#333333"/>
+<path d="M 495 134 L 495.0 155.0" fill="none" stroke="#333333"/>
+<path d="M 495 164 L 491.0 155.0 L 499.0 155.0 Z" fill="#333333"/>
+<path d="M 495 208 L 495.0 229.0" fill="none" stroke="#333333"/>
+<path d="M 495 238 L 491.0 229.0 L 499.0 229.0 Z" fill="#333333"/>
+<path d="M 495 282 L 115.8 358.2" fill="none" stroke="#333333"/>
+<path d="M 107 360 L 115.0 354.3 L 116.6 362.1 Z" fill="#333333"/>
+<path d="M 495 282 L 310.3 356.6" fill="none" stroke="#333333"/>
+<path d="M 302 360 L 308.8 352.9 L 311.8 360.3 Z" fill="#333333"/>
+<path d="M 495 282 L 496.8 351.0" fill="none" stroke="#333333"/>
+<path d="M 497 360 L 492.8 351.1 L 500.8 350.9 Z" fill="#333333"/>
+<path d="M 495 282 L 683.6 356.7" fill="none" stroke="#333333"/>
+<path d="M 692 360 L 682.2 360.4 L 685.1 353.0 Z" fill="#333333"/>
+<path d="M 495 282 L 878.2 358.2" fill="none" stroke="#333333"/>
+<path d="M 887 360 L 877.4 362.2 L 879.0 354.3 Z" fill="#333333"/>
+<path d="M 107 472 L 107.0 531.0" fill="none" stroke="#333333" stroke-dasharray="6 4"/>
+<path d="M 107 540 L 103.0 531.0 L 111.0 531.0 Z" fill="#333333"/>
+<rect x="76.0" y="498.0" width="62" height="16" fill="#ffffff"/>
+<text x="107.0" y="510.0" font-size="11" fill="#333333">catalogue</text>
+<path d="M 887 472 L 887.0 531.0" fill="none" stroke="#333333" stroke-dasharray="6 4"/>
+<path d="M 887 540 L 883.0 531.0 L 891.0 531.0 Z" fill="#333333"/>
+<rect x="856.0" y="498.0" width="62" height="16" fill="#ffffff"/>
+<text x="887.0" y="510.0" font-size="11" fill="#333333">commandes</text>
+<path d="M 497 540 L 497.0 481.0" fill="none" stroke="#333333" stroke-dasharray="6 4"/>
+<path d="M 497 472 L 501.0 481.0 L 493.0 481.0 Z" fill="#333333"/>
+<rect x="430.0" y="498.0" width="134" height="16" fill="#ffffff"/>
+<text x="497.0" y="510.0" font-size="11" fill="#333333">agrégats + historique</text>
+<path d="M 692 540 L 692.0 481.0" fill="none" stroke="#333333" stroke-dasharray="6 4"/>
+<path d="M 692 472 L 696.0 481.0 L 688.0 481.0 Z" fill="#333333"/>
+<rect x="670.0" y="498.0" width="44" height="16" fill="#ffffff"/>
+<text x="692.0" y="510.0" font-size="11" fill="#333333">graphe</text>
+<rect x="395" y="20" width="200" height="44" rx="8" ry="8" fill="#f5f5f5" stroke="#666666"/>
+<text x="495.0" y="38.0" font-size="14" font-weight="bold" fill="#000000">Clients</text>
+<text x="495.0" y="54.0" font-size="11.5" fill="#000000">navigateur · app mobile</text>
+<rect x="395" y="94" width="200" height="40" rx="8" ry="8" fill="#f5f5f5" stroke="#666666"/>
+<text x="495.0" y="118.0" font-size="14" font-weight="bold" fill="#000000">Load balancer</text>
+<rect x="370" y="164" width="250" height="44" rx="8" ry="8" fill="#dae8fc" stroke="#6c8ebf"/>
+<text x="495.0" y="182.0" font-size="14" font-weight="bold" fill="#000000">Serveurs web ×N</text>
+<text x="495.0" y="198.0" font-size="11.5" fill="#000000">sans état (stateless)</text>
+<rect x="370" y="238" width="250" height="44" rx="8" ry="8" fill="#dae8fc" stroke="#6c8ebf"/>
+<text x="495.0" y="264.0" font-size="14" font-weight="bold" fill="#000000">API / services métier</text>
+<rect x="20" y="360" width="175" height="112" rx="8" ry="8" fill="#d5e8d4" stroke="#82b366"/>
+<text x="107.5" y="388.0" font-size="14" font-weight="bold" fill="#000000">MongoDB</text>
+<text x="107.5" y="404.0" font-size="11.5" fill="#000000">Lot 1 — Catalogue</text>
+<text x="107.5" y="420.0" font-size="11.5" fill="#000000">Document · CP</text>
+<text x="107.5" y="436.0" font-size="11.5" fill="#000000">replica set,</text>
+<text x="107.5" y="452.0" font-size="11.5" fill="#000000">lectures sur secondaires</text>
+<rect x="215" y="360" width="175" height="112" rx="8" ry="8" fill="#f8cecc" stroke="#b85450"/>
+<text x="302.5" y="388.0" font-size="14" font-weight="bold" fill="#000000">Redis</text>
+<text x="302.5" y="404.0" font-size="11.5" fill="#000000">Lot 2 — Panier &amp; sessions</text>
+<text x="302.5" y="420.0" font-size="11.5" fill="#000000">Clé-valeur en mémoire</text>
+<text x="302.5" y="436.0" font-size="11.5" fill="#000000">TTL · &lt; 1 ms</text>
+<text x="302.5" y="452.0" font-size="11.5" fill="#000000">partagé entre serveurs</text>
+<rect x="410" y="360" width="175" height="112" rx="8" ry="8" fill="#fff2cc" stroke="#d6b656"/>
+<text x="497.5" y="388.0" font-size="14" font-weight="bold" fill="#000000">Cassandra</text>
+<text x="497.5" y="404.0" font-size="11.5" fill="#000000">Lot 3 — Logs &amp; analytics</text>
+<text x="497.5" y="420.0" font-size="11.5" fill="#000000">Colonnes · AP</text>
+<text x="497.5" y="436.0" font-size="11.5" fill="#000000">écritures massives,</text>
+<text x="497.5" y="452.0" font-size="11.5" fill="#000000">rétention par TTL</text>
+<rect x="605" y="360" width="175" height="112" rx="8" ry="8" fill="#e1d5e7" stroke="#9673a6"/>
+<text x="692.5" y="388.0" font-size="14" font-weight="bold" fill="#000000">Neo4j</text>
+<text x="692.5" y="404.0" font-size="11.5" fill="#000000">Lot 4 — Recommandations</text>
+<text x="692.5" y="420.0" font-size="11.5" fill="#000000">Graphe · CP</text>
+<text x="692.5" y="436.0" font-size="11.5" fill="#000000">données dérivées,</text>
+<text x="692.5" y="452.0" font-size="11.5" fill="#000000">reconstructibles</text>
+<rect x="800" y="360" width="175" height="112" rx="8" ry="8" fill="#ffffff" stroke="#999999" stroke-dasharray="6 4"/>
+<text x="887.5" y="388.0" font-size="14" font-weight="bold" fill="#000000">SGBDR existant</text>
+<text x="887.5" y="404.0" font-size="11.5" fill="#000000">Commandes &amp; paiement</text>
+<text x="887.5" y="420.0" font-size="11.5" fill="#000000">ACID</text>
+<text x="887.5" y="436.0" font-size="11.5" fill="#000000">hors périmètre</text>
+<text x="887.5" y="452.0" font-size="11.5" fill="#000000">des 4 lots</text>
+<rect x="20" y="540" width="955" height="46" rx="8" ry="8" fill="#f5f5f5" stroke="#666666" stroke-dasharray="6 4"/>
+<text x="497.5" y="559.0" font-size="14" font-weight="bold" fill="#000000">Traitements asynchrones</text>
+<text x="497.5" y="575.0" font-size="11.5" fill="#000000">change streams MongoDB · jobs Spark batch · export des commandes</text>
+</g></svg>
