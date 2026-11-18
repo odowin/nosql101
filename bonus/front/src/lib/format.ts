@@ -22,6 +22,14 @@ export function priceView(p: PriceInfo) {
   };
 }
 
+/** TTL Redis en secondes → « 29 min 05 s » ; négatif (-1 sans TTL, -2 clé absente) → « expirée ». */
+export function formatTtl(seconds: number) {
+  if (seconds < 0) return "expirée";
+  const m = Math.floor(seconds / 60);
+  const s = String(seconds % 60).padStart(2, "0");
+  return m ? `${m} min ${s} s` : `${seconds} s`;
+}
+
 /** Lien qui conserve les paramètres courants en remplaçant ceux de `patch` (undefined = retiré). */
 export function withParams(path: string, current: Record<string, string | string[] | undefined>, patch: Record<string, string | undefined>) {
   const sp = new URLSearchParams();

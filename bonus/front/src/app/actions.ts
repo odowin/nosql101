@@ -14,7 +14,7 @@ import {
   setQuantitySchema,
   skuSchema,
 } from "@/lib/schemas";
-import { getSessionId, withSession } from "@/lib/session";
+import { endSession, getSessionId, withSession } from "@/lib/session";
 
 // Résultat sérialisable : en production Next masque le message des erreurs levées par une action.
 export type ActionResult<T> = { ok: true; data: T } | { ok: false; error: string };
@@ -61,6 +61,12 @@ export async function loginCustomer(input: { customer_id: string }): Promise<Act
   return run(loginSchema, input, ({ customer_id }) =>
     withSession((sid) => api.login(sid, customer_id)).then((s) => andRefresh(s.cart)),
   );
+}
+
+/** Le panier client reste dans Redis (TTL propre) et revient à la reconnexion. */
+export async function logout(): Promise<void> {
+  await endSession();
+  refresh();
 }
 
 export async function checkout(): Promise<ActionResult<Order>> {

@@ -1,11 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { formatPrice, priceView, withParams } from "./format";
+import { formatPrice, formatTtl, priceView, withParams } from "./format";
 
 describe("format", () => {
   it("formate un prix en euros fr-FR, qu'il arrive en nombre ou en chaîne", () => {
     // Intl utilise des espaces insécables : on les normalise pour comparer.
     expect(formatPrice(1299.9).replace(/\s/g, " ")).toBe("1 299,90 €");
     expect(formatPrice("12.5").replace(/\s/g, " ")).toBe("12,50 €");
+  });
+
+  it("formate le TTL d'une session Redis", () => {
+    expect(formatTtl(1800)).toBe("30 min 00 s");
+    expect(formatTtl(65)).toBe("1 min 05 s");
+    expect(formatTtl(9)).toBe("9 s");
+    expect(formatTtl(-2)).toBe("expirée");
   });
 
   it("garde les paramètres répétés, remplace ceux du patch et retire les vides", () => {
