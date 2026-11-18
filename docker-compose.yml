@@ -113,6 +113,22 @@ services:
       retries: 10
       start_period: 60s
 
+  # Front Next.js (http://localhost:3000), consomme l'API
+  front:
+    build: ./front
+    ports:
+      - "3000:3000"
+    environment:
+      API_URL: http://api:8000
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 15s
 
 volumes:
   mongo_data:
