@@ -2,8 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ChevronDown, CircleHelp, Menu, Package, Percent, Search, ShoppingBag, Store, ThumbsUp, User } from "lucide-react";
+import { ChevronDown, CircleHelp, Menu, Package, Percent, ShoppingBag, Store, ThumbsUp, User } from "lucide-react";
 import { MegaMenu, MenuDrawer, useHoverIntent } from "@/components/categories-menu";
+import { SearchBox } from "@/components/search-box";
 import type { Category } from "@/lib/api/types";
 import { cn } from "@/lib/utils";
 
@@ -108,32 +109,9 @@ export function HeaderShell({ customer, count, categories }: { customer?: string
             <span className="caps text-[0.625rem] font-medium max-lg:sr-only">Menu</span>
           </button>
 
-          <form
-            action="/produits"
-            role="search"
-            className={cn(
-              "relative px-[15px] max-lg:order-last max-lg:basis-full max-lg:pb-2 lg:flex-1 lg:px-0",
-              compact && "max-lg:hidden",
-            )}
-          >
-            <label htmlFor="site-search" className="sr-only">
-              Rechercher dans le catalogue
-            </label>
-            <input
-              id="site-search"
-              type="search"
-              name="q"
-              placeholder="Chercher un produit, une marque, une catégorie"
-              className="h-11 w-full rounded-lg bg-white pr-12 pl-4 text-base text-ldlc-strong placeholder:text-[oklch(52%_0_0)] lg:text-sm"
-            />
-            <button
-              type="submit"
-              aria-label="Rechercher"
-              className="absolute inset-y-0 right-[15px] flex w-11 items-center justify-center rounded-r-lg text-ldlc-text hover:text-ldlc-strong lg:right-0"
-            >
-              <Search className="size-6" strokeWidth={1.5} aria-hidden />
-            </button>
-          </form>
+          <div className={cn("px-[15px] max-lg:order-last max-lg:basis-full max-lg:pb-2 lg:flex-1 lg:px-0", compact && "max-lg:hidden")}>
+            <SearchBox />
+          </div>
 
           <nav aria-label="Espace client" className="flex">
             {/* Pas de boutiques physiques dans le projet : BOUTIQUES mène aux indicateurs de la boutique en ligne. */}
