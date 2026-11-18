@@ -12,7 +12,7 @@ function price(v: string | string[] | undefined) {
   return s && Number.isFinite(n) && n >= 0 ? n : undefined;
 }
 
-/** Paramètres d'URL de /catalogue → requête GET /products (spec=k:v répétable, page → skip). */
+/** Paramètres d'URL de /produits → requête GET /products (spec=k:v répétable, page → skip). */
 export function parseCatalogFilters(sp: SearchParams): ProductQuery {
   const page = Math.max(1, Math.trunc(Number(first(sp.page))) || 1);
   return {

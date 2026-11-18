@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
 
 const links = [
-  { href: "/catalogue", label: "Catalogue" },
+  { href: "/produits", label: "Catalogue" },
   { href: "/analytics", label: "Analytics" },
   { href: "/commandes", label: "Commandes" },
 ];

@@ -11,7 +11,7 @@ export type ProductSummary = {
   brand: { _id: string; name: string };
   range?: string;
   price: number;
-  stock?: { status: string; qty: number };
+  stock?: { status: string; qty?: number };
   rating: { avg: number; count: number };
 };
 

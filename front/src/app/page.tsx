@@ -8,7 +8,7 @@ export default function Home() {
       <p className="mt-4 text-muted-foreground">
         Parcourez le catalogue, suivez vos commandes et explorez les indicateurs analytiques.
       </p>
-      <Link href="/catalogue" className={buttonVariants({ size: "lg", className: "mt-6 min-h-11" })}>
+      <Link href="/produits" className={buttonVariants({ size: "lg", className: "mt-6 min-h-11" })}>
         Voir le catalogue
       </Link>
     </main>
