@@ -8,6 +8,7 @@ import { BuyBox } from "@/components/buy-box";
 import { CategoryIcon } from "@/components/category-icon";
 import { StockLabel } from "@/components/product-card";
 import { Stars } from "@/components/stars";
+import { ProductTabs } from "@/components/product-tabs";
 import { RecoSection } from "@/components/reco-section";
 import { ReviewForm } from "@/components/review-form";
 import { TrackEvent } from "@/components/track-event";
@@ -17,7 +18,8 @@ import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ApiError, getCategories, getDailyViews, getProduct, getRecommendations, listReviews } from "@/lib/api/client";
 import { categoryHref, categoryTrail } from "@/lib/categories";
-import { formatDate, priceParts, priceView, specSummary } from "@/lib/format";
+import { formatDate, priceParts, priceView, ratingBreakdown, specSummary } from "@/lib/format";
+import type { Spec } from "@/lib/api/types";
 
 type Props = { params: Promise<{ sku: string }>; searchParams: Promise<{ avis?: string }> };
 
@@ -38,6 +40,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return { title: `${p?.name ?? "Produit"} · LDLC NoSQL` };
 }
 
+const specValue = (s: Spec) => `${typeof s.v === "boolean" ? (s.v ? "Oui" : "Non") : typeof s.v === "number" ? s.v.toLocaleString("fr-FR") : s.v}${s.u ? ` ${s.u}` : ""}`;
+
 const DELIVERY: Record<string, string> = {
   in_stock: "Livré après-demain",
   low_stock: "Livré sous 3 jours",
@@ -56,16 +60,153 @@ export default async function ProductPage({ params, searchParams }: Props) {
   const page = Math.max(1, Math.trunc(Number((await searchParams).avis)) || 1);
   const [p, reviews, views, categories] = await Promise.all([
     loadProduct(sku),
-    listReviews(sku, REVIEWS_PER_PAGE, (page - 1) * REVIEWS_PER_PAGE).catch(() => null),
+    // shortcut: au-delà de 100 avis, la répartition ne porte que sur les 100 plus récents ; ajouter un agrégat API si besoin.
+    listReviews(sku, 100).catch(() => null),
     getDailyViews(sku, 1).then((d) => d[0]?.views ?? 0).catch(() => null),
     getCategories().catch(() => []),
   ]);
   const trail = categoryTrail(categories, p.category._id);
-  const reviewPages = reviews ? Math.max(1, Math.ceil(reviews.total / REVIEWS_PER_PAGE)) : 1;
+  const reviewPages = reviews ? Math.max(1, Math.ceil(reviews.items.length / REVIEWS_PER_PAGE)) : 1;
+  const pageItems = reviews?.items.slice((page - 1) * REVIEWS_PER_PAGE, page * REVIEWS_PER_PAGE) ?? [];
   const outOfStock = p.stock?.status === "out_of_stock";
   const v = priceView(p);
   const { units, cents } = priceParts(v.was ? p.effective_price : p.price);
   const delivery = DELIVERY[p.stock?.status ?? ""];
+
+  const general: [string, string][] = [
+    ["Désignation", p.name],
+    ["Marque", p.brand.name],
+    ...(p.range ? [["Gamme", p.range] as [string, string]] : []),
+    ["Catégorie", p.category.name],
+    ["Référence", p._id],
+  ];
+  const groups: [string, [string, string][]][] = [
+    ["Informations générales", general],
+    ["Caractéristiques", (p.specs ?? []).map((s) => [s.label ?? s.k, specValue(s)])],
+  ];
+
+  // Pas de texte marketing en base : le descriptif est rédigé à partir des specs (MongoDB).
+  const description = (
+    <div className="flex max-w-[65ch] flex-col gap-3">
+      <h3 className="font-serif text-2xl font-extrabold text-ldlc-night">{p.name}</h3>
+      <p>
+        {p.brand.name}
+        {p.range && ` ${p.range}`}, rayon {p.category.name.toLowerCase()}.{" "}
+        {p.specs?.length ? `${specSummary(p.specs, 99)}.` : ""}
+      </p>
+      <p className="text-xs text-muted-foreground">Fiche stockée dans MongoDB (specs libres), servie par le cache Redis.</p>
+    </div>
+  );
+
+  const specsTable = (
+    <table className="tabular w-full text-[13px] sm:table-fixed">
+      <caption className="sr-only">Fiche technique</caption>
+      {groups.map(([group, rows]) =>
+        rows.length ? (
+          <tbody key={group} className="border-t border-border">
+            {/* Mobile : le groupe passe en ligne de titre au lieu de la colonne fusionnée. */}
+            <tr className="sm:hidden">
+              <th colSpan={2} scope="colgroup" className="caps pt-3 pb-1 text-left text-sm font-bold tracking-normal text-primary">{group}</th>
+            </tr>
+            {rows.map(([label, value], i) => (
+              <tr key={label} className="border-b border-border">
+                {i === 0 && (
+                  <th scope="rowgroup" rowSpan={rows.length} className="caps w-1/4 py-1.5 pr-4 pl-2.5 text-left align-top text-sm font-bold tracking-normal text-primary max-sm:hidden">
+                    {group}
+                  </th>
+                )}
+                <th scope="row" className="w-1/3 py-1.5 pr-4 pl-1.5 text-left font-medium text-ldlc-text">{label}</th>
+                <td className="py-1.5 pr-1.5 text-ldlc-strong">{value}</td>
+              </tr>
+            ))}
+          </tbody>
+        ) : null,
+      )}
+    </table>
+  );
+
+  const reviewsPanel =
+    reviews === null ? (
+      <p className="text-muted-foreground">Avis indisponibles pour le moment.</p>
+    ) : (
+      <div className="flex flex-col gap-6">
+        {/* Synthèse : note sur 10 (avg sur 5 × 2), répartition calculée sur les avis chargés. */}
+        <div className="tabular grid items-center gap-6 rounded-lg bg-ldlc-pale p-5 md:grid-cols-[180px_1fr_auto]">
+          <div className="flex flex-col items-center gap-1 text-center">
+            <p className="caps font-bold text-ldlc-strong">Note générale</p>
+            <p className="font-bold text-primary">
+              <span className="text-5xl leading-none">{(Math.round(p.rating.avg * 20) / 10).toLocaleString("fr-FR")}</span>
+              <span className="text-xl">/10</span>
+            </p>
+            <Stars avg={p.rating.avg} count={p.rating.count} bare />
+            <p className="text-ldlc-price">sur {reviews.total} avis</p>
+          </div>
+          <ul className="flex flex-col gap-1.5" aria-label="Répartition des notes">
+            {ratingBreakdown(reviews.items.map((r) => r.rating)).map((b) => (
+              <li key={b.stars} className="grid grid-cols-[auto_1fr_3rem_4rem] items-center gap-3">
+                <Stars avg={b.stars} count={1} bare />
+                <span className="h-1.5 rounded-full bg-[oklch(85%_0.05_220)]" aria-hidden>
+                  <span className="block h-full rounded-full bg-primary" style={{ width: `${b.pct}%` }} />
+                </span>
+                <span className="text-right text-lg text-ldlc-text">{b.pct}%</span>
+                <span className="text-[13px] text-ldlc-text">{b.count ? `${b.count} avis` : ""}</span>
+              </li>
+            ))}
+          </ul>
+          <a href="#donner-avis" className={buttonVariants({ variant: "navy", size: "pill", className: "justify-self-center" })}>
+            Donner votre avis ›
+          </a>
+        </div>
+
+        {pageItems.length === 0 ? (
+          <p className="text-muted-foreground">Aucun avis pour l&apos;instant. Soyez le premier !</p>
+        ) : (
+          <ul className="divide-y border-t border-border">
+            {pageItems.map((r) => (
+              <li key={r._id} className="grid gap-3 py-5 md:grid-cols-[290px_1fr]">
+                <div className="text-[13px] text-muted-foreground">
+                  <p className="text-sm font-bold text-ldlc-strong">par {r.author}</p>
+                  <p>Publié le {formatDate(r.created_at)}</p>
+                  {r.verified_purchase && <p>Achat vérifié</p>}
+                </div>
+                <div className="flex max-w-[75ch] flex-col gap-2">
+                  <p className="flex flex-wrap items-center gap-3">
+                    <Stars avg={r.rating} count={1} bare />
+                    <span className="font-bold text-ldlc-strong">{r.title}</span>
+                  </p>
+                  <p className="leading-[1.7]">{r.comment}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+        {reviewPages > 1 && (
+          <nav aria-label="Pages d'avis" className="flex items-center gap-3">
+            {page > 1 && (
+              <Link href={`?avis=${page - 1}#avis`} className={buttonVariants({ variant: "outlineNavy", size: "pill" })}>
+                Avis précédents
+              </Link>
+            )}
+            <span className="tabular text-sm text-muted-foreground">
+              Page {page} sur {reviewPages}
+            </span>
+            {page < reviewPages && (
+              <Link href={`?avis=${page + 1}#avis`} className={buttonVariants({ variant: "outlineNavy", size: "pill" })}>
+                Avis suivants
+              </Link>
+            )}
+          </nav>
+        )}
+
+        <div id="donner-avis" className="scroll-mt-24 border-t border-border pt-5">
+          <h3 className="caps text-base font-bold text-ldlc-strong">Donner votre avis</h3>
+          <p className="mb-3 text-sm text-muted-foreground">
+            Réservé aux clients connectés (connexion depuis le <Link href="/panier" className="underline underline-offset-4">panier</Link>). Avis stockés dans MongoDB.
+          </p>
+          <ReviewForm sku={sku} />
+        </div>
+      </div>
+    );
 
   return (
     <main className="flex flex-col gap-10">
@@ -139,24 +280,15 @@ export default async function ProductPage({ params, searchParams }: Props) {
         </div>
       </section>
 
-      {p.specs?.length > 0 && (
-        <section aria-labelledby="specs">
-          <SectionHeading id="specs" title="Caractéristiques" sub="Specs libres MongoDB" />
-          <table className="mt-3 w-full max-w-2xl rounded-lg bg-card text-sm [&_td]:px-4 [&_th]:px-4">
-            <tbody className="divide-y">
-              {p.specs.map((s) => (
-                <tr key={s.k}>
-                  <th scope="row" className="w-1/2 py-2 pr-4 text-left font-medium text-muted-foreground">{s.label ?? s.k}</th>
-                  <td className="tabular py-2">
-                    {typeof s.v === "boolean" ? (s.v ? "Oui" : "Non") : String(s.v)}
-                    {s.u && ` ${s.u}`}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </section>
-      )}
+      <ProductTabs
+        label="Informations produit"
+        initial={page > 1 ? "avis" : undefined}
+        tabs={[
+          { id: "descriptif", title: "Descriptif", content: description },
+          { id: "fiche-technique", title: "Fiche technique", content: specsTable },
+          { id: "avis", title: `Avis clients${reviews ? ` (${reviews.total})` : ""}`, content: reviewsPanel },
+        ]}
+      />
 
       <section aria-labelledby="recos">
         <SectionHeading id="recos" title="Recommandations" sub="Graphe Neo4j" />
@@ -169,55 +301,6 @@ export default async function ProductPage({ params, searchParams }: Props) {
         </div>
       </section>
 
-      <section id="avis" aria-label="Avis clients" className="scroll-mt-20">
-        <SectionHeading title="Avis clients" sub="MongoDB" />
-        {reviews === null ? (
-          <p className="mt-2 text-muted-foreground">Avis indisponibles pour le moment.</p>
-        ) : reviews.items.length === 0 ? (
-          <p className="mt-2 text-muted-foreground">Aucun avis pour l&apos;instant. Soyez le premier !</p>
-        ) : (
-          <ul className="mt-3 flex max-w-[65ch] flex-col gap-4">
-            {reviews.items.map((r) => (
-              <li key={r._id} className="border-b pb-4">
-                <p className="tabular text-sm">
-                  <span className="font-semibold text-link" aria-label={`Note ${r.rating} sur 5`}>
-                    {"★".repeat(r.rating)}
-                    <span className="text-muted-foreground">{"★".repeat(5 - r.rating)}</span>
-                  </span>{" "}
-                  <span className="font-medium">{r.title}</span>
-                </p>
-                <p className="mt-1">{r.comment}</p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {r.author} · {formatDate(r.created_at)}
-                  {r.verified_purchase && " · achat vérifié"}
-                </p>
-              </li>
-            ))}
-          </ul>
-        )}
-        {reviewPages > 1 && (
-          <nav aria-label="Pages d'avis" className="mt-4 flex items-center gap-3">
-            {page > 1 && (
-              <Link href={`?avis=${page - 1}#avis`} className={buttonVariants({ variant: "outline", className: "min-h-11" })}>
-                Avis précédents
-              </Link>
-            )}
-            <span className="tabular text-sm text-muted-foreground">
-              Page {page} sur {reviewPages}
-            </span>
-            {page < reviewPages && (
-              <Link href={`?avis=${page + 1}#avis`} className={buttonVariants({ variant: "outline", className: "min-h-11" })}>
-                Avis suivants
-              </Link>
-            )}
-          </nav>
-        )}
-        <h3 className="mt-8 font-semibold">Donner votre avis</h3>
-        <p className="mb-3 text-sm text-muted-foreground">
-          Réservé aux clients connectés (connexion depuis le <Link href="/panier" className="underline underline-offset-4">panier</Link>).
-        </p>
-        <ReviewForm sku={sku} />
-      </section>
     </main>
   );
 }

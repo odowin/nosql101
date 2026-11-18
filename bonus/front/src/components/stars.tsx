@@ -1,7 +1,7 @@
 import { Star } from "lucide-react";
 
-/** 5 étoiles jaunes (arrondi à l'unité) + « N avis » ; rien sans avis. */
-export function Stars({ avg, count }: { avg: number; count: number }) {
+/** 5 étoiles jaunes (arrondi à l'unité) + « N avis » (sauf `bare`) ; rien sans avis. */
+export function Stars({ avg, count, bare }: { avg: number; count: number; bare?: boolean }) {
   if (!count) return <span className="text-xs text-muted-foreground">Pas encore d&apos;avis</span>;
   const full = Math.round(avg);
   return (
@@ -11,7 +11,7 @@ export function Stars({ avg, count }: { avg: number; count: number }) {
           <Star key={i} className={`size-4 ${i < full ? "fill-ldlc-yellow text-ldlc-yellow" : "text-border"}`} aria-hidden />
         ))}
       </span>
-      <span className="tabular text-[0.8125rem] font-bold text-ldlc-price">{count} avis</span>
+      {!bare && <span className="tabular text-[0.8125rem] font-bold text-ldlc-price">{count} avis</span>}
     </span>
   );
 }

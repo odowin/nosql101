@@ -64,3 +64,11 @@ export function withParams(path: string, current: Record<string, string | string
 }
 
 export const ORDER_STATUS: Record<string, string> = { paid: "Payée", shipped: "Expédiée", delivered: "Livrée", cancelled: "Annulée" };
+
+/** Répartition des notes 5 → 1 étoile : nombre d'avis et pourcentage arrondi (0 sans avis). */
+export function ratingBreakdown(ratings: number[]) {
+  return [5, 4, 3, 2, 1].map((stars) => {
+    const count = ratings.filter((r) => r === stars).length;
+    return { stars, count, pct: ratings.length ? Math.round((count / ratings.length) * 100) : 0 };
+  });
+}

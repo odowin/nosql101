@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatPeriod, formatPrice, formatTtl, priceParts, priceView, specSummary, withParams } from "./format";
+import { formatPeriod, formatPrice, formatTtl, priceParts, priceView, ratingBreakdown, specSummary, withParams } from "./format";
 
 describe("format", () => {
   it("formate un prix en euros fr-FR, qu'il arrive en nombre ou en chaîne", () => {
@@ -72,5 +72,16 @@ describe("priceView", () => {
       ]),
     ).toBe("Socket AM5 - Fréquence de base 4,7 GHz - Graphique intégré - cores 8");
     expect(specSummary([{ k: "a", v: 1 }, { k: "b", v: 2 }], 1)).toBe("a 1");
+  });
+
+  it("répartit les notes de 5 à 1 étoile en pourcentages", () => {
+    expect(ratingBreakdown([5, 5, 4, 1])).toEqual([
+      { stars: 5, count: 2, pct: 50 },
+      { stars: 4, count: 1, pct: 25 },
+      { stars: 3, count: 0, pct: 0 },
+      { stars: 2, count: 0, pct: 0 },
+      { stars: 1, count: 1, pct: 25 },
+    ]);
+    expect(ratingBreakdown([]).every((b) => b.pct === 0)).toBe(true);
   });
 });
