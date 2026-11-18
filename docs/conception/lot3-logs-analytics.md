@@ -57,7 +57,6 @@ Cassandra impose le **query-driven** : une table par requête, des données dupl
 - `product_views_by_day` : 365 lignes par an et par produit. `top_products_by_period` : ≤ 100 lignes.
 - `orders_by_customer` : quelques dizaines de commandes par particulier, partition bornée. Pour un client B2B (milliers de commandes), on ajouterait un bucket `year` à la clé de partition.
 
-
 ```sql
 CREATE TABLE ldlc.events_by_hour (
   day date, hour tinyint, shard tinyint, event_id timeuuid,
@@ -83,7 +82,7 @@ Schéma complet : [`db/cassandra/schema.cql`](../../db/cassandra/schema.cql). Ke
 ## Requêtes types
 
 ```sql
--- Ingestion d'un product_view (pré-agrégé par le consommateur)
+-- Ingestion d'un product_view (en production le consommateur pré-agrège : views + n par micro-lot)
 INSERT INTO ldlc.events_by_hour (day, hour, shard, event_id, event_type, session_id, sku)
   VALUES ('2026-11-18', 14, 3, now(), 'product_view', '9f2c', 'CPU-AMD-R7-9800X3D');
 UPDATE ldlc.product_views_by_day SET views = views + 1 WHERE sku = 'CPU-AMD-R7-9800X3D' AND day = '2026-11-18';
@@ -130,7 +129,6 @@ Les vues sont donc une mesure **approximative**, ce qui suffit pour un classemen
 - Parcours de session : 90 jours.
 
 **Anti-patterns évités.** Pas d'`ALLOW FILTERING` ni d'index secondaire : chaque requête cible une partition. Pas de partition non bornée : buckets temporels et shards. Pas d'usage en file d'attente ni de `DELETE` massif générateur de tombstones : expiration par TTL + TWCS, upsert de rangs.
-
 
 **Déploiement et CAP / PACELC.** Cassandra 5.0, 2 DC (`dc_paris`, `dc_lyon`) × 3 nœuds, RF=3 par DC : AP avec cohérence réglable. En PACELC : PA/EL pour les événements (`LOCAL_ONE`), PC/EC local pour les commandes (`LOCAL_QUORUM`). Réglage retenu : `LOCAL_ONE` / `LOCAL_QUORUM`, RF=3 × 2 DC, `BATCH` loggé.
 

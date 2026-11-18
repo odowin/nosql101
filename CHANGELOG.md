@@ -2,6 +2,16 @@
 
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), versions selon [SemVer](https://semver.org/lang/fr/).
 
+## [1.0.1] — 2026-11-18
+
+Relecture de cohérence entre les documents après la restructuration par lot (#13).
+
+### Corrigé
+
+- [docs/choix-technologiques.md](docs/choix-technologiques.md) : les produits compatibles ne sont pas de simples références ; la fiche porte les clés `compat` et un extrait embarqué `compatible` (≤ 5), le graphe Neo4j fait foi pour la relation complète (aligné sur le Lot 1).
+- [Lot 4](docs/conception/lot4-recommandations.md) et [synthèse](docs/conception/00-contexte-synthese.md) : si Neo4j est indisponible, le repli se fait sur le top des produits **consultés** (`top_products_by_period`), pas sur les ventes.
+- [Lot 3](docs/conception/lot3-logs-analytics.md) : l'exemple d'ingestion précise la pré-agrégation des compteurs par le consommateur (`views + n`).
+
 ## [1.0.0] — 2026-11-18
 
 Première version rendue : architecture de données NoSQL de la refonte LDLC (persistance polyglotte, une base par lot).
@@ -32,4 +42,5 @@ Première version rendue : architecture de données NoSQL de la refonte LDLC (pe
 
 - Prototype d'API (bonus) : `api/` vide.
 
+[1.0.1]: https://github.com/odowin/nosql101/releases/tag/v1.0.1
 [1.0.0]: https://github.com/odowin/nosql101/releases/tag/v1.0.0
