@@ -9,10 +9,9 @@ import { CategoryIcon } from "@/components/category-icon";
 import { StockLabel } from "@/components/product-card";
 import { Stars } from "@/components/stars";
 import { ProductTabs } from "@/components/product-tabs";
-import { RecoSection } from "@/components/reco-section";
+import { RecoCarousel } from "@/components/reco-carousel";
 import { ReviewForm } from "@/components/review-form";
 import { TrackEvent } from "@/components/track-event";
-import { SectionHeading } from "@/components/section-heading";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -50,8 +49,7 @@ const DELIVERY: Record<string, string> = {
 
 const recos = [
   { kind: "compatible", title: "Compatibles" },
-  { kind: "bought-together", title: "Souvent achetés ensemble" },
-  { kind: "also-bought", title: "Ils ont aussi acheté" },
+  { kind: "bought-together", title: "Achetés ensemble" },
   { kind: "similar", title: "Produits similaires" },
 ] as const;
 
@@ -210,7 +208,7 @@ export default async function ProductPage({ params, searchParams }: Props) {
     );
 
   return (
-    <main className="flex flex-col gap-10 max-lg:pb-16">
+    <main className="max-lg:pb-16">
       <TrackEvent event_type="product_view" sku={sku} />
       <Breadcrumb
         items={[
@@ -289,27 +287,33 @@ export default async function ProductPage({ params, searchParams }: Props) {
         </div>
       </section>
 
-      <ProductTabs
-        label="Informations produit"
-        initial={page > 1 ? "avis" : undefined}
-        tabs={[
-          { id: "descriptif", title: "Descriptif", content: description },
-          { id: "fiche-technique", title: "Fiche technique", content: specsTable },
-          { id: "avis", title: `Avis clients${reviews ? ` (${reviews.total})` : ""}`, content: reviewsPanel },
-        ]}
-      />
+      <div className="mb-[30px]">
+        <ProductTabs
+          label="Informations produit"
+          initial={page > 1 ? "avis" : undefined}
+          tabs={[
+            { id: "descriptif", title: "Descriptif", content: description },
+            { id: "fiche-technique", title: "Fiche technique", content: specsTable },
+            { id: "avis", title: `Avis clients${reviews ? ` (${reviews.total})` : ""}`, content: reviewsPanel },
+          ]}
+        />
+      </div>
 
-      <section aria-labelledby="recos">
-        <SectionHeading id="recos" title="Recommandations" sub="Graphe Neo4j" />
-        <div className="stagger mt-3 grid gap-4 sm:grid-cols-2">
-          {recos.map((r) => (
-            <Suspense key={r.kind} fallback={<Skeleton className="h-72 rounded-xl" />}>
-              <RecoSection title={r.title} items={getRecommendations(sku, r.kind)} />
-            </Suspense>
-          ))}
-        </div>
+      <section aria-label="Produits associés (graphe Neo4j)" className="mb-[30px]">
+        <ProductTabs
+          label="Produits associés"
+          initial="compatible"
+          tabs={recos.map((r) => ({
+            id: r.kind,
+            title: r.title,
+            content: (
+              <Suspense fallback={<Skeleton className="h-[290px] rounded-lg" />}>
+                <RecoCarousel label={r.title} items={getRecommendations(sku, r.kind)} />
+              </Suspense>
+            ),
+          }))}
+        />
       </section>
-
     </main>
   );
 }
