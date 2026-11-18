@@ -247,6 +247,16 @@
     @starting-style { opacity: 0; }
   }
 
+  /* Feuille de filtres mobile : monte depuis le bas (barre « Filtrer »). */
+  .sheet {
+    translate: 0 100%;
+    transition: translate 250ms cubic-bezier(0.2, 0.7, 0.2, 1), overlay 250ms allow-discrete, display 250ms allow-discrete;
+  }
+  .sheet[open] {
+    translate: 0 0;
+    @starting-style { translate: 0 100%; }
+  }
+
   /* Curseur double : les pistes natives sont transparentes et laissent passer le pointeur, seules les poignées le captent. */
   .dual-range {
     appearance: none;
