@@ -58,4 +58,16 @@ Script complet et exécutable : [db/redis/queries.redis](../../db/redis/queries.
 
 ## Justification des compromis
 
-_À compléter (CAP, patterns, Query-Driven)._
+**Dimensionnement.** ~1 M paniers × 0,5 Ko + 50 k sessions × 0,3 Ko + 27 k fiches × 10 Ko ≈ **0,8 Go**. Trois maîtres suffisent largement ; le cluster sert la disponibilité plus que la capacité. L'environnement local (Docker Compose) est limité à `maxmemory 256mb`.
+
+**Persistance et éviction.** `appendonly yes` + `appendfsync everysec` : au pire 1 s d'écritures perdues au redémarrage. `maxmemory-policy volatile-ttl` : toutes les clés ont un TTL, et sous pression mémoire Redis évince d'abord celles dont le TTL restant est le plus court. L'ordre suit la valeur métier : le cache produit (≤ 300 s, reconstructible depuis MongoDB) part en premier, puis les sessions (≤ 30 min), et les paniers (7 à 30 j) en dernier. On ne perd donc un panier qu'en ultime recours, sans jamais refuser d'écriture.
+
+**Redis Cluster.** 16 384 hash slots répartis sur 3 maîtres, chacun avec un réplica. `cart:anon:…` et `cart:customer:…` tombent dans des slots différents : la fusion au login **n'est pas atomique** (pas de `MULTI` multi-slots, et un hash tag commun est impossible puisque les deux identifiants sont indépendants). Pire cas, une interruption au milieu de la fusion double une quantité, ce que le client voit et corrige avant de payer. Un panier n'est pas une commande, le risque est donc accepté.
+
+**CAP / PACELC : AP, PA/EL.** La réplication maître→réplica est asynchrone : lors d'un basculement, les dernières écritures acquittées peuvent être perdues (une ligne de panier, une session à recréer). Justification métier : un panier se reconstruit en un clic, alors qu'une latence ou une indisponibilité au moment d'ajouter un article coûte une vente. Le paiement, lui, ne lit jamais Redis comme source de vérité : le service commandes revalide prix et stock. Les serveurs web sont **stateless** (identifiant de session porté par un cookie) et s'ajoutent derrière le load balancer sans affinité.
+
+| Techno | CAP | PACELC | Réglage retenu | Risque accepté |
+|---|---|---|---|---|
+| Redis Cluster | AP | PA/EL | réplication asynchrone, AOF `everysec`, `volatile-ttl` | perte des dernières lignes de panier au basculement ; fusion au login non atomique |
+
+Comparaison avec les trois autres bases : [00-contexte-synthese.md](00-contexte-synthese.md).
