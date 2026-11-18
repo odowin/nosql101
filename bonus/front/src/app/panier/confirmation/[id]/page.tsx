@@ -11,7 +11,7 @@ export default async function ConfirmationPage({ params }: { params: Promise<{ i
   const order = await getOrder(id).catch(() => null); // l'écriture Cassandra peut arriver juste après
   return (
     <main className="mx-auto flex max-w-[65ch] flex-col items-center gap-4 py-12 text-center">
-      <CircleCheck className="size-12 text-emerald-600 dark:text-emerald-400" aria-hidden />
+      <CircleCheck className="size-12 text-success" aria-hidden />
       <h1 className="text-3xl font-bold">Merci pour votre commande</h1>
       <p>
         Numéro de commande : <span className="font-mono font-semibold">{id}</span>

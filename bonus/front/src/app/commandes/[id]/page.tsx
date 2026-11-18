@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Badge } from "@/components/ui/badge";
+import { SectionHeading } from "@/components/section-heading";
+import { Breadcrumb } from "@/components/breadcrumb";
 import { ApiError, getOrder } from "@/lib/api/client";
 import { formatDate, formatPrice, ORDER_STATUS as STATUS } from "@/lib/format";
 import { currentSession } from "@/lib/session";
@@ -21,48 +22,54 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
   if (!order || order.customer_id !== session?.customer_id) notFound();
 
   return (
-    <main className="flex max-w-3xl flex-col gap-6">
-      <nav aria-label="Fil d'Ariane" className="text-sm text-muted-foreground">
-        <Link href="/commandes" className="underline-offset-4 hover:underline">Mes commandes</Link> / {order.order_id}
-      </nav>
-      <header>
-        <h1 className="flex flex-wrap items-center gap-2 text-3xl font-bold">
-          Commande <span className="font-mono text-2xl">{order.order_id}</span>
-        </h1>
-        <p className="mt-1 flex flex-wrap items-center gap-2 text-muted-foreground">
-          {formatDate(order.order_date)} <Badge variant="secondary">{STATUS[order.status] ?? order.status}</Badge>
-          <Badge variant="outline">Cassandra</Badge>
-        </p>
-      </header>
-      <table className="w-full text-sm">
-        <caption className="sr-only">Articles de la commande</caption>
-        <thead className="text-left text-muted-foreground">
-          <tr className="border-b">
-            <th scope="col" className="py-2 font-medium">Article</th>
-            <th scope="col" className="py-2 text-right font-medium">Qté</th>
-            <th scope="col" className="py-2 text-right font-medium">Prix unitaire</th>
-            <th scope="col" className="py-2 text-right font-medium">Total</th>
-          </tr>
-        </thead>
-        <tbody className="tabular divide-y">
-          {order.items.map((i) => (
-            <tr key={i.sku}>
-              <td className="py-2">
-                <Link href={`/produits/${encodeURIComponent(i.sku)}`} className="hover:text-primary">{i.name}</Link>
-              </td>
-              <td className="py-2 text-right">{i.quantity}</td>
-              <td className="py-2 text-right">{formatPrice(i.unit_price)}</td>
-              <td className="py-2 text-right">{formatPrice(i.unit_price * i.quantity)}</td>
-            </tr>
-          ))}
-        </tbody>
-        <tfoot>
-          <tr className="border-t">
-            <th scope="row" colSpan={3} className="py-3 text-right">Total</th>
-            <td className="tabular py-3 text-right text-lg font-bold">{formatPrice(order.total)}</td>
-          </tr>
-        </tfoot>
-      </table>
+    <main>
+      <Breadcrumb
+        items={[{ label: "Mon compte", href: "/compte" }, { label: "Mes commandes", href: "/commandes" }, { label: order.order_id }]}
+      />
+      <section aria-labelledby="order-title" className="bloc">
+        <SectionHeading
+          inner
+          as="h1"
+          id="order-title"
+          title={
+            <>
+              Commande <span className="font-mono normal-case">{order.order_id}</span>
+            </>
+          }
+          sub={`${formatDate(order.order_date)} · ${STATUS[order.status] ?? order.status} · Cassandra`}
+        />
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[520px] text-sm [&_td]:px-4 [&_th]:px-4">
+            <caption className="sr-only">Articles de la commande</caption>
+            <thead className="caps text-left text-[0.8125rem] text-muted-foreground">
+              <tr className="border-b-2">
+                <th scope="col" className="py-2 font-medium">Article</th>
+                <th scope="col" className="py-2 text-right font-medium">Qté</th>
+                <th scope="col" className="py-2 text-right font-medium">Prix unitaire</th>
+                <th scope="col" className="py-2 text-right font-medium">Total</th>
+              </tr>
+            </thead>
+            <tbody className="tabular divide-y">
+              {order.items.map((i) => (
+                <tr key={i.sku}>
+                  <td className="py-2">
+                    <Link href={`/produits/${encodeURIComponent(i.sku)}`} className="inline-flex min-h-11 items-center font-bold text-ldlc-strong underline-offset-4 hover:underline">{i.name}</Link>
+                  </td>
+                  <td className="py-2 text-right">{i.quantity}</td>
+                  <td className="py-2 text-right">{formatPrice(i.unit_price)}</td>
+                  <td className="py-2 text-right">{formatPrice(i.unit_price * i.quantity)}</td>
+                </tr>
+              ))}
+            </tbody>
+            <tfoot>
+              <tr className="border-t">
+                <th scope="row" colSpan={3} className="py-3 text-right">Total</th>
+                <td className="tabular py-3 text-right text-lg font-bold text-ldlc-price">{formatPrice(order.total)}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </section>
     </main>
   );
 }

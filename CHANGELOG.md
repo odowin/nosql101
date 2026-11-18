@@ -2,6 +2,19 @@
 
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), versions selon [SemVer](https://semver.org/lang/fr/).
 
+## [1.3.0] — 2026-11-18
+
+Front aligné sur le design de ldlc.com et sessions utilisateur (#21).
+
+### Ajouté
+
+- **Design ldlc.com** dans le front ([bonus/front/README.md](bonus/front/README.md)), sans logo ni visuel de la marque :
+  - Coquille : Montserrat et Source Serif 4, couleurs mesurées en `oklch()` (contraste AA), pages internes claires à blocs blancs, accueil sombre ; en-tête compact fixe au défilement ; méga-menu « Tous nos produits » et tiroir mobile ; recherche avec suggestions ; pied de page bleu nuit et réassurance.
+  - Pages : catégorie (`/categories/[id]`), liste à filtres (marques, double curseur de prix, en stock, en promo, caractéristiques) avec tri et pagination, fiche à onglets (description, fiche technique, avis notés sur 10), panneau « ajouté au panier » avec vente croisée, panier à étapes, connexion (`/connexion`), compte, promos (`/promos`).
+  - Mobile : barres collantes (Filtrer, Acheter, Passer commande), feuille de filtres.
+- **Sessions utilisateur** (Lot 2, Redis) : page `/compte` avec connexion par identifiant client (fusion du panier), TTL glissant de la session, déconnexion (`DELETE /sessions/{sid}`, le panier client est conservé) ; identifiant dans l'en-tête.
+- **API** : `GET /products` accepte `sort` (`price_asc`, `price_desc`, `name`, `rating`, `discount`, sur le prix effectif), `brand` répétable et `in_stock` ; tests pytest associés.
+
 ## [1.2.0] — 2026-11-18
 
 Front Next.js du prototype et promotions sur le catalogue (#18, #19).
@@ -80,6 +93,7 @@ Première version rendue : architecture de données NoSQL de la refonte LDLC (pe
 
 - Prototype d'API (bonus) : `api/` vide (ajouté en 1.1.0).
 
+[1.3.0]: https://github.com/odowin/nosql101/releases/tag/v1.3.0
 [1.2.0]: https://github.com/odowin/nosql101/releases/tag/v1.2.0
 [1.1.0]: https://github.com/odowin/nosql101/releases/tag/v1.1.0
 [1.0.1]: https://github.com/odowin/nosql101/releases/tag/v1.0.1

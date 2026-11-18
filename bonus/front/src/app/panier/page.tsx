@@ -1,36 +1,41 @@
 import type { Metadata } from "next";
 import { CartView } from "@/components/cart-view";
-import { LoginForm } from "@/components/login-form";
-import { Badge } from "@/components/ui/badge";
 import { getCart } from "@/lib/api/client";
 import { currentSession, readSessionId } from "@/lib/session";
 
 export const metadata: Metadata = { title: "Panier · LDLC NoSQL" };
 
+// Le tunnel se limite au panier : « Passer commande » valide directement (livraison et paiement simulés).
+const STEPS = ["Panier", "Livraison", "Paiement"];
+
 export default async function CartPage() {
   const sid = await readSessionId();
   const [cart, session] = await Promise.all([sid ? getCart(sid).catch(() => null) : null, currentSession()]);
   return (
-    <main className="grid gap-8 lg:grid-cols-[1fr_18rem]">
-      <header className="lg:col-span-2">
-        <h1 className="flex items-center gap-2 text-3xl font-bold">
-          Panier <Badge variant="outline">Redis</Badge>
-        </h1>
-      </header>
+    // Place réservée à la barre collante du bas en mobile.
+    <main className="pb-24 lg:pb-0">
+      <nav aria-label="Étapes de commande" className="mb-5">
+        <ol className="caps flex items-center justify-center gap-2 text-[0.8125rem] font-bold">
+          {STEPS.map((s, i) => (
+            <li key={s} className="flex items-center gap-2">
+              {i > 0 && <span aria-hidden className="text-muted-foreground">›</span>}
+              <span
+                aria-current={i === 0 ? "step" : undefined}
+                className={i === 0 ? "flex items-center gap-2 text-primary" : "flex items-center gap-2 text-muted-foreground"}
+              >
+                <span
+                  aria-hidden
+                  className={`tabular grid size-7 place-items-center rounded-full ${i === 0 ? "bg-primary text-white" : "bg-border text-ldlc-text"}`}
+                >
+                  {i + 1}
+                </span>
+                {s}
+              </span>
+            </li>
+          ))}
+        </ol>
+      </nav>
       <CartView items={cart?.items ?? []} loggedIn={!!session?.customer_id} />
-      <aside className="flex flex-col gap-3 rounded-xl bg-card p-5 ring-1 ring-foreground/10 lg:self-start">
-        <h2 className="font-semibold">Compte client</h2>
-        {session?.customer_id ? (
-          <p className="text-sm">
-            Connecté en tant que <span className="font-mono font-semibold">{session.customer_id}</span>.
-          </p>
-        ) : (
-          <>
-            <p className="text-sm text-muted-foreground">Connexion simulée : saisissez un identifiant (ex. C0001).</p>
-            <LoginForm />
-          </>
-        )}
-      </aside>
     </main>
   );
 }
