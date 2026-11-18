@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ProductCard } from "@/components/product-card";
+import { SectionHeading } from "@/components/section-heading";
 import { TrackEvent } from "@/components/track-event";
 import { getCategories, getProduct, listProducts } from "@/lib/api/client";
 import type { Category } from "@/lib/api/types";
@@ -51,16 +51,21 @@ export default async function CatalogPage({ searchParams }: { searchParams: Prom
     <main className="grid gap-8 md:grid-cols-[16rem_1fr]">
       {query.q && <TrackEvent event_type="search" search_query={query.q} />}
       <header className="md:col-span-2">
-        <h1 className="text-3xl font-bold">Catalogue</h1>
-        <p className="mt-1 flex flex-wrap items-center gap-2 text-muted-foreground">
-          <span className="tabular">
-            {page.total} produit{page.total > 1 ? "s" : ""}
-          </span>
-          <Badge variant="outline">MongoDB</Badge>
-        </p>
+        <SectionHeading
+          as="h1"
+          title={query.on_sale ? "Promos en cours" : "Catalogue"}
+          sub={
+            <span className="tabular">
+              {page.total} produit{page.total > 1 ? "s" : ""} · MongoDB
+            </span>
+          }
+        />
       </header>
 
-      <form action="/produits" className="flex flex-col gap-4" aria-label="Filtres du catalogue">
+      <form action="/produits" className="flex flex-col gap-4 self-start rounded-xl bg-header p-4 ring-1 ring-white/10" aria-labelledby="filters-title">
+        <h2 id="filters-title" className="caps text-sm font-bold">
+          Filtrer
+        </h2>
         <label className={field}>
           Recherche
           <Input type="search" name="q" defaultValue={query.q ?? ""} placeholder="ex. SSD NVMe" className={control} />
@@ -137,7 +142,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: Prom
 
       <section aria-label="Résultats">
         {page.items.length ? (
-          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="stagger grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {page.items.map((p) => (
               <ProductCard key={p._id} p={p} />
             ))}

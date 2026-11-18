@@ -5,7 +5,11 @@ import { Price } from "@/components/price";
 
 export function ProductCard({ p }: { p: ProductSummary }) {
   return (
-    <li className="relative flex flex-col gap-2 rounded-xl bg-card p-4 ring-1 ring-foreground/10 transition-shadow focus-within:ring-2 focus-within:ring-ring hover:shadow-md">
+    <li className="surface-light relative flex flex-col gap-2 rounded-xl p-4 transition-[transform,box-shadow] focus-within:ring-2 focus-within:ring-ring hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/40">
+      {/* Pas de photo produit : une vignette CSS réserve la place (aspect-ratio) et porte la marque. */}
+      <div className="grid aspect-[16/10] place-items-center rounded-lg bg-[radial-gradient(circle_at_50%_40%,oklch(0.97_0_0),oklch(0.9_0_0))]" aria-hidden>
+        <span className="text-2xl font-black tracking-tight text-neutral-400 uppercase">{p.brand.name}</span>
+      </div>
       <span className="text-xs text-muted-foreground">
         {p.brand.name} · {p.category.name}
       </span>
@@ -26,8 +30,8 @@ export function ProductCard({ p }: { p: ProductSummary }) {
 }
 
 const STOCK: Record<string, [string, string]> = {
-  in_stock: ["En stock", "text-emerald-700 dark:text-emerald-400"],
-  low_stock: ["Stock faible", "text-amber-700 dark:text-amber-400"],
+  in_stock: ["En stock", "text-success"],
+  low_stock: ["Stock faible", "text-warning"],
   preorder: ["En précommande", "text-muted-foreground"],
   out_of_stock: ["Rupture de stock", "text-destructive"],
 };
