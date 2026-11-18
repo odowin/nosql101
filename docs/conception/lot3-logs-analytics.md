@@ -108,4 +108,34 @@ Requêtes complètes : [`db/cassandra/queries.cql`](../../db/cassandra/queries.c
 
 ## Justification des compromis
 
-_À compléter (CAP, patterns, Query-Driven)._
+**Compteurs.** Un `product_view` incrémente `product_views_by_day` **et** `daily_views_by_shard` ; un `search` incrémente `searches_by_day`. Limites des `counter` :
+- pas de TTL ;
+- table réservée aux compteurs ;
+- incrément **non idempotent** : un retry après timeout peut compter deux fois, et un rejeu double tout. Tout chargement initial doit donc être protégé par un marqueur (exécution unique).
+
+Les vues sont donc une mesure **approximative**, ce qui suffit pour un classement et des statistiques d'audience. Le consommateur Kafka **pré-agrège** par micro-lot (`+n` toutes les secondes au lieu de n × `+1`), ce qui divise les écritures et les retries. En cas de dérive, un job batch recalcule les vues exactes depuis `events_by_hour`.
+
+**Top-N.** Un job (toutes les 5 min) lit les 8 partitions `daily_views_by_shard` du jour, ou 7 × 8 pour la semaine, trie en mémoire et **upserte** les rangs 1 à 100 de `period = 'day:2026-11-18' | 'week:2026-W47'`. On écrase des rangs fixes au lieu de supprimer puis réinsérer : **aucune tombstone**. La lecture est une simple tranche de partition.
+
+**Commandes.** Les deux tables sont écrites dans un **`BATCH` loggé** : l'atomicité est garantie à terme (les deux ou aucune), sans isolation. Ce n'est pas une optimisation de performance. Les rejeux Kafka sont sans effet : même clé primaire, donc upsert.
+
+**Cohérence réglable.**
+- Événements : `LOCAL_ONE`. Perdre un clic est tolérable, la latence et la disponibilité d'écriture priment.
+- Commandes : `LOCAL_QUORUM` en écriture **et** en lecture : R + W = 2 + 2 > RF = 3, donc le client relit toujours sa commande dans son DC, sans attendre le DC distant.
+
+**Rétention.**
+- Logs bruts : TTL 13 mois. La CNIL limite les traceurs de mesure d'audience à 13 mois et les données collectées à 25 mois ; 13 mois permettent aussi la comparaison N-1.
+- Agrégats (anonymes) : conservés.
+- Commandes : **10 ans** (obligation de conservation des pièces comptables).
+- Parcours de session : 90 jours.
+
+**Anti-patterns évités.** Pas d'`ALLOW FILTERING` ni d'index secondaire : chaque requête cible une partition. Pas de partition non bornée : buckets temporels et shards. Pas d'usage en file d'attente ni de `DELETE` massif générateur de tombstones : expiration par TTL + TWCS, upsert de rangs.
+
+
+**Déploiement et CAP / PACELC.** Cassandra 5.0, 2 DC (`dc_paris`, `dc_lyon`) × 3 nœuds, RF=3 par DC : AP avec cohérence réglable. En PACELC : PA/EL pour les événements (`LOCAL_ONE`), PC/EC local pour les commandes (`LOCAL_QUORUM`). Réglage retenu : `LOCAL_ONE` / `LOCAL_QUORUM`, RF=3 × 2 DC, `BATCH` loggé.
+
+**Risques et limites.**
+- Compteurs approximatifs (incrément non idempotent).
+- Agrégats (top-N) en retard de 5 min.
+- Les analyses ad hoc sont hors de portée de Cassandra : un data lake (Kafka → Parquet sur stockage objet → Spark/Trino) est prévu pour l'analytique ad hoc et le recalcul exact des compteurs (voir [synthèse](00-contexte-synthese.md)).
+- Cohérence inter-bases à terme seulement ; Kafka *at-least-once*, donc consommateurs idempotents (voir [contexte](00-contexte-synthese.md)).
