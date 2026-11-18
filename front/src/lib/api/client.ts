@@ -61,6 +61,10 @@ export const createReview = (
 ) => call<T.Review>(api.POST("/products/{sku}/reviews", { params: { path: { sku } }, body }));
 export const getRecommendations = (sku: string, kind: T.RecoKind) =>
   call<T.Recommendation[]>(api.GET(`/recommendations/{sku}/${kind}`, { params: { path: { sku } }, ...catalog() }));
+export const getCustomerRecommendations = (customer_id: string, limit = 6) =>
+  call<T.Recommendation[]>(
+    api.GET("/recommendations/customers/{customer_id}", { params: { path: { customer_id }, query: { limit } }, ...live }),
+  );
 
 // --- Sessions et panier (en-tête X-Session-Id)
 export const createSession = () => call<T.Session>(api.POST("/sessions", live));

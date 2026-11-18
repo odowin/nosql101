@@ -12,3 +12,5 @@ export function withParams(path: string, current: Record<string, string | string
   const qs = sp.toString();
   return qs ? `${path}?${qs}` : path;
 }
+
+export const ORDER_STATUS: Record<string, string> = { paid: "Payée", shipped: "Expédiée", delivered: "Livrée", cancelled: "Annulée" };

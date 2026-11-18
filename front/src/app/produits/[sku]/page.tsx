@@ -11,7 +11,7 @@ import { TrackEvent } from "@/components/track-event";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ApiError, getDailyViews, getProduct, listReviews } from "@/lib/api/client";
+import { ApiError, getDailyViews, getProduct, getRecommendations, listReviews } from "@/lib/api/client";
 import { formatDate, formatPrice } from "@/lib/format";
 
 type Props = { params: Promise<{ sku: string }>; searchParams: Promise<{ avis?: string }> };
@@ -113,7 +113,7 @@ export default async function ProductPage({ params, searchParams }: Props) {
         <div className="mt-3 grid gap-4 sm:grid-cols-2">
           {recos.map((r) => (
             <Suspense key={r.kind} fallback={<Skeleton className="h-40 rounded-xl" />}>
-              <RecoSection sku={sku} kind={r.kind} title={r.title} />
+              <RecoSection title={r.title} items={getRecommendations(sku, r.kind)} />
             </Suspense>
           ))}
         </div>
