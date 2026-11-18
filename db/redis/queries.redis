@@ -1,0 +1,57 @@
+# Requêtes types du Lot 2 (paniers et sessions) — Redis 7.4.
+# Exécution : grep -v '^#' db/redis/queries.redis | grep -v '^$' | docker compose -p ldlc-nosql exec -T redis redis-cli
+# Une commande par ligne. Clés de démo (session:demo, cart:anon:demo, cart:customer:CDEMO, product:DEMO-SKU), supprimées en fin de fichier.
+#
+# 1. Session : un Hash par session, TTL glissant de 30 min (1800 s) reposé à chaque accès.
+HSET session:demo customer_id "" cart_id anon:demo created_at 2026-11-18T10:00Z last_seen 2026-11-18T10:00Z
+EXPIRE session:demo 1800
+TTL session:demo
+#
+# 2. Ajout au panier : MULTI/EXEC applique ensemble l'incrément de ligne et le rafraîchissement des TTL.
+# HINCRBY est atomique en O(1) : pas de lecture-modification-écriture, donc pas de course entre deux onglets.
+MULTI
+HINCRBY cart:anon:demo CPU-AMD-R7-9800X3D 1
+EXPIRE cart:anon:demo 604800
+EXPIRE session:demo 1800
+EXEC
+MULTI
+HINCRBY cart:anon:demo CPU-AMD-R7-9800X3D 1
+HINCRBY cart:anon:demo RAM-CORSAIR-VENGEANCE-32-6000 2
+EXPIRE cart:anon:demo 604800
+EXEC
+#
+# 3. Lecture du panier (SKU -> quantité ; l'application l'enrichit ensuite avec nom et prix courant depuis MongoDB).
+HGETALL cart:anon:demo
+TTL cart:anon:demo
+#
+# 4. Login : fusion ligne à ligne du panier anonyme dans le panier client, puis suppression de l'anonyme
+# et bascule de la session. Sur un Cluster cette fusion n'est pas atomique (deux slots), cf. conception.
+HINCRBY cart:customer:CDEMO CPU-AMD-R7-9800X3D 1
+HINCRBY cart:customer:CDEMO RAM-CORSAIR-VENGEANCE-32-6000 2
+DEL cart:anon:demo
+HSET session:demo customer_id CDEMO cart_id customer:CDEMO
+EXPIRE cart:customer:CDEMO 2592000
+HGETALL cart:customer:CDEMO
+HGETALL session:demo
+#
+# 5. Cache-aside de la fiche produit : String JSON, TTL 300 s. Sur MISS l'application lit MongoDB puis fait SET EX ;
+# toute écriture sur le produit invalide le cache par DEL.
+GET product:DEMO-SKU
+SET product:DEMO-SKU "{\"sku\":\"DEMO-SKU\",\"name\":\"Produit de démo\",\"price\":\"1.00\"}" EX 300
+GET product:DEMO-SKU
+TTL product:DEMO-SKU
+DEL product:DEMO-SKU
+GET product:DEMO-SKU
+#
+# 6. Encodage mémoire : un petit Hash est stocké en listpack (très compact) ; le cache reste une String.
+OBJECT ENCODING cart:customer:CDEMO
+OBJECT ENCODING session:demo
+#
+# 7. Politique d'éviction : volatile-ttl évince d'abord les clés au TTL restant le plus court (cache, puis sessions, puis paniers).
+CONFIG GET maxmemory-policy
+CONFIG GET maxmemory
+CONFIG GET appendfsync
+#
+# Nettoyage des clés de démo.
+DEL session:demo cart:anon:demo cart:customer:CDEMO product:DEMO-SKU
+EXISTS session:demo cart:customer:CDEMO
