@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
-from app import catalog
+from app import analytics, catalog
 from app.db import cassandra_session, mongo_db, neo4j_driver, redis_client
 
 app = FastAPI(
@@ -15,6 +15,7 @@ app = FastAPI(
     ),
 )
 app.include_router(catalog.router)
+app.include_router(analytics.router)
 
 
 @app.get("/health", tags=["Santé"])

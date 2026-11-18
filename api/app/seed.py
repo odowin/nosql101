@@ -1,11 +1,15 @@
 """Seed idempotent des bases à partir de `data/catalog.json` (lancé au démarrage : `python -m app.seed`)."""
 import json
+import random
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
+from decimal import Decimal
 from pathlib import Path
 
 from bson import Decimal128, ObjectId
+from cassandra.concurrent import execute_concurrent_with_args
 
+from app.analytics import prepared, record_order, shard_of
 from app.catalog import compatible_for
 from app.db import cassandra_session, mongo_db, neo4j_driver, redis_client
 
@@ -81,11 +85,74 @@ def seed_mongo(data: dict):
     print(f"[seed] mongodb : {len(products)} produits, {len(reviews)} avis")
 
 
+def synthetic_orders(data: dict) -> list[dict]:
+    """Commandes synthétiques déterministes de C0001..C0060 (réutilisées par le seed Neo4j)."""
+    rng = random.Random(42)
+    prices = {p["_id"]: (p["name"], Decimal(str(p["price"]))) for p in data["products"]}
+    anchor = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    orders = []
+    for n in range(1, 61):
+        for _ in range(rng.randint(1, 3)):
+            bundle = rng.choice(data["bundles"])
+            skus = rng.sample(bundle, rng.randint(2, len(bundle)))
+            if rng.random() < 0.3:
+                extra = rng.choice(list(prices))
+                if extra not in skus:
+                    skus.append(extra)
+            items = [{"sku": s, "name": prices[s][0], "quantity": rng.choices([1, 2], [9, 1])[0],
+                      "unit_price": prices[s][1]} for s in skus]
+            date = anchor - timedelta(days=rng.randint(0, 539), seconds=rng.randint(0, 86399))
+            orders.append({
+                "customer_id": f"C{n:04d}",
+                "order_id": f"CMD-{date:%Y%m%d}-{rng.getrandbits(24):06x}",
+                "order_date": date,
+                "status": "delivered" if (anchor - date).days > 7 else rng.choice(["shipped", "paid"]),
+                "total": sum(i["quantity"] * i["unit_price"] for i in items),
+                "items": items,
+            })
+    return orders
+
+
+SEARCHES = {"rtx 5070": 42, "ryzen 7": 35, "ddr5 32go": 28, "ssd nvme 2to": 19,
+            "alimentation 850w": 11, "clavier mecanique": 8}
+
+
+def seed_cassandra(data: dict):
+    """Commandes + compteurs de vues/recherches (non idempotents : gardés par le marqueur `orders_by_id`)."""
+    session = cassandra_session()
+    if session.execute("SELECT order_id FROM orders_by_id LIMIT 1").one():
+        print("[seed] cassandra déjà peuplé, ignoré")
+        return
+    orders = synthetic_orders(data)
+    for o in orders:
+        record_order(o)
+    rng = random.Random(42)
+    in_bundle = {s for b in data["bundles"] for s in b}
+    today = datetime.now(timezone.utc).date()
+    by_day, by_shard = [], []
+    for offset in range(14):
+        day = today - timedelta(days=offset)
+        for p in data["products"]:
+            sku = p["_id"]
+            n = rng.randint(3, 25) * (4 if p["category"] in ("gpu", "cpu") else 1) * (2 if sku in in_bundle else 1)
+            by_day.append((n, sku, day))
+            by_shard.append((n, day, shard_of(sku), sku))
+    execute_concurrent_with_args(
+        session, prepared("UPDATE product_views_by_day SET views = views + ? WHERE sku=? AND day=?"), by_day)
+    execute_concurrent_with_args(
+        session, prepared("UPDATE daily_views_by_shard SET views = views + ? WHERE day=? AND shard=? AND sku=?"), by_shard)
+    execute_concurrent_with_args(
+        session, prepared("UPDATE searches_by_day SET searches = searches + ? WHERE day=? AND shard=? AND search_query=?"),
+        [(n, today, shard_of(q), q) for q, n in SEARCHES.items()])
+    print(f"[seed] cassandra : {len(orders)} commandes, {len(by_day)} compteurs de vues")
+
+
 def run():
     wait_for_dbs()
     data = load_catalog()
     seed_mongo(data)
-    # T5 : seed_cassandra(data) ; T6 : seed_neo4j(data)
+    seed_cassandra(data)
+    # T6 : seed_neo4j(data)
 
 
 if __name__ == "__main__":
