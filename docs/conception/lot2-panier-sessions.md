@@ -38,7 +38,23 @@ Flux ② de l'[architecture globale](../../architecture/README.md) : API → Red
 
 ## Requêtes types
 
-_À compléter._
+```redis
+HSET session:9f2c customer_id "" cart_id anon:4be1 created_at 2026-11-18T10:00Z last_seen 2026-11-18T10:00Z
+EXPIRE session:9f2c 1800
+MULTI                                   # ajout au panier + rafraîchissement des TTL
+HINCRBY cart:anon:4be1 CPU-AMD-R7-9800X3D 1
+EXPIRE cart:anon:4be1 604800
+EXPIRE session:9f2c 1800
+EXEC
+HGETALL cart:anon:4be1                  # lecture du panier (enrichi ensuite par MongoDB : nom, prix courant)
+# Login : fusion ligne à ligne puis bascule de la session
+HINCRBY cart:customer:C0001 CPU-AMD-R7-9800X3D 1      # pour chaque champ du panier anonyme
+DEL cart:anon:4be1
+HSET session:9f2c customer_id C0001 cart_id customer:C0001
+EXPIRE cart:customer:C0001 2592000
+```
+
+Script complet et exécutable : [db/redis/queries.redis](../../db/redis/queries.redis).
 
 ## Justification des compromis
 
