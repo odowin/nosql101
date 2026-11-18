@@ -64,7 +64,10 @@ export async function SiteHeader() {
             <span className="max-sm:sr-only">Boutiques</span>
           </Link>
           <Link href="/compte" className={iconLink}>
-            <User className="size-6" aria-hidden />
+            <span className="relative">
+              <User className="size-6" aria-hidden />
+              {customer && <span aria-hidden className="absolute -right-0.5 -bottom-0.5 size-2.5 rounded-full bg-emerald-400 ring-2 ring-header" />}
+            </span>
             <span className="max-w-20 truncate max-sm:sr-only">{customer ?? "Compte"}</span>
             {customer && <span className="sr-only">, connecté</span>}
           </Link>
