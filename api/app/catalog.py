@@ -1,12 +1,13 @@
 """Lot 1 — Catalogue produits (MongoDB) avec cache-aside Redis sur la fiche produit."""
 import json
 from datetime import datetime, timezone
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 from typing import Any
 
 from bson import Decimal128, ObjectId
-from fastapi import APIRouter, HTTPException, Query, Response
-from pydantic import BaseModel, ConfigDict, Field
+from fastapi import APIRouter, HTTPException, Query
+from fastapi.responses import JSONResponse
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, model_validator
 from pymongo.errors import DuplicateKeyError
 
 from app.db import mongo_db, redis_client, to_json
@@ -15,6 +16,40 @@ router = APIRouter(tags=["Lot 1 — Catalogue (MongoDB)"])
 
 CACHE_TTL = 300
 LIST_PROJECTION = {"specs": 0, "top_reviews": 0}
+CENT = Decimal("0.01")
+
+
+def _dt(v) -> datetime:
+    return v if isinstance(v, datetime) else datetime.fromisoformat(v)
+
+
+def effective_price(product: dict, now: datetime | None = None) -> tuple[Decimal, int | None, bool]:
+    """(prix effectif, remise en %, en promo) : promo en cours ssi starts_at <= now < ends_at.
+
+    Accepte le document MongoDB (Decimal128, datetime) ou sa forme JSON en cache (float, ISO).
+    """
+    price = Decimal(str(product["price"]))
+    promo = product.get("promo")
+    now = now or datetime.now(timezone.utc)
+    if not promo or not _dt(promo["starts_at"]) <= now < _dt(promo["ends_at"]):
+        return price, None, False
+    if promo.get("price") is not None:
+        eff = Decimal(str(promo["price"]))
+    else:
+        eff = (price * (100 - promo["percent"]) / 100).quantize(CENT, ROUND_HALF_UP)
+    discount = promo.get("percent") or int(((1 - eff / price) * 100).quantize(Decimal(1), ROUND_HALF_UP))
+    return eff, discount, True
+
+
+def price_fields(product: dict) -> dict:
+    """Champs de prix ajoutés à toute réponse produit (calculés à la lecture, même depuis le cache)."""
+    eff, discount, on_sale = effective_price(product)
+    return {"effective_price": float(eff), "on_sale": on_sale, "discount_percent": discount,
+            "promo": to_json(product.get("promo"))}
+
+
+def with_price(product: dict) -> dict:
+    return {**product, **price_fields(product)}
 
 
 def compatible_for(sku: str, compat: dict, limit: int = 5) -> list[dict]:
@@ -60,11 +95,16 @@ def list_products(
     min_price: Decimal | None = None,
     max_price: Decimal | None = None,
     spec: list[str] = Query([], description="Filtre `k:v` répétable, ex. `socket:AM5`"),
+    on_sale: bool = Query(False, description="Seulement les promos en cours"),
     limit: int = Query(20, ge=1, le=100),
     skip: int = Query(0, ge=0),
 ):
-    """Liste filtrée (projection légère : sans specs ni avis)."""
+    """Liste filtrée (projection légère : sans specs ni avis). `min_price`/`max_price` portent sur le prix de référence."""
     query: dict[str, Any] = {}
+    if on_sale:
+        now = datetime.now(timezone.utc)
+        query["promo.starts_at"] = {"$lte": now}
+        query["promo.ends_at"] = {"$gt": now}
     if category:
         query["category._id"] = category
     if brand:
@@ -87,22 +127,26 @@ def list_products(
         query["specs"] = {"$all": matches}
     products = mongo_db().products
     items = products.find(query, LIST_PROJECTION).sort("_id", 1).skip(skip).limit(limit)
-    return {"total": products.count_documents(query), "items": to_json(list(items))}
+    return {"total": products.count_documents(query), "items": [with_price(p) for p in to_json(list(items))]}
 
 
 @router.get("/products/{sku}")
 def get_product(sku: str):
-    """Fiche complète. Cache-aside Redis `product:{sku}` (TTL 300 s), en-tête `X-Cache`."""
+    """Fiche complète. Cache-aside Redis `product:{sku}` (TTL 300 s), en-tête `X-Cache`.
+
+    Le cache garde la promo brute ; le prix effectif est recalculé à chaque lecture.
+    """
     key = f"product:{sku}"
     cached = redis_client().get(key)
     if cached:
-        return Response(cached, media_type="application/json", headers={"X-Cache": "HIT"})
-    doc = mongo_db().products.find_one({"_id": sku})
-    if not doc:
-        raise HTTPException(404, "produit inconnu")
-    body = json.dumps(to_json(doc), ensure_ascii=False)
-    redis_client().set(key, body, ex=CACHE_TTL)
-    return Response(body, media_type="application/json", headers={"X-Cache": "MISS"})
+        doc, status = json.loads(cached), "HIT"
+    else:
+        found = mongo_db().products.find_one({"_id": sku})
+        if not found:
+            raise HTTPException(404, "produit inconnu")
+        doc, status = to_json(found), "MISS"
+        redis_client().set(key, json.dumps(doc, ensure_ascii=False), ex=CACHE_TTL)
+    return JSONResponse(with_price(doc), headers={"X-Cache": status})
 
 
 class Spec(BaseModel):
@@ -111,6 +155,23 @@ class Spec(BaseModel):
     v: Any
     label: str | None = None
     u: str | None = None
+
+
+class Promo(BaseModel):
+    """Promo embarquée : exactement un de `percent` / `price`, en cours sur [starts_at, ends_at)."""
+    label: str = Field(examples=["Black Friday"])
+    percent: int | None = Field(None, ge=1, le=90)
+    price: Decimal | None = Field(None, gt=0)
+    starts_at: AwareDatetime
+    ends_at: AwareDatetime
+
+    @model_validator(mode="after")
+    def _check(self):
+        if (self.percent is None) == (self.price is None):
+            raise ValueError("promo : exactement un de percent ou price")
+        if self.ends_at <= self.starts_at:
+            raise ValueError("promo : ends_at doit suivre starts_at")
+        return self
 
 
 class ProductIn(BaseModel):
@@ -126,6 +187,13 @@ class ProductIn(BaseModel):
     stock: dict | None = None
     specs: list[Spec] = []
     compat: dict = {"uses": [], "supports": []}
+    promo: Promo | None = None
+
+    @model_validator(mode="after")
+    def _promo_below_price(self):
+        if self.promo and self.promo.price is not None and self.promo.price >= self.price:
+            raise ValueError("promo : le prix promo doit être inférieur au prix")
+        return self
 
 
 @router.post("/products", status_code=201)
@@ -151,11 +219,15 @@ def create_product(body: ProductIn):
         created_at=now,
         updated_at=now,
     )
+    if body.promo:
+        doc["promo"] = body.promo.model_dump(exclude_none=True)
+        if body.promo.price is not None:
+            doc["promo"]["price"] = Decimal128(str(body.promo.price.quantize(CENT)))
     try:
         db.products.insert_one(doc)
     except DuplicateKeyError:
         raise HTTPException(409, "produit (ou slug) déjà existant")
-    return to_json(doc)
+    return with_price(to_json(doc))
 
 
 @router.get("/products/{sku}/reviews")
