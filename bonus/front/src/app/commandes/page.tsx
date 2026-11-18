@@ -39,7 +39,7 @@ export default async function OrdersPage() {
         />
       </header>
       {orders.length ? (
-        <ul className="divide-y self-start overflow-hidden rounded-xl bg-header ring-1 ring-white/10">
+        <ul className="divide-y self-start overflow-hidden rounded-lg bg-card">
           {orders.map((o) => (
             <li key={o.order_id}>
               <Link href={`/commandes/${encodeURIComponent(o.order_id)}`} className="flex min-h-11 flex-wrap items-center gap-x-4 gap-y-1 p-4 transition-colors hover:bg-neutral-900 active:bg-neutral-800">

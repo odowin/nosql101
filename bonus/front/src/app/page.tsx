@@ -35,7 +35,7 @@ export default async function Home() {
   ];
 
   return (
-    <main className="flex flex-col gap-10">
+    <main className="theme-dark flex flex-col gap-10">
       <h1 className="sr-only">LDLC NoSQL : la boutique repensée sur quatre bases NoSQL</h1>
 
       <section aria-labelledby="hero-title" className="overflow-hidden rounded-xl">

@@ -1,44 +1,103 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-/* Thème sombre unique : `dark:` s'applique toujours. */
-@custom-variant dark (&:where(html, html *));
+/* Pages internes en clair (#f0f0f0, blocs blancs) ; l'accueil passe en sombre via `.theme-dark` (opération Black Days).
+   `dark:` ne s'applique que sous l'accueil sombre. */
+@custom-variant dark (&:where(:root:has(.theme-dark), :root:has(.theme-dark) *));
 
-/* Contrastes vérifiés (WCAG AA) : texte clair / fond 16:1, muted / card ≥ 6:1, blanc / primary 4.8:1, link / fond 7:1. */
+/* Couleurs mesurées sur ldlc.com (SPEC §4), converties en oklch. Les teintes trop claires pour l'AA en texte
+   (#0096c8, #969696, #32b414, #ff3c00) ont une variante assombrie : --primary, --muted-foreground, --success, --hot. */
 :root {
+  color-scheme: light;
+  --ldlc-black: oklch(0% 0 0);
+  --ldlc-blue: oklch(63.1% 0.127 231); /* #0096c8, décor et grands aplats sans texte */
+  --ldlc-pale: oklch(93.7% 0.024 213); /* #d9eff4 : méga-menu, filtres, encadrés */
+  --ldlc-navy: oklch(27.8% 0.135 263); /* #001e69 : boutons secondaires, titres de groupe */
+  --ldlc-price: oklch(35.9% 0.135 261); /* #0a3782 : prix, liens */
+  --ldlc-night: oklch(29.8% 0.07 268); /* #1e2b50 : pied de page, titres serif */
+  --ldlc-footer-link: oklch(91.8% 0.033 216); /* #cceaf2 */
+  --ldlc-yellow: oklch(85.7% 0.175 88); /* #ffc800 */
+  --ldlc-on-yellow: oklch(31.1% 0.055 53); /* #462814 */
+  --ldlc-orange: oklch(75.9% 0.177 61); /* #ff9100 */
+  --ldlc-strong: oklch(27.7% 0 0); /* #282828 */
+  --ldlc-text: oklch(43.1% 0 0); /* #505050 */
+  --ldlc-alt: oklch(97.6% 0 0); /* #f7f7f7 : lignes alternées */
+
+  --background: oklch(95.5% 0 0); /* #f0f0f0 */
+  --foreground: var(--ldlc-strong);
+  --text: var(--ldlc-text);
+  --header: var(--ldlc-black);
+  --card: oklch(100% 0 0);
+  --card-foreground: var(--ldlc-strong);
+  --popover: oklch(100% 0 0);
+  --popover-foreground: var(--ldlc-strong);
+  --primary: oklch(51% 0.12 233); /* #0096c8 assombri : blanc dessus 5,5:1, sur #d9eff4 4,6:1 */
+  --primary-foreground: oklch(100% 0 0);
+  --link: var(--ldlc-price);
+  --hot: oklch(53% 0.2 36); /* #ff3c00 assombri : 4,8:1 sur #d9eff4 */
+  --promo: oklch(70% 0.18 48);
+  --promo-foreground: oklch(17% 0 0);
+  --promo-text: oklch(55% 0.17 42);
+  --success: oklch(52% 0.16 142); /* #32b414 assombri : 5,2:1 sur blanc, 4,5:1 sur #f0f0f0 */
+  --warning: oklch(52% 0.12 70);
+  --tile: oklch(100% 0 0);
+  --tile-foreground: var(--ldlc-strong);
+  --secondary: var(--ldlc-alt);
+  --secondary-foreground: var(--ldlc-strong);
+  --muted: var(--ldlc-alt);
+  --muted-foreground: oklch(52% 0 0); /* #969696 assombri : 4,8:1 sur #f0f0f0, 4,6:1 sur #d9eff4 */
+  --accent: var(--ldlc-pale);
+  --accent-foreground: var(--ldlc-price);
+  --destructive: oklch(55% 0.22 29);
+  --border: oklch(91% 0 0); /* #e1e1e1 */
+  --input: oklch(91% 0 0);
+  --ring: var(--primary);
+  --radius: 0.5rem;
+}
+
+/* Accueil sombre (#1e1e1e) : contrastes vérifiés AA (texte 16:1, muted ≥ 6:1, link 7:1). */
+:root:has(.theme-dark) {
   color-scheme: dark;
-  --background: oklch(0.22 0 0);
-  --foreground: oklch(0.97 0 0);
-  --header: oklch(0 0 0);
-  --card: oklch(0.27 0 0);
+  --background: oklch(23.5% 0 0);
+  --foreground: oklch(97% 0 0);
+  --text: oklch(97% 0 0);
+  --card: oklch(27% 0 0);
   --card-foreground: var(--foreground);
-  --popover: oklch(0.26 0 0);
+  --popover: oklch(26% 0 0);
   --popover-foreground: var(--foreground);
-  --primary: oklch(0.55 0.12 240);
-  --primary-foreground: oklch(1 0 0);
-  --link: oklch(0.75 0.12 240);
-  --promo: oklch(0.7 0.18 48);
-  --promo-foreground: oklch(0.17 0 0);
-  --promo-text: var(--promo); /* prix promo en texte : 5,3:1 sur card */
-  --success: oklch(0.78 0.15 155);
-  --warning: oklch(0.82 0.14 80);
-  --tile: oklch(1 0 0);
-  --tile-foreground: oklch(0.22 0 0);
-  --secondary: oklch(0.32 0 0);
+  --link: oklch(75% 0.12 240);
+  --promo-text: var(--promo);
+  --success: oklch(78% 0.15 155);
+  --warning: oklch(82% 0.14 80);
+  --secondary: oklch(32% 0 0);
   --secondary-foreground: var(--foreground);
-  --muted: oklch(0.3 0 0);
-  --muted-foreground: oklch(0.76 0 0);
-  --accent: oklch(0.32 0.03 240);
+  --muted: oklch(30% 0 0);
+  --muted-foreground: oklch(76% 0 0);
+  --accent: oklch(32% 0.03 240);
   --accent-foreground: var(--foreground);
-  --destructive: oklch(0.7 0.17 25);
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 18%);
-  --ring: oklch(0.75 0.12 240);
-  --radius: 0.625rem;
+  --destructive: oklch(70% 0.17 25);
+  --border: oklch(100% 0 0 / 12%);
+  --input: oklch(100% 0 0 / 18%);
+  --ring: oklch(75% 0.12 240);
 }
 
 @theme inline {
-  --font-sans: var(--font-sans);
+  --font-sans: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-source-serif), Georgia, serif;
+  --color-text: var(--text);
+  --color-hot: var(--hot);
+  --color-ldlc-blue: var(--ldlc-blue);
+  --color-ldlc-pale: var(--ldlc-pale);
+  --color-ldlc-navy: var(--ldlc-navy);
+  --color-ldlc-price: var(--ldlc-price);
+  --color-ldlc-night: var(--ldlc-night);
+  --color-ldlc-footer-link: var(--ldlc-footer-link);
+  --color-ldlc-yellow: var(--ldlc-yellow);
+  --color-ldlc-on-yellow: var(--ldlc-on-yellow);
+  --color-ldlc-orange: var(--ldlc-orange);
+  --color-ldlc-strong: var(--ldlc-strong);
+  --color-ldlc-alt: var(--ldlc-alt);
+  --color-ldlc-text: var(--ldlc-text);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -76,12 +135,18 @@
   * { @apply border-border outline-ring; }
   html { font-kerning: normal; }
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-background font-sans antialiased;
+    color: var(--text);
+    font-size: 0.875rem; /* corps LDLC : 14px / 21px / 500 */
+    font-weight: 500;
     line-height: 1.5;
-    /* Texture unique et légère : grille de points carrés, quasi invisible derrière le contenu. */
+  }
+  /* Texture de l'accueil sombre seulement : grille de points carrés, quasi invisible. */
+  body:has(.theme-dark) {
     background-image: radial-gradient(oklch(1 0 0 / 4%) 1px, transparent 1px);
     background-size: 22px 22px;
   }
+  ::placeholder { font-style: italic; }
   h1, h2, h3 { line-height: 1.2; text-wrap: balance; letter-spacing: -0.02em; }
   p { text-wrap: pretty; }
   :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
@@ -89,23 +154,36 @@
   /* Flèche native collée au bord sous Chrome : chevron dessiné, la marge droite vient de pr-9. */
   select {
     appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23c4c4c4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23767676' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 0.75rem center;
   }
 }
 
-/* Petites capitales des libellés de navigation : capitales, corps réduit, interlettrage élargi. */
+/* Capitales des libellés (nav, boutons, titres de section) : interlettrage légèrement élargi. */
 @utility caps {
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-weight: 500;
+  letter-spacing: 0.03em;
 }
 
-/* Marges latérales qui respectent encoches et coins arrondis. */
+/* Gouttières de page : 15 px en mobile, 20 px dès 1024 px, sans passer sous encoches et coins arrondis. */
 @utility px-safe {
-  padding-left: max(1rem, env(safe-area-inset-left));
-  padding-right: max(1rem, env(safe-area-inset-right));
+  padding-left: max(15px, env(safe-area-inset-left));
+  padding-right: max(15px, env(safe-area-inset-right));
+  @media (width >= 64rem) {
+    padding-left: max(20px, env(safe-area-inset-left));
+    padding-right: max(20px, env(safe-area-inset-right));
+  }
+}
+
+/* Bloc blanc des pages internes (.sbloc) : rayon 8, sans ombre, 30 px entre blocs. */
+@utility bloc {
+  background-color: var(--card);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 22px 15px;
+  margin-bottom: 30px;
+  @media (width >= 64rem) { padding: 22px 30px; }
 }
 
 /* Surface claire (cartes blanches sur fond sombre) : les tokens de texte passent en variante foncée, tous ≥ 5:1 sur blanc. */

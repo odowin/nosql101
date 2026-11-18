@@ -17,7 +17,7 @@ export default async function CartPage() {
         <SectionHeading as="h1" title="Panier" sub="Conservé dans Redis, durée de vie glissante" />
       </header>
       <CartView items={cart?.items ?? []} loggedIn={!!session?.customer_id} />
-      <aside className="flex flex-col gap-3 rounded-xl bg-header p-5 ring-1 ring-white/10 lg:self-start">
+      <aside className="flex flex-col gap-3 rounded-lg bg-card p-5 lg:self-start">
         <h2 className="caps text-sm font-bold">Compte client</h2>
         {session?.customer_id ? (
           <p className="text-sm">

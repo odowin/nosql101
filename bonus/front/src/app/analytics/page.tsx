@@ -36,7 +36,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
       <div className="stagger grid gap-4 md:grid-cols-3">
         <TopTable title="Top produits du jour" data={today} />
         <TopTable title="Top produits de la semaine" data={week} />
-        <section className="min-w-0 rounded-xl bg-header p-4 ring-1 ring-white/10">
+        <section className="min-w-0 rounded-lg bg-card p-4">
           <h2 className="caps text-sm font-bold">Top recherches du jour</h2>
           {!searches ? (
             <Unavailable />
@@ -57,7 +57,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
         </section>
       </div>
 
-      <section aria-labelledby="daily" className="rounded-xl bg-header p-4 ring-1 ring-white/10">
+      <section aria-labelledby="daily" className="rounded-lg bg-card p-4">
         <h2 id="daily" className="caps text-sm font-bold">Vues quotidiennes d&apos;un produit</h2>
         <form action="/analytics" className="mt-3 flex flex-wrap items-end gap-2">
           <label className="flex flex-col gap-1.5 text-sm font-medium">
@@ -110,7 +110,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
 
 function TopTable({ title, data }: { title: string; data: TopProducts | null }) {
   return (
-    <section className="min-w-0 rounded-xl bg-header p-4 ring-1 ring-white/10">
+    <section className="min-w-0 rounded-lg bg-card p-4">
       <h2 className="caps text-sm font-bold">{title}</h2>
       {!data ? (
         <Unavailable />

@@ -78,7 +78,7 @@ export default async function ProductPage({ params, searchParams }: Props) {
             <Badge variant="outline">MongoDB · cache Redis</Badge>
           </p>
         </div>
-        <aside className="flex flex-col gap-3 self-start rounded-xl bg-header p-5 ring-1 ring-white/10">
+        <aside className="flex flex-col gap-3 self-start rounded-lg bg-card p-5">
           <Price p={p} detailed className="text-3xl [&>span:first-child]:font-bold" />
           {p.stock && <StockLabel status={p.stock.status} qty={p.stock.qty} />}
           <AddToCart sku={sku} disabled={outOfStock} />
@@ -92,7 +92,7 @@ export default async function ProductPage({ params, searchParams }: Props) {
       {p.specs?.length > 0 && (
         <section aria-labelledby="specs">
           <SectionHeading id="specs" title="Caractéristiques" sub="Specs libres MongoDB" />
-          <table className="mt-3 w-full max-w-2xl rounded-xl bg-header text-sm ring-1 ring-white/10 [&_td]:px-4 [&_th]:px-4">
+          <table className="mt-3 w-full max-w-2xl rounded-lg bg-card text-sm [&_td]:px-4 [&_th]:px-4">
             <tbody className="divide-y">
               {p.specs.map((s) => (
                 <tr key={s.k}>

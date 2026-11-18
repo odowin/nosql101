@@ -10,7 +10,7 @@ import { currentSession } from "@/lib/session";
 
 export const metadata: Metadata = { title: "Mon compte · LDLC NoSQL" };
 
-const card = "flex flex-col gap-4 rounded-xl bg-header p-6 ring-1 ring-white/10";
+const card = "flex flex-col gap-4 rounded-lg bg-card p-6";
 
 export default async function AccountPage() {
   const session = await currentSession();

@@ -17,6 +17,13 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
         link: "text-primary underline-offset-4 hover:underline",
+        // Pilules LDLC (SPEC §3 Boutons), à combiner avec les tailles pill*.
+        buy: "bg-ldlc-yellow text-ldlc-on-yellow hover:bg-[color-mix(in_oklch,var(--ldlc-yellow),black_8%)] active:bg-[color-mix(in_oklch,var(--ldlc-yellow),black_14%)]",
+        buyNow: "bg-ldlc-orange text-ldlc-on-yellow hover:bg-[color-mix(in_oklch,var(--ldlc-orange),black_8%)] active:bg-[color-mix(in_oklch,var(--ldlc-orange),black_14%)]",
+        navy: "bg-ldlc-navy text-white hover:bg-[color-mix(in_oklch,var(--ldlc-navy),white_12%)] active:bg-[color-mix(in_oklch,var(--ldlc-navy),white_20%)]",
+        info: "bg-primary text-primary-foreground hover:bg-[color-mix(in_oklch,var(--primary),black_10%)] active:bg-[color-mix(in_oklch,var(--primary),black_18%)]",
+        outlineNavy: "border-2 border-ldlc-navy text-ldlc-navy hover:bg-ldlc-navy hover:text-white active:bg-[color-mix(in_oklch,var(--ldlc-navy),white_12%)]",
+        outlineDanger: "border-2 border-destructive text-destructive hover:bg-destructive hover:text-white",
       },
       size: {
         default:
@@ -30,6 +37,10 @@ const buttonVariants = cva(
         "icon-sm":
           "size-7 rounded-[min(var(--radius-md),12px)] in-data-[slot=button-group]:rounded-lg",
         "icon-lg": "size-12",
+        // 40 px mesurés, portés à 44 px pour la cible tactile ; le grand (50 px) sert à « Passer commande ».
+        pill: "h-11 gap-1.5 rounded-[40px] px-[17px] text-sm font-bold uppercase tracking-[0.02em] disabled:bg-border disabled:text-[oklch(52%_0_0)] disabled:opacity-100",
+        "pill-lg": "h-[50px] gap-2 rounded-[40px] px-6 text-base font-bold uppercase tracking-[0.02em]",
+        "pill-icon": "size-11 rounded-full",
       },
     },
     defaultVariants: {

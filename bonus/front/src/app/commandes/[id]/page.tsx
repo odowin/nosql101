@@ -38,7 +38,7 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
         />
         <Badge variant="secondary" className="mt-2">{STATUS[order.status] ?? order.status}</Badge>
       </header>
-      <table className="w-full rounded-xl bg-header text-sm ring-1 ring-white/10 [&_td]:px-4 [&_th]:px-4">
+      <table className="w-full rounded-lg bg-card text-sm [&_td]:px-4 [&_th]:px-4">
         <caption className="sr-only">Articles de la commande</caption>
         <thead className="text-left text-muted-foreground">
           <tr className="border-b">

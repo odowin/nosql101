@@ -62,7 +62,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: Prom
         />
       </header>
 
-      <form action="/produits" className="flex flex-col gap-4 self-start rounded-xl bg-header p-4 ring-1 ring-white/10" aria-labelledby="filters-title">
+      <form action="/produits" className="flex flex-col gap-4 self-start rounded-lg bg-card p-4" aria-labelledby="filters-title">
         <h2 id="filters-title" className="caps text-sm font-bold">
           Filtrer
         </h2>
