@@ -15,13 +15,16 @@ export async function GET(req: NextRequest) {
   const q = (req.nextUrl.searchParams.get("q") ?? "").trim().slice(0, 64);
   const empty: Suggestions = { queries: [], products: [] };
   if (q.length < 2) return NextResponse.json(empty);
-  const [searches, page] = await Promise.all([
+  const [searches, first] = await Promise.all([
     getTopSearches(50).catch(() => []), // API absente : pas de suggestion plutôt qu'une erreur sous le champ
     listProducts({ q, limit: 3 }).catch(() => null),
   ]);
   const t = q.toLowerCase();
+  const queries = searches.map((s) => s.search_query).filter((s) => s.toLowerCase().includes(t)).slice(0, 5);
+  // La recherche texte de l'API porte sur des mots entiers : pour un début de mot (« ry »), on prend les produits de la 1re requête suggérée.
+  const page = first?.items.length || !queries.length ? first : await listProducts({ q: queries[0], limit: 3 }).catch(() => null);
   const body: Suggestions = {
-    queries: searches.map((s) => s.search_query).filter((s) => s.toLowerCase().includes(t)).slice(0, 5),
+    queries,
     products: (page?.items ?? []).map((p) => ({
       sku: p._id,
       name: p.name,

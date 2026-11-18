@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Search, Star } from "lucide-react";
@@ -11,6 +11,12 @@ import { highlight } from "@/lib/highlight";
 import { cn } from "@/lib/utils";
 
 const LIST = "search-suggestions";
+const DESKTOP = "(width >= 64rem)";
+const onMedia = (cb: () => void) => {
+  const m = matchMedia(DESKTOP);
+  m.addEventListener("change", cb);
+  return () => m.removeEventListener("change", cb);
+};
 
 /**
  * Recherche de l'en-tête : combobox ARIA (flèches, Entrée, Échap) avec suggestions après 200 ms sans frappe.
@@ -23,6 +29,8 @@ export function SearchBox({ className }: { className?: string }) {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
   const term = q.trim();
+  // Le placeholder long est tronqué dans le champ mobile : « Rechercher » comme LDLC sous 1024 px.
+  const desktop = useSyncExternalStore(onMedia, () => matchMedia(DESKTOP).matches, () => true);
 
   useEffect(() => {
     if (term.length < 2) return;
@@ -104,7 +112,7 @@ export function SearchBox({ className }: { className?: string }) {
         aria-autocomplete="list"
         aria-activedescendant={show && active >= 0 ? `${LIST}-${active}` : undefined}
         autoComplete="off"
-        placeholder="Chercher un produit, une marque, une catégorie"
+        placeholder={desktop ? "Chercher un produit, une marque, une catégorie" : "Rechercher"}
         className={cn(
           "h-11 w-full bg-white pr-12 pl-4 text-base [&::-webkit-search-cancel-button]:appearance-none text-ldlc-strong placeholder:text-[oklch(52%_0_0)] lg:text-sm",
           show ? "rounded-t-lg" : "rounded-lg",
@@ -126,7 +134,7 @@ export function SearchBox({ className }: { className?: string }) {
         role="listbox"
         aria-label="Suggestions de recherche"
         hidden={!show}
-        className="absolute inset-x-0 top-full z-50 origin-top overflow-hidden rounded-b-lg border-t border-border bg-white pb-1 text-ldlc-text shadow-[0_8px_16px_oklch(0_0_0/25%)] animate-in fade-in zoom-in-95 duration-150"
+        className="surface-light absolute inset-x-0 top-full z-50 origin-top overflow-hidden rounded-b-lg border-t border-border bg-white pb-1 text-ldlc-text shadow-[0_8px_16px_oklch(0_0_0/25%)] animate-in fade-in zoom-in-95 duration-150"
       >
         {nq > 0 && (
           <div role="group" aria-labelledby={`${LIST}-q`}>
