@@ -20,6 +20,19 @@ db.createCollection('products', {
           bsonType: 'object',
           properties: { status: { enum: ['in_stock', 'low_stock', 'out_of_stock', 'preorder'] } }
         },
+        // promo embarquée optionnelle : en cours ssi starts_at <= now < ends_at (pas de drapeau, pas de purge)
+        promo: {
+          bsonType: 'object',
+          required: ['label', 'starts_at', 'ends_at'],
+          properties: {
+            label: { bsonType: 'string' },
+            percent: { bsonType: 'int', minimum: 1, maximum: 90 },
+            price: { bsonType: 'decimal' },
+            starts_at: { bsonType: 'date' },
+            ends_at: { bsonType: 'date' }
+          },
+          oneOf: [ { required: ['percent'] }, { required: ['price'] } ] // exactement un des deux
+        },
         specs: {
           bsonType: 'array',
           items: {
@@ -50,6 +63,7 @@ db.products.createIndex({ 'category._id': 1, price: 1 });
 db.products.createIndex({ 'category._id': 1, 'specs.k': 1, 'specs.v': 1 }); // Attribute pattern
 db.products.createIndex({ 'brand._id': 1 });
 db.products.createIndex({ slug: 1 }, { unique: true });
+db.products.createIndex({ 'promo.ends_at': 1 }, { partialFilterExpression: { promo: { $exists: true } } }); // seuls les produits en promo
 db.products.createIndex({ name: 'text' }, { default_language: 'none' });
 db.reviews.createIndex({ product_id: 1, created_at: -1 });
 db.categories.createIndex({ ancestors: 1 });

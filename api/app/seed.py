@@ -67,7 +67,7 @@ def seed_mongo(data: dict):
                      key=lambda r: r["created_at"], reverse=True)
         total = sum(r["rating"] for r in own)
         products.append({
-            **p,
+            **{k: v for k, v in p.items() if k != "promo"},  # promo posée par seed_promos
             "category": {"_id": cat["_id"], "name": cat["name"], "path": "/".join(cat["ancestors"] + [cat["_id"]])},
             "brand": {"_id": brand["_id"], "name": brand["name"]},
             "price": Decimal128(str(p["price"])),
@@ -85,6 +85,26 @@ def seed_mongo(data: dict):
     for p in products:
         db.products.update_one({"_id": p["_id"]}, {"$set": {"compatible": compatible_for(p["_id"], p["compat"])}})
     print(f"[seed] mongodb : {len(products)} produits, {len(reviews)} avis")
+
+
+def seed_promos(data: dict):
+    """Promos du jeu de démo, datées relativement à maintenant ; rejouée à chaque démarrage (dates fraîches)."""
+    db, now = mongo_db(), datetime.now(timezone.utc).replace(microsecond=0)
+    for p in data["products"]:
+        promo = p.get("promo")
+        if promo:
+            doc = {"label": promo["label"],
+                   "starts_at": now + timedelta(days=promo["start_days"]),
+                   "ends_at": now + timedelta(days=promo["end_days"])}
+            if "price" in promo:
+                doc["price"] = Decimal128(str(promo["price"]))
+            else:
+                doc["percent"] = promo["percent"]
+            db.products.update_one({"_id": p["_id"]}, {"$set": {"promo": doc}})
+        else:
+            db.products.update_one({"_id": p["_id"]}, {"$unset": {"promo": ""}})
+    redis_client().delete(*[f"product:{p['_id']}" for p in data["products"]])  # fiches en cache périmées
+    print(f"[seed] mongodb : {sum('promo' in p for p in data['products'])} promos")
 
 
 def synthetic_orders(data: dict) -> list[dict]:
@@ -207,6 +227,7 @@ def run():
     wait_for_dbs()
     data = load_catalog()
     seed_mongo(data)
+    seed_promos(data)
     seed_cassandra(data)
     seed_neo4j(data)
 
