@@ -95,6 +95,11 @@ export default async function CatalogPage({ searchParams }: { searchParams: Prom
           <Input id="max_price" name="max_price" inputMode="decimal" placeholder="max" defaultValue={query.max_price ?? ""} className={control} />
         </fieldset>
 
+        <label className="flex min-h-11 items-center gap-2 text-sm font-medium">
+          <input type="checkbox" name="on_sale" value="true" defaultChecked={query.on_sale} className="size-4 accent-primary" />
+          En promo
+        </label>
+
         {query.category ? (
           facets.map(([k, f]) => (
             <fieldset key={k}>

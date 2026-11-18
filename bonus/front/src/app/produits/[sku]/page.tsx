@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { Star } from "lucide-react";
 import { AddToCart } from "@/components/add-to-cart";
 import { StockLabel } from "@/components/product-card";
+import { Price } from "@/components/price";
 import { RecoSection } from "@/components/reco-section";
 import { ReviewForm } from "@/components/review-form";
 import { TrackEvent } from "@/components/track-event";
@@ -12,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ApiError, getDailyViews, getProduct, getRecommendations, listReviews } from "@/lib/api/client";
-import { formatDate, formatPrice } from "@/lib/format";
+import { formatDate } from "@/lib/format";
 
 type Props = { params: Promise<{ sku: string }>; searchParams: Promise<{ avis?: string }> };
 
@@ -77,7 +78,7 @@ export default async function ProductPage({ params, searchParams }: Props) {
           </p>
         </div>
         <aside className="flex flex-col gap-3 rounded-xl bg-card p-5 ring-1 ring-foreground/10">
-          <span className="tabular text-3xl font-bold">{formatPrice(p.price)}</span>
+          <Price p={p} detailed className="text-3xl [&>span:first-child]:font-bold" />
           {p.stock && <StockLabel status={p.stock.status} qty={p.stock.qty} />}
           <AddToCart sku={sku} disabled={outOfStock} />
           <p className="tabular flex items-center justify-between gap-2 text-sm text-muted-foreground">

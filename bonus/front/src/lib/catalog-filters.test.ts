@@ -8,7 +8,8 @@ describe("parseCatalogFilters", () => {
   it("garde les specs k:v valides, ignore les autres, et convertit page en skip", () => {
     expect(
       parseCatalogFilters({ category: "cpu", spec: ["socket:AM5", "sans-separateur", " cores:8 ", ":x"], page: "3" }),
-    ).toMatchObject({ category: "cpu", spec: ["socket:AM5", "cores:8"], limit: 20, skip: 40 });
+    ).toMatchObject({ category: "cpu", spec: ["socket:AM5", "cores:8"], limit: 20, skip: 40, on_sale: undefined });
+    expect(parseCatalogFilters({ on_sale: "true" }).on_sale).toBe(true);
   });
 
   it("accepte une spec unique, des prix à virgule et rejette prix négatif ou page invalide", () => {

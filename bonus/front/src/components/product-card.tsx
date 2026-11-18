@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Star } from "lucide-react";
 import type { ProductSummary } from "@/lib/api/types";
-import { formatPrice } from "@/lib/format";
+import { Price } from "@/components/price";
 
 export function ProductCard({ p }: { p: ProductSummary }) {
   return (
@@ -13,7 +13,7 @@ export function ProductCard({ p }: { p: ProductSummary }) {
         {p.name}
       </Link>
       <div className="mt-auto flex items-end justify-between gap-2 pt-2">
-        <span className="tabular text-lg font-semibold">{formatPrice(p.price)}</span>
+        <Price p={p} className="text-lg" />
         <span className="tabular inline-flex items-center gap-1 text-sm text-muted-foreground">
           <Star className="size-4 fill-current text-primary" aria-hidden />
           <span className="sr-only">Note</span>
