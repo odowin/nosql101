@@ -75,8 +75,14 @@ Un produit reconditionné garde sa catégorie d'origine et porte un attribut `co
 ```js
 db.createCollection("products", { validationLevel: "moderate", validator: { $jsonSchema: {
   bsonType: "object", required: ["name", "category", "brand", "price"],
-  properties: { price: { bsonType: "decimal" }, specs: { bsonType: "array" } } } } })
+  properties: { name: { bsonType: "string" }, slug: { bsonType: "string" }, price: { bsonType: "decimal" },
+    schema_version: { bsonType: "int" },
+    stock: { bsonType: "object", properties: { status: { enum: ["in_stock", "low_stock", "out_of_stock", "preorder"] } } },
+    specs: { bsonType: "array", items: { bsonType: "object", required: ["k", "v"], properties: {
+      k: { bsonType: "string" }, v: { bsonType: ["string", "int", "double", "bool", "decimal"] }, u: { bsonType: "string" } } } } } } } })
 ```
+
+Convention : une valeur numérique n'est jamais une chaîne avec unité (`v: 120, u: "W"`, pas `v: "120 W"`), sinon `$gte`/`$lte` sur `specs.v` ne fonctionnent plus.
 
 Index `products` : `{category._id:1, price:1}` (liste triée par prix), `{category._id:1, specs.k:1, specs.v:1}` (facettes), `{brand._id:1}`, `{slug:1}` unique, texte `{name:"text"}`. Index `reviews` : `{product_id:1, created_at:-1}`. Index `categories` : `{ancestors:1}`.
 
@@ -98,13 +104,15 @@ db.reviews.find({ product_id: "CPU-AMD-R7-9800X3D" }).sort({ created_at: -1 }).s
 db.products.aggregate([ { $match: { "category._id": "cpu" } }, { $unwind: "$specs" },
   { $group: { _id: { k: "$specs.k", v: "$specs.v" }, n: { $sum: 1 } } }, { $sort: { "_id.k": 1, n: -1 } } ])
 
-// Ajout d'un avis : insertion, puis mise à jour atomique du document produit (subset + computed)
+// Ajout d'un avis : insertion, puis UNE mise à jour par pipeline du produit (subset + computed)
 db.reviews.insertOne(r)   // r = { _id, product_id, customer_id, author, rating: 5, title, comment, created_at }
-const p = db.products.findOneAndUpdate({ _id: r.product_id },
-  { $inc: { "rating.count": 1, "rating.sum": r.rating },
-    $push: { top_reviews: { $each: [r], $sort: { created_at: -1 }, $slice: 3 } } },
-  { returnDocument: "after" })
-db.products.updateOne({ _id: p._id }, { $set: { "rating.avg": p.rating.sum / p.rating.count } })  // + DEL product:{sku}
+db.products.updateOne({ _id: r.product_id }, [
+  { $set: { "rating.count": { $add: [{ $ifNull: ["$rating.count", 0] }, 1] },
+            "rating.sum": { $add: [{ $ifNull: ["$rating.sum", 0] }, r.rating] },
+            top_reviews: { $slice: [{ $sortArray: { sortBy: { created_at: -1 }, input: { $concatArrays: [
+              { $ifNull: ["$top_reviews", []] },
+              [{ $literal: { _id: r._id, author: r.author, rating: r.rating, title: r.title, created_at: r.created_at } }] ] } } }, 3] } } },
+  { $set: { "rating.avg": { $divide: ["$rating.sum", "$rating.count"] } } } ])   // + DEL product:{sku}
 
 // Évolution sans migration : nouvel attribut et nouvelle catégorie
 db.products.insertOne({ _id: "GPU-NVIDIA-RTX5090", /* … */ specs: [ { k: "dlss", label: "DLSS", v: "4" } ] })
@@ -114,7 +122,7 @@ db.categories.insertOne({ _id: "vr", name: "Casques VR", parent: "peripheriques"
 
 Chaque critère de facette exige son propre `$elemMatch` : sans lui, le `socket` d'un élément et le `AM5` d'un autre suffiraient à faire correspondre le document. Seul le premier `$elemMatch` borne l'index `{category._id, specs.k, specs.v}` ; les suivants sont filtrés au FETCH, donc on place le critère le plus sélectif en premier.
 
-`$inc` et `$push` sur un même document sont atomiques. La seconde écriture (`avg`) est idempotente et recalculable : une coupure entre les deux laisse au pire une moyenne en retard d'un avis.
+Le pipeline recalcule `count`, `sum`, `avg` et `top_reviews` (3 plus récents, sous-ensemble des champs de l'avis) en une seule écriture atomique, sans lecture préalable. Restent deux écritures non transactionnelles, l'insertion dans `reviews` puis la mise à jour de `products` : une coupure entre les deux laisse un avis présent mais non compté, que l'on recalcule depuis `reviews`. Si ce décalage devenait inacceptable, une transaction multi-documents est possible sur le replica set, au prix de la latence.
 
 ## Justification des compromis
 
