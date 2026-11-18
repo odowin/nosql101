@@ -28,6 +28,7 @@ Hors périmètre : la prise de commande et le paiement restent dans une base rel
 | Livrable | Fichier |
 |---|---|
 | Sujet du projet | [docs/sujet.md](docs/sujet.md) |
+| Historique des versions | [CHANGELOG.md](CHANGELOG.md) |
 | Schéma d'architecture | [architecture/README.md](architecture/README.md) (Mermaid) |
 | Contexte, hypothèses, synthèse des compromis | [docs/conception/00-contexte-synthese.md](docs/conception/00-contexte-synthese.md) |
 | Conception Lot 1 — Catalogue produits | [docs/conception/lot1-catalogue-produits.md](docs/conception/lot1-catalogue-produits.md) |
