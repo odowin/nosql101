@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { SectionHeading } from "@/components/section-heading";
 import { Badge } from "@/components/ui/badge";
 import { ApiError, getOrder } from "@/lib/api/client";
 import { formatDate, formatPrice, ORDER_STATUS as STATUS } from "@/lib/format";
@@ -26,15 +27,18 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
         <Link href="/commandes" className="underline-offset-4 hover:underline">Mes commandes</Link> / {order.order_id}
       </nav>
       <header>
-        <h1 className="flex flex-wrap items-center gap-2 text-3xl font-bold">
-          Commande <span className="font-mono text-2xl">{order.order_id}</span>
-        </h1>
-        <p className="mt-1 flex flex-wrap items-center gap-2 text-muted-foreground">
-          {formatDate(order.order_date)} <Badge variant="secondary">{STATUS[order.status] ?? order.status}</Badge>
-          <Badge variant="outline">Cassandra</Badge>
-        </p>
+        <SectionHeading
+          as="h1"
+          title={
+            <>
+              Commande <span className="font-mono normal-case">{order.order_id}</span>
+            </>
+          }
+          sub={`${formatDate(order.order_date)} · Cassandra`}
+        />
+        <Badge variant="secondary" className="mt-2">{STATUS[order.status] ?? order.status}</Badge>
       </header>
-      <table className="w-full text-sm">
+      <table className="w-full rounded-xl bg-header text-sm ring-1 ring-white/10 [&_td]:px-4 [&_th]:px-4">
         <caption className="sr-only">Articles de la commande</caption>
         <thead className="text-left text-muted-foreground">
           <tr className="border-b">

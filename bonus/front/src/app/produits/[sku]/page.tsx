@@ -9,6 +9,7 @@ import { Price } from "@/components/price";
 import { RecoSection } from "@/components/reco-section";
 import { ReviewForm } from "@/components/review-form";
 import { TrackEvent } from "@/components/track-event";
+import { SectionHeading } from "@/components/section-heading";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -77,7 +78,7 @@ export default async function ProductPage({ params, searchParams }: Props) {
             <Badge variant="outline">MongoDB · cache Redis</Badge>
           </p>
         </div>
-        <aside className="flex flex-col gap-3 rounded-xl bg-card p-5 ring-1 ring-foreground/10">
+        <aside className="flex flex-col gap-3 self-start rounded-xl bg-header p-5 ring-1 ring-white/10">
           <Price p={p} detailed className="text-3xl [&>span:first-child]:font-bold" />
           {p.stock && <StockLabel status={p.stock.status} qty={p.stock.qty} />}
           <AddToCart sku={sku} disabled={outOfStock} />
@@ -90,8 +91,8 @@ export default async function ProductPage({ params, searchParams }: Props) {
 
       {p.specs?.length > 0 && (
         <section aria-labelledby="specs">
-          <h2 id="specs" className="text-xl font-semibold">Caractéristiques</h2>
-          <table className="mt-3 w-full max-w-2xl text-sm">
+          <SectionHeading id="specs" title="Caractéristiques" sub="Specs libres MongoDB" />
+          <table className="mt-3 w-full max-w-2xl rounded-xl bg-header text-sm ring-1 ring-white/10 [&_td]:px-4 [&_th]:px-4">
             <tbody className="divide-y">
               {p.specs.map((s) => (
                 <tr key={s.k}>
@@ -108,10 +109,8 @@ export default async function ProductPage({ params, searchParams }: Props) {
       )}
 
       <section aria-labelledby="recos">
-        <h2 id="recos" className="flex items-center gap-2 text-xl font-semibold">
-          Recommandations <Badge variant="outline">Neo4j</Badge>
-        </h2>
-        <div className="mt-3 grid gap-4 sm:grid-cols-2">
+        <SectionHeading id="recos" title="Recommandations" sub="Graphe Neo4j" />
+        <div className="stagger mt-3 grid gap-4 sm:grid-cols-2">
           {recos.map((r) => (
             <Suspense key={r.kind} fallback={<Skeleton className="h-40 rounded-xl" />}>
               <RecoSection title={r.title} items={getRecommendations(sku, r.kind)} />
@@ -120,10 +119,8 @@ export default async function ProductPage({ params, searchParams }: Props) {
         </div>
       </section>
 
-      <section aria-labelledby="avis" className="scroll-mt-20">
-        <h2 id="avis" className="flex items-center gap-2 text-xl font-semibold">
-          Avis clients <Badge variant="outline">MongoDB</Badge>
-        </h2>
+      <section id="avis" aria-label="Avis clients" className="scroll-mt-20">
+        <SectionHeading title="Avis clients" sub="MongoDB" />
         {reviews === null ? (
           <p className="mt-2 text-muted-foreground">Avis indisponibles pour le moment.</p>
         ) : reviews.items.length === 0 ? (

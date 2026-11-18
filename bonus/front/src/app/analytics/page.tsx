@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
+import { SectionHeading } from "@/components/section-heading";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getDailyViews, getTopProducts, getTopSearches } from "@/lib/api/client";
@@ -27,19 +27,17 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
   return (
     <main className="flex flex-col gap-8">
       <header>
-        <h1 className="flex items-center gap-2 text-3xl font-bold">
-          Analytics <Badge variant="outline">Cassandra</Badge>
-        </h1>
-        <p className="mt-1 max-w-[65ch] text-muted-foreground">
+        <SectionHeading as="h1" title="Meilleures ventes et analytics" sub="Cassandra" />
+        <p className="mt-2 max-w-[65ch] text-muted-foreground">
           Compteurs de vues et de recherches agrégés par jour, alimentés par les événements de navigation.
         </p>
       </header>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="stagger grid gap-4 md:grid-cols-3">
         <TopTable title="Top produits du jour" data={today} />
         <TopTable title="Top produits de la semaine" data={week} />
-        <section className="rounded-xl bg-card p-4 ring-1 ring-foreground/10">
-          <h2 className="font-semibold">Top recherches du jour</h2>
+        <section className="min-w-0 rounded-xl bg-header p-4 ring-1 ring-white/10">
+          <h2 className="caps text-sm font-bold">Top recherches du jour</h2>
           {!searches ? (
             <Unavailable />
           ) : searches.length === 0 ? (
@@ -59,8 +57,8 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
         </section>
       </div>
 
-      <section aria-labelledby="daily" className="rounded-xl bg-card p-4 ring-1 ring-foreground/10">
-        <h2 id="daily" className="font-semibold">Vues quotidiennes d&apos;un produit</h2>
+      <section aria-labelledby="daily" className="rounded-xl bg-header p-4 ring-1 ring-white/10">
+        <h2 id="daily" className="caps text-sm font-bold">Vues quotidiennes d&apos;un produit</h2>
         <form action="/analytics" className="mt-3 flex flex-wrap items-end gap-2">
           <label className="flex flex-col gap-1.5 text-sm font-medium">
             SKU
@@ -112,8 +110,8 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
 
 function TopTable({ title, data }: { title: string; data: TopProducts | null }) {
   return (
-    <section className="rounded-xl bg-card p-4 ring-1 ring-foreground/10">
-      <h2 className="font-semibold">{title}</h2>
+    <section className="min-w-0 rounded-xl bg-header p-4 ring-1 ring-white/10">
+      <h2 className="caps text-sm font-bold">{title}</h2>
       {!data ? (
         <Unavailable />
       ) : data.items.length === 0 ? (
@@ -123,7 +121,7 @@ function TopTable({ title, data }: { title: string; data: TopProducts | null }) 
           {data.items.map((i) => (
             <li key={i.sku}>
               <Link href={`/analytics?sku=${encodeURIComponent(i.sku)}`} className="flex min-h-11 items-center gap-2 hover:text-link">
-                <span className="tabular w-5 text-muted-foreground">{i.rank}</span>
+                <span className="tabular w-5 font-bold text-promo-text">{i.rank}</span>
                 <span className="min-w-0 flex-1 truncate">{i.name ?? i.sku}</span>
                 <span className="tabular text-muted-foreground">{i.views}</span>
               </Link>
