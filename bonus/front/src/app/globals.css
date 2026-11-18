@@ -1,53 +1,103 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (@media (prefers-color-scheme: dark));
+/* Pages internes en clair (#f0f0f0, blocs blancs) ; l'accueil passe en sombre via `.theme-dark` (opération Black Days).
+   `dark:` ne s'applique que sous l'accueil sombre. */
+@custom-variant dark (&:where(:root:has(.theme-dark), :root:has(.theme-dark) *));
 
+/* Couleurs mesurées sur ldlc.com (SPEC §4), converties en oklch. Les teintes trop claires pour l'AA en texte
+   (#0096c8, #969696, #32b414, #ff3c00) ont une variante assombrie : --primary, --muted-foreground, --success, --hot. */
 :root {
-  --background: oklch(0.985 0.003 250);
-  --foreground: oklch(0.2 0.02 255);
-  --card: oklch(1 0 0);
-  --card-foreground: var(--foreground);
-  --popover: var(--card);
-  --popover-foreground: var(--foreground);
-  --primary: oklch(0.62 0.19 45);
-  --primary-foreground: oklch(0.99 0.01 60);
-  --secondary: oklch(0.96 0.006 250);
-  --secondary-foreground: oklch(0.25 0.02 255);
-  --muted: oklch(0.96 0.006 250);
-  --muted-foreground: oklch(0.5 0.02 255);
-  --accent: oklch(0.95 0.03 60);
-  --accent-foreground: oklch(0.3 0.05 45);
-  --destructive: oklch(0.55 0.22 27);
-  --border: oklch(0.91 0.008 250);
-  --input: oklch(0.88 0.01 250);
-  --ring: oklch(0.62 0.19 45);
-  --radius: 0.625rem;
+  color-scheme: light;
+  --ldlc-black: oklch(0% 0 0);
+  --ldlc-blue: oklch(63.1% 0.127 231); /* #0096c8, décor et grands aplats sans texte */
+  --ldlc-pale: oklch(93.7% 0.024 213); /* #d9eff4 : méga-menu, filtres, encadrés */
+  --ldlc-navy: oklch(27.8% 0.135 263); /* #001e69 : boutons secondaires, titres de groupe */
+  --ldlc-price: oklch(35.9% 0.135 261); /* #0a3782 : prix, liens */
+  --ldlc-night: oklch(29.8% 0.07 268); /* #1e2b50 : pied de page, titres serif */
+  --ldlc-footer-link: oklch(91.8% 0.033 216); /* #cceaf2 */
+  --ldlc-yellow: oklch(85.7% 0.175 88); /* #ffc800 */
+  --ldlc-on-yellow: oklch(31.1% 0.055 53); /* #462814 */
+  --ldlc-orange: oklch(75.9% 0.177 61); /* #ff9100 */
+  --ldlc-strong: oklch(27.7% 0 0); /* #282828 */
+  --ldlc-text: oklch(43.1% 0 0); /* #505050 */
+  --ldlc-alt: oklch(97.6% 0 0); /* #f7f7f7 : lignes alternées */
+
+  --background: oklch(95.5% 0 0); /* #f0f0f0 */
+  --foreground: var(--ldlc-strong);
+  --text: var(--ldlc-text);
+  --header: var(--ldlc-black);
+  --card: oklch(100% 0 0);
+  --card-foreground: var(--ldlc-strong);
+  --popover: oklch(100% 0 0);
+  --popover-foreground: var(--ldlc-strong);
+  --primary: oklch(51% 0.12 233); /* #0096c8 assombri : blanc dessus 5,5:1, sur #d9eff4 4,6:1 */
+  --primary-foreground: oklch(100% 0 0);
+  --link: var(--ldlc-price);
+  --hot: oklch(53% 0.2 36); /* #ff3c00 assombri : 4,8:1 sur #d9eff4 */
+  --promo: oklch(70% 0.18 48);
+  --promo-foreground: oklch(17% 0 0);
+  --promo-text: oklch(55% 0.17 42);
+  --success: oklch(50% 0.16 142); /* #32b414 assombri : AA sur blanc, #f0f0f0 et le bleu pâle #d9eff4 */
+  --warning: oklch(52% 0.12 70);
+  --tile: oklch(100% 0 0);
+  --tile-foreground: var(--ldlc-strong);
+  --secondary: var(--ldlc-alt);
+  --secondary-foreground: var(--ldlc-strong);
+  --muted: var(--ldlc-alt);
+  --muted-foreground: oklch(52% 0 0); /* #969696 assombri : 4,8:1 sur #f0f0f0, 4,6:1 sur #d9eff4 */
+  --accent: var(--ldlc-pale);
+  --accent-foreground: var(--ldlc-price);
+  --destructive: oklch(55% 0.22 29);
+  --border: oklch(91% 0 0); /* #e1e1e1 */
+  --input: oklch(91% 0 0);
+  --ring: var(--primary);
+  --radius: 0.5rem;
 }
 
-@media (prefers-color-scheme: dark) {
-:root {
-  --background: oklch(0.17 0.015 255);
-  --foreground: oklch(0.96 0.005 250);
-  --card: oklch(0.22 0.015 255);
-  --primary: oklch(0.72 0.17 50);
-  --primary-foreground: oklch(0.2 0.03 45);
-  --secondary: oklch(0.27 0.015 255);
-  --secondary-foreground: oklch(0.96 0.005 250);
-  --muted: oklch(0.27 0.015 255);
-  --muted-foreground: oklch(0.72 0.015 250);
-  --accent: oklch(0.3 0.04 50);
-  --accent-foreground: oklch(0.95 0.02 60);
-  --destructive: oklch(0.68 0.2 25);
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 16%);
-  --ring: oklch(0.72 0.17 50);
+/* Accueil sombre (#1e1e1e) : contrastes vérifiés AA (texte 16:1, muted ≥ 6:1, link 7:1). */
+:root:has(.theme-dark) {
   color-scheme: dark;
-}
+  --background: oklch(23.5% 0 0);
+  --foreground: oklch(97% 0 0);
+  --text: oklch(97% 0 0);
+  --card: oklch(27% 0 0);
+  --card-foreground: var(--foreground);
+  --popover: oklch(26% 0 0);
+  --popover-foreground: var(--foreground);
+  --link: oklch(75% 0.12 240);
+  --promo-text: var(--promo);
+  --success: oklch(78% 0.15 155);
+  --warning: oklch(82% 0.14 80);
+  --secondary: oklch(32% 0 0);
+  --secondary-foreground: var(--foreground);
+  --muted: oklch(30% 0 0);
+  --muted-foreground: oklch(76% 0 0);
+  --accent: oklch(32% 0.03 240);
+  --accent-foreground: var(--foreground);
+  --destructive: oklch(70% 0.17 25);
+  --border: oklch(100% 0 0 / 12%);
+  --input: oklch(100% 0 0 / 18%);
+  --ring: oklch(75% 0.12 240);
 }
 
 @theme inline {
-  --font-sans: var(--font-sans);
+  --font-sans: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-source-serif), Georgia, serif;
+  --color-text: var(--text);
+  --color-hot: var(--hot);
+  --color-ldlc-blue: var(--ldlc-blue);
+  --color-ldlc-pale: var(--ldlc-pale);
+  --color-ldlc-navy: var(--ldlc-navy);
+  --color-ldlc-price: var(--ldlc-price);
+  --color-ldlc-night: var(--ldlc-night);
+  --color-ldlc-footer-link: var(--ldlc-footer-link);
+  --color-ldlc-yellow: var(--ldlc-yellow);
+  --color-ldlc-on-yellow: var(--ldlc-on-yellow);
+  --color-ldlc-orange: var(--ldlc-orange);
+  --color-ldlc-strong: var(--ldlc-strong);
+  --color-ldlc-alt: var(--ldlc-alt);
+  --color-ldlc-text: var(--ldlc-text);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -56,6 +106,15 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-header: var(--header);
+  --color-link: var(--link);
+  --color-promo: var(--promo);
+  --color-promo-foreground: var(--promo-foreground);
+  --color-promo-text: var(--promo-text);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-tile: var(--tile);
+  --color-tile-foreground: var(--tile-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -73,15 +132,181 @@
 }
 
 @layer base {
-  * { @apply border-border outline-ring/50; }
+  * { @apply border-border outline-ring; }
   html { font-kerning: normal; }
-  body { @apply bg-background text-foreground font-sans antialiased; line-height: 1.5; }
+  body {
+    @apply bg-background font-sans antialiased;
+    color: var(--text);
+    font-size: 0.875rem; /* corps LDLC : 14px / 21px / 500 */
+    font-weight: 500;
+    line-height: 1.5;
+  }
+  /* Texture de l'accueil sombre seulement : grille de points carrés, quasi invisible. */
+  body:has(.theme-dark) {
+    background-image: radial-gradient(oklch(1 0 0 / 4%) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+  ::placeholder { font-style: italic; }
   h1, h2, h3 { line-height: 1.2; text-wrap: balance; letter-spacing: -0.02em; }
   p { text-wrap: pretty; }
   :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
   .tabular { font-variant-numeric: tabular-nums; }
+  /* Flèche native collée au bord sous Chrome : chevron dessiné, la marge droite vient de pr-9. */
+  select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23767676' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+  }
+}
+
+/* Capitales des libellés (nav, boutons, titres de section) : interlettrage légèrement élargi. */
+@utility caps {
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* Gouttières de page : 15 px en mobile, 20 px dès 1024 px, sans passer sous encoches et coins arrondis. */
+@utility px-safe {
+  padding-left: max(15px, env(safe-area-inset-left));
+  padding-right: max(15px, env(safe-area-inset-right));
+  @media (width >= 64rem) {
+    padding-left: max(20px, env(safe-area-inset-left));
+    padding-right: max(20px, env(safe-area-inset-right));
+  }
+}
+
+/* Bloc blanc des pages internes (.sbloc) : rayon 8, sans ombre, 30 px entre blocs. */
+@utility bloc {
+  background-color: var(--card);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 22px 15px;
+  margin-bottom: 30px;
+  @media (width >= 64rem) { padding: 22px 30px; }
+}
+
+/* Surface claire (cartes blanches sur fond sombre) : les tokens de texte passent en variante foncée, tous ≥ 5:1 sur blanc. */
+@utility surface-light {
+  background-color: var(--tile);
+  color: var(--tile-foreground);
+  --foreground: var(--tile-foreground);
+  --muted-foreground: oklch(0.48 0 0);
+  --promo-text: oklch(0.55 0.17 42);
+  --success: oklch(0.5 0.13 150);
+  --warning: oklch(0.52 0.12 70);
+  --destructive: oklch(0.52 0.19 25);
+  --link: oklch(0.48 0.13 240);
+  --border: oklch(0 0 0 / 12%);
+}
+
+/* Bannière d'accueil en CSS : faisceaux de projecteurs et halo turquoise sur noir, sans image. */
+@utility hero-bg {
+  background:
+    radial-gradient(50% 60% at 50% 105%, oklch(0.62 0.1 200 / 35%), transparent 70%),
+    conic-gradient(from 160deg at 18% -15%, transparent 0deg 8deg, oklch(1 0 0 / 9%) 12deg, transparent 20deg 360deg),
+    conic-gradient(from 170deg at 82% -15%, transparent 0deg 8deg, oklch(1 0 0 / 9%) 12deg, transparent 20deg 360deg),
+    radial-gradient(70% 90% at 50% 0%, oklch(0.32 0.03 220), oklch(0.1 0 0) 75%);
+}
+
+/* Entrée des grilles : chaque élément monte avec 30 ms de décalage, plafonné à 240 ms. N'intercepte aucun clic. */
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } }
+@utility stagger {
+  & > * { animation: rise 320ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+  & > :nth-child(2) { animation-delay: 30ms; }
+  & > :nth-child(3) { animation-delay: 60ms; }
+  & > :nth-child(4) { animation-delay: 90ms; }
+  & > :nth-child(5) { animation-delay: 120ms; }
+  & > :nth-child(6) { animation-delay: 150ms; }
+  & > :nth-child(7) { animation-delay: 180ms; }
+  & > :nth-child(8) { animation-delay: 210ms; }
+  & > :nth-child(n + 9) { animation-delay: 240ms; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, ::before, ::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+  *, ::before, ::after { animation-duration: 0.01ms !important; animation-delay: 0ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
+
+/* Tiroir du burger : glisse depuis la gauche, voile qui s'estompe ; transitions CSS, donc interruptibles. */
+@layer components {
+  .drawer {
+    translate: -100% 0;
+    transition: translate 250ms cubic-bezier(0.2, 0.7, 0.2, 1), overlay 250ms allow-discrete, display 250ms allow-discrete;
+  }
+  .drawer[open] {
+    translate: 0 0;
+    @starting-style { translate: -100% 0; }
+  }
+  .drawer::backdrop {
+    background: oklch(0% 0 0 / 50%);
+    opacity: 0;
+    transition: opacity 250ms, overlay 250ms allow-discrete, display 250ms allow-discrete;
+  }
+  .drawer[open]::backdrop {
+    opacity: 1;
+    @starting-style { opacity: 0; }
+  }
+
+  /* Feuille de filtres mobile : monte depuis le bas (barre « Filtrer »). */
+  .sheet {
+    translate: 0 100%;
+    transition: translate 250ms cubic-bezier(0.2, 0.7, 0.2, 1), overlay 250ms allow-discrete, display 250ms allow-discrete;
+  }
+  .sheet[open] {
+    translate: 0 0;
+    @starting-style { translate: 0 100%; }
+  }
+
+  /* Panneau « ajouté au panier » : glisse depuis la droite (600 px), depuis le bas sous 1024 px ; voile noir. */
+  .side-panel {
+    translate: 0 100%;
+    transition: translate 250ms cubic-bezier(0.2, 0.7, 0.2, 1), overlay 250ms allow-discrete, display 250ms allow-discrete;
+    @media (width >= 64rem) { translate: 100% 0; }
+  }
+  .side-panel[open] {
+    translate: 0 0;
+    @starting-style {
+      translate: 0 100%;
+      @media (width >= 64rem) { translate: 100% 0; }
+    }
+  }
+  .side-panel::backdrop {
+    background: oklch(0% 0 0 / 50%);
+    opacity: 0;
+    transition: opacity 250ms, overlay 250ms allow-discrete, display 250ms allow-discrete;
+  }
+  .side-panel[open]::backdrop {
+    opacity: 1;
+    @starting-style { opacity: 0; }
+  }
+
+  /* Curseur double : les pistes natives sont transparentes et laissent passer le pointeur, seules les poignées le captent. */
+  .dual-range {
+    appearance: none;
+    background: none;
+    pointer-events: none;
+    padding: 0 4px;
+  }
+  .dual-range::-webkit-slider-thumb {
+    appearance: none;
+    pointer-events: auto;
+    width: 22px;
+    height: 34px;
+    border-radius: 6px;
+    background: var(--ldlc-price);
+    border: 2px solid white;
+    cursor: grab;
+  }
+  .dual-range::-moz-range-thumb {
+    pointer-events: auto;
+    width: 18px;
+    height: 30px;
+    border-radius: 6px;
+    background: var(--ldlc-price);
+    border: 2px solid white;
+    cursor: grab;
+  }
+  .dual-range:focus-visible { outline: none; }
+  .dual-range:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--ring); outline-offset: 2px; }
+  .dual-range:focus-visible::-moz-range-thumb { outline: 2px solid var(--ring); outline-offset: 2px; }
 }

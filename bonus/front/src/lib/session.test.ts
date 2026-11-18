@@ -1,12 +1,13 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ApiError } from "./api/client";
-import { isSessionExpired, withSession } from "./session";
+import { endSession, isSessionExpired, withSession } from "./session";
 
 const jar = new Map<string, string>();
 vi.mock("next/headers", () => ({
   cookies: async () => ({
     get: (name: string) => (jar.has(name) ? { value: jar.get(name) } : undefined),
     set: (name: string, value: string) => jar.set(name, value),
+    delete: (name: string) => jar.delete(name),
   }),
 }));
 
@@ -39,5 +40,23 @@ describe("session", () => {
     const fn = vi.fn().mockRejectedValue(new ApiError(404, "SKU inconnu"));
     await expect(withSession(fn)).rejects.toMatchObject({ message: "SKU inconnu" });
     expect(fn).toHaveBeenCalledTimes(1);
+  });
+
+  it("déconnexion : DELETE /sessions/{sid} puis cookie supprimé", async () => {
+    jar.set("sid", "abc");
+    const fetchMock = vi.fn<(req: Request) => Promise<Response>>(async () => new Response(null, { status: 204 }));
+    vi.stubGlobal("fetch", fetchMock);
+    await endSession();
+    const req = fetchMock.mock.calls[0][0];
+    expect(req.method).toBe("DELETE");
+    expect(new URL(req.url).pathname).toBe("/sessions/abc");
+    expect(jar.has("sid")).toBe(false);
+  });
+
+  it("déconnexion : supprime le cookie même si l'API est injoignable", async () => {
+    jar.set("sid", "abc");
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new TypeError("fetch failed")));
+    await endSession();
+    expect(jar.has("sid")).toBe(false);
   });
 });

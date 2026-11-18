@@ -27,7 +27,7 @@ export function ReviewForm({ sku }: { sku: string }) {
         </label>
         <label className={field}>
           Note
-          <select name="rating" defaultValue="5" className="h-11 rounded-lg border border-input bg-transparent px-2">
+          <select name="rating" defaultValue="5" className="h-11 rounded-lg border border-input bg-transparent pl-3 pr-9">
             {[5, 4, 3, 2, 1].map((n) => (
               <option key={n} value={n}>
                 {n} / 5

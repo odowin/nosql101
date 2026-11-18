@@ -8,14 +8,14 @@ export function Price({ p, detailed, className }: { p: PriceInfo; detailed?: boo
   const v = priceView(p);
   return (
     <span className={cn("tabular inline-flex flex-wrap items-baseline gap-x-2 gap-y-1", className)}>
-      <span className="font-semibold">{v.now}</span>
+      <span className={cn("font-semibold", v.was && "text-promo-text")}>{v.now}</span>
       {v.was && (
         <del className="text-[0.7em] font-normal text-muted-foreground">
           <span className="sr-only">au lieu de </span>
           {v.was}
         </del>
       )}
-      {v.badge && <Badge variant="destructive" className="self-center">{v.badge}</Badge>}
+      {v.badge && <Badge variant="promo" className="self-center">{v.badge}</Badge>}
       {detailed && v.label && (
         <span className="basis-full text-sm font-normal text-muted-foreground">
           {v.label} · {v.until}

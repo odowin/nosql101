@@ -69,6 +69,8 @@ export const getCustomerRecommendations = (customer_id: string, limit = 6) =>
 // --- Sessions et panier (en-tête X-Session-Id)
 export const createSession = () => call<T.Session>(api.POST("/sessions", live));
 export const getSession = (sid: string) => call<T.Session>(api.GET("/sessions/{sid}", { params: { path: { sid } }, ...live }));
+export const deleteSession = (sid: string) =>
+  call<void>(api.DELETE("/sessions/{sid}", { params: { path: { sid } } }));
 export const login = (sid: string, customer_id: string) =>
   call<T.Session & { cart: T.Cart }>(api.POST("/sessions/{sid}/login", { params: { path: { sid } }, body: { customer_id } }));
 export const getCart = (sid: string) => call<T.Cart>(api.GET("/cart", { headers: sessionHeader(sid), ...live }));
