@@ -32,7 +32,7 @@
           "Lot 1 — Catalogue (MongoDB)"
         ],
         "summary": "List Products",
-        "description": "Liste filtrée (projection légère : sans specs ni avis). `min_price`/`max_price` portent sur le prix de référence.",
+        "description": "Liste filtrée et triée (projection légère : sans specs ni avis). `min_price`/`max_price` portent sur le prix de référence.",
         "operationId": "list_products_products_get",
         "parameters": [
           {
@@ -149,6 +149,31 @@
               "title": "On Sale"
             },
             "description": "Seulement les promos en cours"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "price_asc",
+                    "price_desc",
+                    "name",
+                    "rating",
+                    "discount"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Tri ; par défaut par SKU. Les tris prix et remise portent sur le prix effectif",
+              "title": "Sort"
+            },
+            "description": "Tri ; par défaut par SKU. Les tris prix et remise portent sur le prix effectif"
           },
           {
             "name": "limit",

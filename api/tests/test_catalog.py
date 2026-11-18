@@ -185,3 +185,30 @@ def test_on_sale_filter_and_effective_price(client, promo_products):
         "promo": {"label": "x", "percent": 10, "price": 90, "starts_at": NOW.isoformat(),
                   "ends_at": (NOW + DAY).isoformat()}})
     assert both.status_code == 422
+
+
+def _all_cpus(client, **params):
+    return client.get("/products", params={"category": "cpu", "limit": 100, **params}).json()["items"]
+
+
+@pytest.mark.parametrize("sort, key, reverse", [
+    ("price_asc", lambda p: p["effective_price"], False),
+    ("price_desc", lambda p: p["effective_price"], True),
+    ("name", lambda p: p["name"], False),
+    ("rating", lambda p: (p.get("rating", {}).get("avg", -1), p.get("rating", {}).get("count", -1)), True),  # sans note : en dernier
+    ("discount", lambda p: p["discount_percent"] or 0, True),
+])
+def test_sort(client, promo_products, sort, key, reverse):
+    items = _all_cpus(client, sort=sort)
+    keys = [key(p) for p in items]
+    assert keys == sorted(keys, reverse=reverse)
+    assert "CPU-TEST-PROMO-ON" in {p["_id"] for p in items}  # promo en cours : prix effectif 180 au lieu de 200
+    # Tri appliqué avant skip/limit : les pages se suivent sans trou ni doublon.
+    pages = [p["_id"] for skip in range(0, len(items), 3) for p in _all_cpus(client, sort=sort, limit=3, skip=skip)]
+    assert pages == [p["_id"] for p in items]
+
+
+def test_sort_default_and_invalid(client):
+    skus = [p["_id"] for p in _all_cpus(client)]
+    assert skus == sorted(skus)
+    assert client.get("/products", params={"sort": "nope"}).status_code == 422

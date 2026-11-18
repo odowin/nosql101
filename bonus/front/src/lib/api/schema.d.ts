@@ -33,7 +33,7 @@ export interface paths {
         };
         /**
          * List Products
-         * @description Liste filtrée (projection légère : sans specs ni avis). `min_price`/`max_price` portent sur le prix de référence.
+         * @description Liste filtrée et triée (projection légère : sans specs ni avis). `min_price`/`max_price` portent sur le prix de référence.
          */
         get: operations["list_products_products_get"];
         put?: never;
@@ -726,6 +726,8 @@ export interface operations {
                 spec?: string[];
                 /** @description Seulement les promos en cours */
                 on_sale?: boolean;
+                /** @description Tri ; par défaut par SKU. Les tris prix et remise portent sur le prix effectif */
+                sort?: ("price_asc" | "price_desc" | "name" | "rating" | "discount") | null;
                 limit?: number;
                 skip?: number;
             };

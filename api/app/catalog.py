@@ -2,7 +2,7 @@
 import json
 from datetime import datetime, timezone
 from decimal import ROUND_HALF_UP, Decimal
-from typing import Any
+from typing import Any, Literal
 
 from bson import Decimal128, ObjectId
 from fastapi import APIRouter, HTTPException, Query
@@ -76,6 +76,22 @@ def _spec_values(v: str) -> list:
     return values
 
 
+# Le tri a lieu avant skip/limit (pagination stable), `_id` départage les ex æquo.
+SORTS = {
+    "price_asc": {"_eff": 1}, "price_desc": {"_eff": -1}, "name": {"name": 1},
+    "rating": {"rating.avg": -1, "rating.count": -1}, "discount": {"_discount": -1},
+}
+
+
+def _sort_fields(now: datetime) -> dict:
+    """Prix effectif et remise calculés côté MongoDB, même règle que `effective_price` (au demi-centime près)."""
+    active = {"$and": [{"$lte": ["$promo.starts_at", now]}, {"$gt": ["$promo.ends_at", now]}]}
+    by_percent = {"$round": [{"$divide": [{"$multiply": ["$price", {"$subtract": [100, "$promo.percent"]}]}, 100]}, 2]}
+    eff = {"$cond": [active, {"$ifNull": ["$promo.price", by_percent]}, "$price"]}
+    discount = {"$ifNull": ["$promo.percent", {"$multiply": [{"$subtract": [1, {"$divide": [eff, "$price"]}]}, 100]}]}
+    return {"_eff": eff, "_discount": {"$cond": [active, discount, 0]}}
+
+
 @router.get("/categories")
 def list_categories():
     """Arbre des catégories (pattern Array of Ancestors, reconstruit en arbre)."""
@@ -96,10 +112,12 @@ def list_products(
     max_price: Decimal | None = None,
     spec: list[str] = Query([], description="Filtre `k:v` répétable, ex. `socket:AM5`"),
     on_sale: bool = Query(False, description="Seulement les promos en cours"),
+    sort: Literal["price_asc", "price_desc", "name", "rating", "discount"] | None = Query(
+        None, description="Tri ; par défaut par SKU. Les tris prix et remise portent sur le prix effectif"),
     limit: int = Query(20, ge=1, le=100),
     skip: int = Query(0, ge=0),
 ):
-    """Liste filtrée (projection légère : sans specs ni avis). `min_price`/`max_price` portent sur le prix de référence."""
+    """Liste filtrée et triée (projection légère : sans specs ni avis). `min_price`/`max_price` portent sur le prix de référence."""
     query: dict[str, Any] = {}
     if on_sale:
         now = datetime.now(timezone.utc)
@@ -126,7 +144,12 @@ def list_products(
             matches.append({"$elemMatch": {"k": k, "v": {"$in": _spec_values(v)}}})
         query["specs"] = {"$all": matches}
     products = mongo_db().products
-    items = products.find(query, LIST_PROJECTION).sort("_id", 1).skip(skip).limit(limit)
+    pipeline = [{"$match": query}]
+    if sort in ("price_asc", "price_desc", "discount"):
+        pipeline.append({"$addFields": _sort_fields(datetime.now(timezone.utc))})
+    pipeline += [{"$sort": {**SORTS.get(sort, {}), "_id": 1}}, {"$skip": skip}, {"$limit": limit},
+                 {"$project": {**LIST_PROJECTION, "_eff": 0, "_discount": 0}}]
+    items = products.aggregate(pipeline)
     return {"total": products.count_documents(query), "items": [with_price(p) for p in to_json(list(items))]}
 
 
