@@ -58,12 +58,13 @@ const recos = [
 export default async function ProductPage({ params, searchParams }: Props) {
   const sku = decodeURIComponent((await params).sku);
   const page = Math.max(1, Math.trunc(Number((await searchParams).avis)) || 1);
-  const [p, reviews, views, categories] = await Promise.all([
+  const [p, reviews, views, categories, crossSell] = await Promise.all([
     loadProduct(sku),
     // shortcut: au-delà de 100 avis, la répartition ne porte que sur les 100 plus récents ; ajouter un agrégat API si besoin.
     listReviews(sku, 100).catch(() => null),
     getDailyViews(sku, 1).then((d) => d[0]?.views ?? 0).catch(() => null),
     getCategories().catch(() => []),
+    getRecommendations(sku, "bought-together").catch(() => null),
   ]);
   const trail = categoryTrail(categories, p.category._id);
   const reviewPages = reviews ? Math.max(1, Math.ceil(reviews.items.length / REVIEWS_PER_PAGE)) : 1;
@@ -209,7 +210,7 @@ export default async function ProductPage({ params, searchParams }: Props) {
     );
 
   return (
-    <main className="flex flex-col gap-10">
+    <main className="flex flex-col gap-10 max-lg:pb-16">
       <TrackEvent event_type="product_view" sku={sku} />
       <Breadcrumb
         items={[
@@ -276,7 +277,15 @@ export default async function ProductPage({ params, searchParams }: Props) {
             </div>
           </div>
 
-          <BuyBox sku={sku} maxQty={p.stock?.qty ?? 1} disabled={outOfStock} />
+          <BuyBox
+            sku={sku}
+            name={p.name}
+            category={p.category._id}
+            priceLabel={v.now}
+            maxQty={p.stock?.qty ?? 1}
+            disabled={outOfStock}
+            crossSell={crossSell ?? []}
+          />
         </div>
       </section>
 
