@@ -43,7 +43,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: Prom
   const facets = query.category ? await specFacets(page.items.map((p) => p._id)) : [];
   const selected = new Set(query.spec);
   const brands = new Map(page.items.map((p) => [p.brand._id, p.brand.name]));
-  if (query.brand && !brands.has(query.brand)) brands.set(query.brand, query.brand);
+  for (const b of query.brand ?? []) if (!brands.has(b)) brands.set(b, b);
   const current = Math.floor((query.skip ?? 0) / PAGE_SIZE) + 1;
   const pages = Math.max(1, Math.ceil(page.total / PAGE_SIZE));
 
@@ -83,7 +83,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: Prom
         </label>
         <label className={field}>
           Marque
-          <select name="brand" defaultValue={query.brand ?? ""} className={cn(control, "rounded-lg border border-input bg-transparent pl-3 pr-9")}>
+          <select name="brand" defaultValue={query.brand?.[0] ?? ""} className={cn(control, "rounded-lg border border-input bg-transparent pl-3 pr-9")}>
             <option value="">Toutes</option>
             {[...brands].map(([id, name]) => (
               <option key={id} value={id}>

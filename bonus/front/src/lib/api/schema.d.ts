@@ -717,7 +717,8 @@ export interface operations {
         parameters: {
             query?: {
                 category?: string | null;
-                brand?: string | null;
+                /** @description Marque, répétable (l'une ou l'autre) */
+                brand?: string[];
                 /** @description Recherche plein texte sur le nom */
                 q?: string | null;
                 min_price?: number | string | null;
@@ -726,6 +727,8 @@ export interface operations {
                 spec?: string[];
                 /** @description Seulement les promos en cours */
                 on_sale?: boolean;
+                /** @description Seulement les produits expédiables (en stock ou stock faible) */
+                in_stock?: boolean;
                 /** @description Tri ; par défaut par SKU. Les tris prix et remise portent sur le prix effectif */
                 sort?: ("price_asc" | "price_desc" | "name" | "rating" | "discount") | null;
                 limit?: number;

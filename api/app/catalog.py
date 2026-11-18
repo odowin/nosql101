@@ -106,12 +106,13 @@ def list_categories():
 @router.get("/products")
 def list_products(
     category: str | None = None,
-    brand: str | None = None,
+    brand: list[str] = Query([], description="Marque, répétable (l'une ou l'autre)"),
     q: str | None = Query(None, description="Recherche plein texte sur le nom"),
     min_price: Decimal | None = None,
     max_price: Decimal | None = None,
     spec: list[str] = Query([], description="Filtre `k:v` répétable, ex. `socket:AM5`"),
     on_sale: bool = Query(False, description="Seulement les promos en cours"),
+    in_stock: bool = Query(False, description="Seulement les produits expédiables (en stock ou stock faible)"),
     sort: Literal["price_asc", "price_desc", "name", "rating", "discount"] | None = Query(
         None, description="Tri ; par défaut par SKU. Les tris prix et remise portent sur le prix effectif"),
     limit: int = Query(20, ge=1, le=100),
@@ -126,7 +127,9 @@ def list_products(
     if category:
         query["category._id"] = category
     if brand:
-        query["brand._id"] = brand
+        query["brand._id"] = {"$in": brand}
+    if in_stock:
+        query["stock.status"] = {"$in": ["in_stock", "low_stock"]}
     if q:
         query["$text"] = {"$search": q}
     if min_price is not None or max_price is not None:

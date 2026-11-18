@@ -212,3 +212,13 @@ def test_sort_default_and_invalid(client):
     skus = [p["_id"] for p in _all_cpus(client)]
     assert skus == sorted(skus)
     assert client.get("/products", params={"sort": "nope"}).status_code == 422
+
+
+def test_brand_repeated_and_in_stock(client):
+    both = _all_cpus(client, brand=["amd", "intel"])
+    assert {p["brand"]["_id"] for p in both} == {"amd", "intel"}
+    assert len(both) == len(_all_cpus(client, brand="amd")) + len(_all_cpus(client, brand="intel"))
+    everything = client.get("/products", params={"limit": 100}).json()["items"]
+    stocked = client.get("/products", params={"in_stock": "true", "limit": 100}).json()["items"]
+    assert stocked and all(p["stock"]["status"] in ("in_stock", "low_stock") for p in stocked)
+    assert len(stocked) < len(everything)
