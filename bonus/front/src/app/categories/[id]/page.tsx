@@ -3,9 +3,11 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 import { Breadcrumb } from "@/components/breadcrumb";
+import { Carousel } from "@/components/carousel";
 import { CategoryIcon } from "@/components/category-icon";
+import { FlashCard } from "@/components/flash-card";
 import { SectionHeading } from "@/components/section-heading";
-import { getCategories } from "@/lib/api/client";
+import { getCategories, getProduct, getTopProducts } from "@/lib/api/client";
 import { categoryHref, categoryTrail } from "@/lib/categories";
 
 type Props = { params: Promise<{ id: string }> };
@@ -26,6 +28,11 @@ export default async function CategoryPage({ params }: Props) {
   const trail = await load(params);
   const node = trail.at(-1)!;
   if (!node.children.length) redirect(categoryHref(node));
+  // shortcut: l'API ne filtre pas le top par catégorie ; on lit les fiches du top 30 de la semaine et on garde celles de l'univers.
+  const top = await getTopProducts("week", 30).catch(() => null);
+  const best = (await Promise.allSettled((top?.items ?? []).map((t) => getProduct(t.sku))))
+    .flatMap((r) => (r.status === "fulfilled" && r.value.category.path.split("/").includes(node._id) ? [r.value] : []))
+    .slice(0, 10);
 
   return (
     <main>
@@ -85,6 +92,17 @@ export default async function CategoryPage({ params }: Props) {
           ))}
         </ul>
       </section>
+
+      {best.length > 0 && (
+        <section className="bloc" aria-labelledby="top-ventes">
+          <SectionHeading id="top-ventes" inner title={`Top des ventes ${node.name}`} />
+          <Carousel label={`Top des ventes ${node.name}`}>
+            {best.map((p) => (
+              <FlashCard key={p._id} p={p} className="w-[240px] shrink-0 snap-start ring-1 ring-border lg:w-[260px]" />
+            ))}
+          </Carousel>
+        </section>
+      )}
     </main>
   );
 }
