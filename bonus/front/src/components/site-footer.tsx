@@ -18,7 +18,7 @@ const columns = [
     title: "Explorer",
     links: [
       { href: "/produits", label: "Tout le catalogue" },
-      { href: "/produits?on_sale=true", label: "Promos en cours" },
+      { href: "/promos", label: "Promos en cours" },
       { href: "/analytics", label: "Meilleures ventes" },
     ],
   },

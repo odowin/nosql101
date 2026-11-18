@@ -69,7 +69,7 @@ export function CartView({ items, loggedIn }: { items: CartLine[]; loggedIn: boo
           </div>
           <div className="relative flex flex-col items-center gap-4 border-2 border-[oklch(75%_0_0)] bg-background px-8 py-6 text-center after:absolute after:-bottom-[11px] after:left-10 after:size-5 after:rotate-45 after:border-r-2 after:border-b-2 after:border-[oklch(75%_0_0)] after:bg-background max-md:after:hidden">
             <p className="text-xl font-bold text-muted-foreground italic">Le carton attend son premier article !</p>
-            <Link href="/produits" className={buttonVariants({ variant: "navy", size: "pill" })}>
+            <Link href="/promos" className={buttonVariants({ variant: "navy", size: "pill" })}>
               Trouver l&apos;inspiration <ChevronRight className="size-3.5" aria-hidden />
             </Link>
           </div>

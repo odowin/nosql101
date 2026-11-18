@@ -27,7 +27,7 @@ export default async function Home() {
   const univers = leaves(categories);
 
   const tabs = [
-    { href: "/produits?on_sale=true", label: promo?.label ?? "Black Days" },
+    { href: "/promos", label: promo?.label ?? "Black Days" },
     { href: "/analytics", label: "Les meilleures ventes" },
     { href: "/produits", label: "Tout le catalogue" },
     { href: "/panier", label: "Mon panier" },
@@ -51,7 +51,7 @@ export default async function Home() {
           >
             {promo?.label ?? "Black Days"}
           </h2>
-          <Link href="/produits?on_sale=true" className={whitePill}>
+          <Link href="/promos" className={whitePill}>
             Voir toutes les offres <ChevronRight className="size-4" aria-hidden />
           </Link>
         </div>
@@ -134,7 +134,7 @@ export default async function Home() {
             title="Promos en cours"
             sub="Prix effectifs calculés par l'API (MongoDB)"
             action={
-              <Link href="/produits?on_sale=true" className="inline-flex min-h-11 items-center gap-1 text-sm text-link underline-offset-4 hover:underline">
+              <Link href="/promos" className="inline-flex min-h-11 items-center gap-1 text-sm text-link underline-offset-4 hover:underline">
                 Toutes les promos <ChevronRight className="size-4" aria-hidden />
               </Link>
             }

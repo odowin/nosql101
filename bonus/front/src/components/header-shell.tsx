@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 const SWAGGER = "http://localhost:8000/docs";
 
 const navLinks = [
-  { href: "/produits?on_sale=true", label: "Promos", icon: Percent },
+  { href: "/promos", label: "Promos", icon: Percent },
   { href: "/analytics", label: "Meilleures ventes", icon: ThumbsUp },
   { href: "/commandes", label: "Commandes", icon: Package },
   { href: SWAGGER, label: "Aide", icon: CircleHelp },
