@@ -22,6 +22,10 @@ export function priceView(p: PriceInfo) {
   };
 }
 
+/** Période d'une promo [starts_at, ends_at) → « du 6 nov. au 19 nov. » (ends_at exclusif). */
+export const formatPeriod = (p: { starts_at: string; ends_at: string }) =>
+  `du ${dayMonth.format(new Date(p.starts_at))} au ${dayMonth.format(new Date(Date.parse(p.ends_at) - 1))}`;
+
 /** TTL Redis en secondes → « 29 min 05 s » ; négatif (-1 sans TTL, -2 clé absente) → « expirée ». */
 export function formatTtl(seconds: number) {
   if (seconds < 0) return "expirée";

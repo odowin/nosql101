@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatPrice, formatTtl, priceView, withParams } from "./format";
+import { formatPeriod, formatPrice, formatTtl, priceView, withParams } from "./format";
 
 describe("format", () => {
   it("formate un prix en euros fr-FR, qu'il arrive en nombre ou en chaîne", () => {
@@ -13,6 +13,13 @@ describe("format", () => {
     expect(formatTtl(65)).toBe("1 min 05 s");
     expect(formatTtl(9)).toBe("9 s");
     expect(formatTtl(-2)).toBe("expirée");
+  });
+
+  it("formate la période d'une promo, fin exclusive", () => {
+    // Fin le 20 à minuit heure de Paris (23:00 UTC) : le dernier jour affiché est le 19.
+    expect(formatPeriod({ starts_at: "2026-11-06T00:00:00Z", ends_at: "2026-11-19T23:00:00Z" }).replace(/\s/g, " ")).toBe(
+      "du 6 nov. au 19 nov.",
+    );
   });
 
   it("garde les paramètres répétés, remplace ceux du patch et retire les vides", () => {
