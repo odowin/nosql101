@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { CircleHelp, Menu, Package, Percent, Search, ShoppingBag, Store, ThumbsUp, User } from "lucide-react";
-import { CategoriesMenu } from "@/components/categories-menu";
+import { ChevronDown, CircleHelp, Menu, Package, Percent, Search, ShoppingBag, Store, ThumbsUp, User } from "lucide-react";
+import { MegaMenu, MenuDrawer, useHoverIntent } from "@/components/categories-menu";
 import type { Category } from "@/lib/api/types";
 import { cn } from "@/lib/utils";
 
@@ -24,15 +24,44 @@ const navLinks = [
  */
 export function HeaderShell({ customer, count, categories }: { customer?: string; count: number; categories: Category[] }) {
   const slot = useRef<HTMLDivElement>(null);
+  const header = useRef<HTMLElement>(null);
   const [compact, setCompact] = useState(false);
+  const [mega, setMega] = useState(false);
+  const [drawer, setDrawer] = useState(false);
+  const hover = useHoverIntent(setMega);
 
   useEffect(() => {
     const el = slot.current;
     if (!el) return;
-    const io = new IntersectionObserver(([e]) => setCompact(!e.isIntersecting));
+    const io = new IntersectionObserver(([e]) => {
+      setCompact(!e.isIntersecting);
+      setMega(false); // le déclencheur change (onglet ↔ burger) : on referme plutôt que de laisser un panneau orphelin
+    });
     io.observe(el);
     return () => io.disconnect();
   }, []);
+
+  // Méga-menu ouvert : Échap le ferme et rend le focus au déclencheur visible, un clic hors de l'en-tête aussi.
+  useEffect(() => {
+    if (!mega) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      setMega(false);
+      [...(header.current?.querySelectorAll<HTMLElement>("[aria-controls=mega-menu]") ?? [])].find((b) => b.offsetParent)?.focus();
+    };
+    const onDown = (e: PointerEvent) => {
+      if (!header.current?.contains(e.target as Node)) setMega(false);
+    };
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("pointerdown", onDown);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("pointerdown", onDown);
+    };
+  }, [mega]);
+
+  // Le burger ouvre le méga-menu en desktop (en-tête compact) et le tiroir en mobile.
+  const burger = () => (matchMedia("(width >= 64rem)").matches ? setMega((o) => !o) : setDrawer(true));
 
   const cell = compact ? "h-[50px]" : "h-[54px] lg:h-20";
   const icon = cn(
@@ -45,12 +74,13 @@ export function HeaderShell({ customer, count, categories }: { customer?: string
   return (
     <div ref={slot} className="h-[110px] bg-header lg:h-[120px]">
       <header
+        ref={header}
         className={cn(
           "z-40 w-full bg-header text-white shadow-[0_1px_1px_oklch(0_0_0/25%)] pt-[env(safe-area-inset-top)]",
           compact ? "fixed inset-x-0 top-0 animate-in slide-in-from-top duration-200" : "relative",
         )}
       >
-        <div className="mx-auto flex max-w-[1600px] flex-wrap items-center pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)] lg:gap-x-4 lg:pr-[max(20px,env(safe-area-inset-right))]">
+        <div className="relative mx-auto flex max-w-[1600px] flex-wrap items-center pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)] lg:gap-x-4 lg:pr-[max(20px,env(safe-area-inset-right))]">
           <Link
             href="/"
             className={cn(
@@ -63,9 +93,11 @@ export function HeaderShell({ customer, count, categories }: { customer?: string
             <span className="caps rounded-full bg-white px-2 py-0.5 text-[0.625rem] font-bold tracking-[0.06em] text-black">NoSQL</span>
           </Link>
 
-          {/* shortcut: le burger mène au catalogue ; le tiroir et le méga-menu arrivent avec le menu des catégories. */}
-          <Link
-            href="/produits"
+          <button
+            type="button"
+            onClick={burger}
+            aria-expanded={mega || drawer}
+            aria-controls="mega-menu"
             className={cn(
               "flex flex-col items-center justify-center gap-0.5 transition-colors hover:bg-white/10 active:bg-white/15 max-lg:order-first max-lg:w-[54px] max-lg:border-r max-lg:border-white/20 lg:w-16",
               cell,
@@ -74,7 +106,7 @@ export function HeaderShell({ customer, count, categories }: { customer?: string
           >
             <Menu className="size-7" strokeWidth={1.5} aria-hidden />
             <span className="caps text-[0.625rem] font-medium max-lg:sr-only">Menu</span>
-          </Link>
+          </button>
 
           <form
             action="/produits"
@@ -133,8 +165,30 @@ export function HeaderShell({ customer, count, categories }: { customer?: string
 
           <nav aria-label="Navigation principale" className={cn("basis-full", compact ? "hidden" : "max-lg:hidden")}>
             <ul className="flex h-10 items-stretch justify-between pr-5">
-              <li className="shrink-0">
-                <CategoriesMenu categories={categories} />
+              <li className="shrink-0" {...hover}>
+                <button
+                  type="button"
+                  aria-expanded={mega}
+                  aria-controls="mega-menu"
+                  // À la souris, le survol a déjà ouvert : le clic confirme au lieu de refermer. Au doigt et au clavier, il bascule.
+                  onClick={(e) => {
+                    const mouse = (e.nativeEvent as PointerEvent).pointerType === "mouse";
+                    setMega((o) => mouse || !o);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key !== "ArrowDown") return;
+                    e.preventDefault();
+                    setMega(true);
+                    requestAnimationFrame(() => document.querySelector<HTMLElement>("#mega-menu a")?.focus());
+                  }}
+                  className={cn(
+                    "caps relative flex h-10 w-[200px] items-center justify-center gap-1.5 rounded-t-lg text-[0.8125rem] font-semibold transition-colors after:absolute after:inset-x-0 after:-inset-y-0.5",
+                    mega ? "bg-white text-ldlc-strong" : "bg-primary text-white hover:bg-[color-mix(in_oklch,var(--primary),black_10%)]",
+                  )}
+                >
+                  Tous nos produits
+                  <ChevronDown className={cn("size-4 transition-transform", mega && "rotate-180")} aria-hidden />
+                </button>
               </li>
               {navLinks.map(({ href, label, icon: Icon }) => (
                 <li key={href} className="shrink-0">
@@ -150,8 +204,10 @@ export function HeaderShell({ customer, count, categories }: { customer?: string
               ))}
             </ul>
           </nav>
+          {mega && <MegaMenu id="mega-menu" categories={categories} onClose={() => setMega(false)} hover={hover} />}
         </div>
       </header>
+      <MenuDrawer open={drawer} onClose={() => setDrawer(false)} categories={categories} links={navLinks} />
     </div>
   );
 }
