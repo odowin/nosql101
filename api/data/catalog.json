@@ -1,0 +1,2773 @@
+{
+ "categories": [
+  {
+   "_id": "informatique",
+   "name": "Informatique",
+   "parent": null,
+   "ancestors": [],
+   "facets": []
+  },
+  {
+   "_id": "composants",
+   "name": "Composants",
+   "parent": "informatique",
+   "ancestors": [
+    "informatique"
+   ],
+   "facets": []
+  },
+  {
+   "_id": "peripheriques",
+   "name": "Périphériques",
+   "parent": "informatique",
+   "ancestors": [
+    "informatique"
+   ],
+   "facets": []
+  },
+  {
+   "_id": "logiciels",
+   "name": "Logiciels",
+   "parent": "informatique",
+   "ancestors": [
+    "informatique"
+   ],
+   "facets": []
+  },
+  {
+   "_id": "cpu",
+   "name": "Processeurs",
+   "parent": "composants",
+   "ancestors": [
+    "informatique",
+    "composants"
+   ],
+   "facets": [
+    {
+     "k": "socket",
+     "label": "Socket"
+    },
+    {
+     "k": "cores",
+     "label": "Cœurs"
+    },
+    {
+     "k": "tdp",
+     "label": "TDP"
+    }
+   ]
+  },
+  {
+   "_id": "motherboard",
+   "name": "Cartes mères",
+   "parent": "composants",
+   "ancestors": [
+    "informatique",
+    "composants"
+   ],
+   "facets": [
+    {
+     "k": "socket",
+     "label": "Socket"
+    },
+    {
+     "k": "chipset",
+     "label": "Chipset"
+    },
+    {
+     "k": "form_factor",
+     "label": "Format"
+    },
+    {
+     "k": "memory_type",
+     "label": "Type de mémoire"
+    }
+   ]
+  },
+  {
+   "_id": "ram",
+   "name": "Mémoire RAM",
+   "parent": "composants",
+   "ancestors": [
+    "informatique",
+    "composants"
+   ],
+   "facets": [
+    {
+     "k": "memory_type",
+     "label": "Type de mémoire"
+    },
+    {
+     "k": "capacity",
+     "label": "Capacité"
+    },
+    {
+     "k": "speed",
+     "label": "Fréquence"
+    }
+   ]
+  },
+  {
+   "_id": "gpu",
+   "name": "Cartes graphiques",
+   "parent": "composants",
+   "ancestors": [
+    "informatique",
+    "composants"
+   ],
+   "facets": [
+    {
+     "k": "gpu_chip",
+     "label": "Puce graphique"
+    },
+    {
+     "k": "vram",
+     "label": "VRAM"
+    }
+   ]
+  },
+  {
+   "_id": "ssd",
+   "name": "SSD",
+   "parent": "composants",
+   "ancestors": [
+    "informatique",
+    "composants"
+   ],
+   "facets": [
+    {
+     "k": "capacity",
+     "label": "Capacité"
+    },
+    {
+     "k": "interface",
+     "label": "Interface"
+    }
+   ]
+  },
+  {
+   "_id": "psu",
+   "name": "Alimentations",
+   "parent": "composants",
+   "ancestors": [
+    "informatique",
+    "composants"
+   ],
+   "facets": [
+    {
+     "k": "wattage",
+     "label": "Puissance"
+    },
+    {
+     "k": "format",
+     "label": "Format"
+    },
+    {
+     "k": "certification",
+     "label": "Certification 80+"
+    }
+   ]
+  },
+  {
+   "_id": "case",
+   "name": "Boîtiers",
+   "parent": "composants",
+   "ancestors": [
+    "informatique",
+    "composants"
+   ],
+   "facets": [
+    {
+     "k": "supported_form_factors",
+     "label": "Formats supportés"
+    },
+    {
+     "k": "max_gpu_length",
+     "label": "Longueur GPU max"
+    }
+   ]
+  },
+  {
+   "_id": "cooler",
+   "name": "Refroidissement",
+   "parent": "composants",
+   "ancestors": [
+    "informatique",
+    "composants"
+   ],
+   "facets": [
+    {
+     "k": "type",
+     "label": "Type"
+    },
+    {
+     "k": "height",
+     "label": "Hauteur"
+    }
+   ]
+  },
+  {
+   "_id": "mouse",
+   "name": "Souris",
+   "parent": "peripheriques",
+   "ancestors": [
+    "informatique",
+    "peripheriques"
+   ],
+   "facets": [
+    {
+     "k": "dpi",
+     "label": "DPI max"
+    },
+    {
+     "k": "wireless",
+     "label": "Sans fil"
+    }
+   ]
+  },
+  {
+   "_id": "keyboard",
+   "name": "Claviers",
+   "parent": "peripheriques",
+   "ancestors": [
+    "informatique",
+    "peripheriques"
+   ],
+   "facets": [
+    {
+     "k": "switch",
+     "label": "Switch"
+    },
+    {
+     "k": "layout",
+     "label": "Disposition"
+    },
+    {
+     "k": "wireless",
+     "label": "Sans fil"
+    }
+   ]
+  },
+  {
+   "_id": "monitor",
+   "name": "Écrans",
+   "parent": "peripheriques",
+   "ancestors": [
+    "informatique",
+    "peripheriques"
+   ],
+   "facets": [
+    {
+     "k": "size",
+     "label": "Taille"
+    },
+    {
+     "k": "resolution",
+     "label": "Résolution"
+    },
+    {
+     "k": "refresh_rate",
+     "label": "Fréquence"
+    },
+    {
+     "k": "panel",
+     "label": "Dalle"
+    }
+   ]
+  },
+  {
+   "_id": "headset",
+   "name": "Casques",
+   "parent": "peripheriques",
+   "ancestors": [
+    "informatique",
+    "peripheriques"
+   ],
+   "facets": [
+    {
+     "k": "wireless",
+     "label": "Sans fil"
+    },
+    {
+     "k": "microphone",
+     "label": "Microphone"
+    }
+   ]
+  },
+  {
+   "_id": "os",
+   "name": "Systèmes d'exploitation",
+   "parent": "logiciels",
+   "ancestors": [
+    "informatique",
+    "logiciels"
+   ],
+   "facets": [
+    {
+     "k": "platform",
+     "label": "Plateforme"
+    },
+    {
+     "k": "licence",
+     "label": "Licence"
+    }
+   ]
+  },
+  {
+   "_id": "office",
+   "name": "Bureautique",
+   "parent": "logiciels",
+   "ancestors": [
+    "informatique",
+    "logiciels"
+   ],
+   "facets": [
+    {
+     "k": "platform",
+     "label": "Plateforme"
+    },
+    {
+     "k": "licence",
+     "label": "Licence"
+    },
+    {
+     "k": "delivery",
+     "label": "Livraison"
+    }
+   ]
+  }
+ ],
+ "brands": [
+  {
+   "_id": "amd",
+   "name": "AMD",
+   "country": "US"
+  },
+  {
+   "_id": "intel",
+   "name": "Intel",
+   "country": "US"
+  },
+  {
+   "_id": "asus",
+   "name": "ASUS",
+   "country": "TW"
+  },
+  {
+   "_id": "msi",
+   "name": "MSI",
+   "country": "TW"
+  },
+  {
+   "_id": "gigabyte",
+   "name": "Gigabyte",
+   "country": "TW"
+  },
+  {
+   "_id": "corsair",
+   "name": "Corsair",
+   "country": "US"
+  },
+  {
+   "_id": "gskill",
+   "name": "G.Skill",
+   "country": "TW"
+  },
+  {
+   "_id": "kingston",
+   "name": "Kingston",
+   "country": "US"
+  },
+  {
+   "_id": "samsung",
+   "name": "Samsung",
+   "country": "KR"
+  },
+  {
+   "_id": "wd",
+   "name": "Western Digital",
+   "country": "US"
+  },
+  {
+   "_id": "crucial",
+   "name": "Crucial",
+   "country": "US"
+  },
+  {
+   "_id": "nzxt",
+   "name": "NZXT",
+   "country": "US"
+  },
+  {
+   "_id": "fractal",
+   "name": "Fractal Design",
+   "country": "SE"
+  },
+  {
+   "_id": "coolermaster",
+   "name": "Cooler Master",
+   "country": "TW"
+  },
+  {
+   "_id": "bequiet",
+   "name": "be quiet!",
+   "country": "DE"
+  },
+  {
+   "_id": "noctua",
+   "name": "Noctua",
+   "country": "AT"
+  },
+  {
+   "_id": "logitech",
+   "name": "Logitech",
+   "country": "CH"
+  },
+  {
+   "_id": "razer",
+   "name": "Razer",
+   "country": "US"
+  },
+  {
+   "_id": "steelseries",
+   "name": "SteelSeries",
+   "country": "DK"
+  },
+  {
+   "_id": "lg",
+   "name": "LG",
+   "country": "KR"
+  },
+  {
+   "_id": "microsoft",
+   "name": "Microsoft",
+   "country": "US"
+  }
+ ],
+ "products": [
+  {
+   "_id": "CPU-AMD-R7-9800X3D",
+   "name": "AMD Ryzen 7 9800X3D (4.7 GHz / 5.2 GHz)",
+   "slug": "amd-ryzen-7-9800x3d-4-7-ghz-5-2-ghz",
+   "category": "cpu",
+   "brand": "amd",
+   "range": "Ryzen 7",
+   "price": 489.95,
+   "stock": {
+    "status": "in_stock",
+    "qty": 42
+   },
+   "specs": [
+    {
+     "k": "socket",
+     "label": "Socket",
+     "v": "AM5"
+    },
+    {
+     "k": "cores",
+     "label": "Cœurs",
+     "v": 8
+    },
+    {
+     "k": "threads",
+     "label": "Threads",
+     "v": 16
+    },
+    {
+     "k": "base_clock",
+     "label": "Fréquence de base",
+     "v": 4.7,
+     "u": "GHz"
+    },
+    {
+     "k": "boost_clock",
+     "label": "Fréquence boost",
+     "v": 5.2,
+     "u": "GHz"
+    },
+    {
+     "k": "tdp",
+     "label": "TDP",
+     "v": 120,
+     "u": "W"
+    },
+    {
+     "k": "igpu",
+     "label": "Graphique intégré",
+     "v": true
+    }
+   ],
+   "compat": {
+    "uses": [
+     "socket:AM5"
+    ],
+    "supports": []
+   }
+  },
+  {
+   "_id": "CPU-AMD-R9-9950X3D",
+   "name": "AMD Ryzen 9 9950X3D (4.3 GHz / 5.7 GHz)",
+   "slug": "amd-ryzen-9-9950x3d-4-3-ghz-5-7-ghz",
+   "category": "cpu",
+   "brand": "amd",
+   "range": "Ryzen 9",
+   "price": 699.95,
+   "stock": {
+    "status": "low_stock",
+    "qty": 4
+   },
+   "specs": [
+    {
+     "k": "socket",
+     "label": "Socket",
+     "v": "AM5"
+    },
+    {
+     "k": "cores",
+     "label": "Cœurs",
+     "v": 16
+    },
+    {
+     "k": "threads",
+     "label": "Threads",
+     "v": 32
+    },
+    {
+     "k": "base_clock",
+     "label": "Fréquence de base",
+     "v": 4.3,
+     "u": "GHz"
+    },
+    {
+     "k": "boost_clock",
+     "label": "Fréquence boost",
+     "v": 5.7,
+     "u": "GHz"
+    },
+    {
+     "k": "tdp",
+     "label": "TDP",
+     "v": 170,
+     "u": "W"
+    },
+    {
+     "k": "igpu",
+     "label": "Graphique intégré",
+     "v": true
+    }
+   ],
+   "compat": {
+    "uses": [
+     "socket:AM5"
+    ],
+    "supports": []
+   }
+  },
+  {
+   "_id": "CPU-AMD-R5-9600X",
+   "name": "AMD Ryzen 5 9600X (3.9 GHz / 5.4 GHz)",
+   "slug": "amd-ryzen-5-9600x-3-9-ghz-5-4-ghz",
+   "category": "cpu",
+   "brand": "amd",
+   "range": "Ryzen 5",
+   "price": 239.95,
+   "stock": {
+    "status": "in_stock",
+    "qty": 65
+   },
+   "specs": [
+    {
+     "k": "socket",
+     "label": "Socket",
+     "v": "AM5"
+    },
+    {
+     "k": "cores",
+     "label": "Cœurs",
+     "v": 6
+    },
+    {
+     "k": "threads",
+     "label": "Threads",
+     "v": 12
+    },
+    {
+     "k": "base_clock",
+     "label": "Fréquence de base",
+     "v": 3.9,
+     "u": "GHz"
+    },
+    {
+     "k": "boost_clock",
+     "label": "Fréquence boost",
+     "v": 5.4,
+     "u": "GHz"
+    },
+    {
+     "k": "tdp",
+     "label": "TDP",
+     "v": 65,
+     "u": "W"
+    },
+    {
+     "k": "igpu",
+     "label": "Graphique intégré",
+     "v": true
+    }
+   ],
+   "compat": {
+    "uses": [
+     "socket:AM5"
+    ],
+    "supports": []
+   }
+  },
+  {
+   "_id": "CPU-INTEL-U7-265K",
+   "name": "Intel Core Ultra 7 265K (3.9 GHz / 5.5 GHz)",
+   "slug": "intel-core-ultra-7-265k-3-9-ghz-5-5-ghz",
+   "category": "cpu",
+   "brand": "intel",
+   "range": "Core Ultra 7",
+   "price": 389.95,
+   "stock": {
+    "status": "in_stock",
+    "qty": 28
+   },
+   "specs": [
+    {
+     "k": "socket",
+     "label": "Socket",
+     "v": "LGA1851"
+    },
+    {
+     "k": "cores",
+     "label": "Cœurs",
+     "v": 20
+    },
+    {
+     "k": "threads",
+     "label": "Threads",
+     "v": 20
+    },
+    {
+     "k": "base_clock",
+     "label": "Fréquence de base",
+     "v": 3.9,
+     "u": "GHz"
+    },
+    {
+     "k": "boost_clock",
+     "label": "Fréquence boost",
+     "v": 5.5,
+     "u": "GHz"
+    },
+    {
+     "k": "tdp",
+     "label": "TDP",
+     "v": 125,
+     "u": "W"
+    },
+    {
+     "k": "igpu",
+     "label": "Graphique intégré",
+     "v": true
+    }
+   ],
+   "compat": {
+    "uses": [
+     "socket:LGA1851"
+    ],
+    "supports": []
+   }
+  },
+  {
+   "_id": "CPU-INTEL-I5-12400F",
+   "name": "Intel Core i5-12400F (2.5 GHz / 4.4 GHz)",
+   "slug": "intel-core-i5-12400f-2-5-ghz-4-4-ghz",
+   "category": "cpu",
+   "brand": "intel",
+   "range": "Core i5",
+   "price": 129.95,
+   "stock": {
+    "status": "in_stock",
+    "qty": 90
+   },
+   "specs": [
+    {
+     "k": "socket",
+     "label": "Socket",
+     "v": "LGA1700"
+    },
+    {
+     "k": "cores",
+     "label": "Cœurs",
+     "v": 6
+    },
+    {
+     "k": "threads",
+     "label": "Threads",
+     "v": 12
+    },
+    {
+     "k": "base_clock",
+     "label": "Fréquence de base",
+     "v": 2.5,
+     "u": "GHz"
+    },
+    {
+     "k": "boost_clock",
+     "label": "Fréquence boost",
+     "v": 4.4,
+     "u": "GHz"
+    },
+    {
+     "k": "tdp",
+     "label": "TDP",
+     "v": 65,
+     "u": "W"
+    },
+    {
+     "k": "igpu",
+     "label": "Graphique intégré",
+     "v": false
+    }
+   ],
+   "compat": {
+    "uses": [
+     "socket:LGA1700"
+    ],
+    "supports": []
+   }
+  },
+  {
+   "_id": "MB-MSI-X870-TOMAHAWK",
+   "name": "MSI MAG X870 TOMAHAWK WIFI",
+   "slug": "msi-mag-x870-tomahawk-wifi",
+   "category": "motherboard",
+   "brand": "msi",
+   "range": "MAG",
+   "price": 299.95,
+   "stock": {
+    "status": "in_stock",
+    "qty": 20
+   },
+   "specs": [
+    {
+     "k": "socket",
+     "label": "Socket",
+     "v": "AM5"
+    },
+    {
+     "k": "chipset",
+     "label": "Chipset",
+     "v": "X870"
+    },
+    {
+     "k": "form_factor",
+     "label": "Format",
+     "v": "ATX"
+    },
+    {
+     "k": "memory_type",
+     "label": "Type de mémoire",
+     "v": "DDR5"
+    },
+    {
+     "k": "memory_slots",
+     "label": "Slots mémoire",
+     "v": 4
+    },
+    {
+     "k": "wifi",
+     "label": "Wi-Fi",
+     "v": true
+    }
+   ],
+   "compat": {
+    "uses": [
+     "form_factor:ATX"
+    ],
+    "supports": [
+     "socket:AM5",
+     "memory:DDR5"
+    ]
+   }
+  },
+  {
+   "_id": "MB-ASUS-B650M-PRIME",
+   "name": "ASUS PRIME B650M-A WIFI II",
+   "slug": "asus-prime-b650m-a-wifi-ii",
+   "category": "motherboard",
+   "brand": "asus",
+   "range": "Prime",
+   "price": 149.95,
+   "stock": {
+    "status": "in_stock",
+    "qty": 35
+   },
+   "specs": [
+    {
+     "k": "socket",
+     "label": "Socket",
+     "v": "AM5"
+    },
+    {
+     "k": "chipset",
+     "label": "Chipset",
+     "v": "B650"
+    },
+    {
+     "k": "form_factor",
+     "label": "Format",
+     "v": "mATX"
+    },
+    {
+     "k": "memory_type",
+     "label": "Type de mémoire",
+     "v": "DDR5"
+    },
+    {
+     "k": "memory_slots",
+     "label": "Slots mémoire",
+     "v": 4
+    },
+    {
+     "k": "wifi",
+     "label": "Wi-Fi",
+     "v": true
+    }
+   ],
+   "compat": {
+    "uses": [
+     "form_factor:mATX"
+    ],
+    "supports": [
+     "socket:AM5",
+     "memory:DDR5"
+    ]
+   }
+  },
+  {
+   "_id": "MB-ASUS-B850I-STRIX",
+   "name": "ASUS ROG STRIX B850-I GAMING WIFI",
+   "slug": "asus-rog-strix-b850-i-gaming-wifi",
+   "category": "motherboard",
+   "brand": "asus",
+   "range": "ROG Strix",
+   "price": 329.95,
+   "stock": {
+    "status": "low_stock",
+    "qty": 6
+   },
+   "specs": [
+    {
+     "k": "socket",
+     "label": "Socket",
+     "v": "AM5"
+    },
+    {
+     "k": "chipset",
+     "label": "Chipset",
+     "v": "B850"
+    },
+    {
+     "k": "form_factor",
+     "label": "Format",
+     "v": "ITX"
+    },
+    {
+     "k": "memory_type",
+     "label": "Type de mémoire",
+     "v": "DDR5"
+    },
+    {
+     "k": "memory_slots",
+     "label": "Slots mémoire",
+     "v": 2
+    },
+    {
+     "k": "wifi",
+     "label": "Wi-Fi",
+     "v": true
+    }
+   ],
+   "compat": {
+    "uses": [
+     "form_factor:ITX"
+    ],
+    "supports": [
+     "socket:AM5",
+     "memory:DDR5"
+    ]
+   }
+  },
+  {
+   "_id": "MB-GIGABYTE-Z890-AORUS-ELITE",
+   "name": "Gigabyte Z890 AORUS ELITE WIFI7",
+   "slug": "gigabyte-z890-aorus-elite-wifi7",
+   "category": "motherboard",
+   "brand": "gigabyte",
+   "range": "Aorus",
+   "price": 319.95,
+   "stock": {
+    "status": "in_stock",
+    "qty": 14
+   },
+   "specs": [
+    {
+     "k": "socket",
+     "label": "Socket",
+     "v": "LGA1851"
+    },
+    {
+     "k": "chipset",
+     "label": "Chipset",
+     "v": "Z890"
+    },
+    {
+     "k": "form_factor",
+     "label": "Format",
+     "v": "ATX"
+    },
+    {
+     "k": "memory_type",
+     "label": "Type de mémoire",
+     "v": "DDR5"
+    },
+    {
+     "k": "memory_slots",
+     "label": "Slots mémoire",
+     "v": 4
+    },
+    {
+     "k": "wifi",
+     "label": "Wi-Fi",
+     "v": true
+    }
+   ],
+   "compat": {
+    "uses": [
+     "form_factor:ATX"
+    ],
+    "supports": [
+     "socket:LGA1851",
+     "memory:DDR5"
+    ]
+   }
+  },
+  {
+   "_id": "MB-MSI-PRO-B760M-DDR4",
+   "name": "MSI PRO B760M-P DDR4",
+   "slug": "msi-pro-b760m-p-ddr4",
+   "category": "motherboard",
+   "brand": "msi",
+   "range": "Pro",
+   "price": 104.95,
+   "stock": {
+    "status": "in_stock",
+    "qty": 50
+   },
+   "specs": [
+    {
+     "k": "socket",
+     "label": "Socket",
+     "v": "LGA1700"
+    },
+    {
+     "k": "chipset",
+     "label": "Chipset",
+     "v": "B760"
+    },
+    {
+     "k": "form_factor",
+     "label": "Format",
+     "v": "mATX"
+    },
+    {
+     "k": "memory_type",
+     "label": "Type de mémoire",
+     "v": "DDR4"
+    },
+    {
+     "k": "memory_slots",
+     "label": "Slots mémoire",
+     "v": 4
+    },
+    {
+     "k": "wifi",
+     "label": "Wi-Fi",
+     "v": false
+    }
+   ],
+   "compat": {
+    "uses": [
+     "form_factor:mATX"
+    ],
+    "supports": [
+     "socket:LGA1700",
+     "memory:DDR4"
+    ]
+   }
+  },
+  {
+   "_id": "RAM-CORSAIR-VENGEANCE-32-6000",
+   "name": "Corsair Vengeance DDR5 32 Go (2x16) 6000 MHz CL30",
+   "slug": "corsair-vengeance-ddr5-32-go-2x16-6000-mhz-cl30",
+   "category": "ram",
+   "brand": "corsair",
+   "range": "Vengeance",
+   "price": 119.95,
+   "stock": {
+    "status": "in_stock",
+    "qty": 80
+   },
+   "specs": [
+    {
+     "k": "memory_type",
+     "label": "Type de mémoire",
+     "v": "DDR5"
+    },
+    {
+     "k": "capacity",
+     "label": "Capacité",
+     "v": 32,
+     "u": "Go"
+    },
+    {
+     "k": "modules",
+     "label": "Modules",
+     "v": 2
+    },
+    {
+     "k": "speed",
+     "label": "Fréquence",
+     "v": 6000,
+     "u": "MHz"
+    },
+    {
+     "k": "cas_latency",
+     "label": "Latence CAS",
+     "v": 30
+    }
+   ],
+   "compat": {
+    "uses": [
+     "memory:DDR5"
+    ],
+    "supports": []
+   }
+  },
+  {
+   "_id": "RAM-GSKILL-TRIDENTZ5-32-6000",
+   "name": "G.Skill Trident Z5 RGB DDR5 32 Go (2x16) 6000 MHz CL30",
+   "slug": "g-skill-trident-z5-rgb-ddr5-32-go-2x16-6000-mhz-cl30",
+   "category": "ram",
+   "brand": "gskill",
+   "range": "Trident Z5",
+   "price": 139.95,
+   "stock": {
+    "status": "in_stock",
+    "qty": 45
+   },
+   "specs": [
+    {
+     "k": "memory_type",
+     "label": "Type de mémoire",
+     "v": "DDR5"
+    },
+    {
+     "k": "capacity",
+     "label": "Capacité",
+     "v": 32,
+     "u": "Go"
+    },
+    {
+     "k": "modules",
+     "label": "Modules",
+     "v": 2
+    },
+    {
+     "k": "speed",
+     "label": "Fréquence",
+     "v": 6000,
+     "u": "MHz"
+    },
+    {
+     "k": "cas_latency",
+     "label": "Latence CAS",
+     "v": 30
+    }
+   ],
+   "compat": {
+    "uses": [
+     "memory:DDR5"
+    ],
+    "supports": []
+   }
+  },
+  {
+   "_id": "RAM-CRUCIAL-PRO-32-5600",
+   "name": "Crucial Pro DDR5 32 Go (2x16) 5600 MHz CL46",
+   "slug": "crucial-pro-ddr5-32-go-2x16-5600-mhz-cl46",
+   "category": "ram",
+   "brand": "crucial",
+   "range": "Pro",
+   "price": 99.95,
+   "stock": {
+    "status": "in_stock",
+    "qty": 60
+   },
+   "specs": [
+    {
+     "k": "memory_type",
+     "label": "Type de mémoire",
+     "v": "DDR5"
+    },
+    {
+     "k": "capacity",
+     "label": "Capacité",
+     "v": 32,
+     "u": "Go"
+    },
+    {
+     "k": "modules",
+     "label": "Modules",
+     "v": 2
+    },
+    {
+     "k": "speed",
+     "label": "Fréquence",
+     "v": 5600,
+     "u": "MHz"
+    },
+    {
+     "k": "cas_latency",
+     "label": "Latence CAS",
+     "v": 46
+    }
+   ],
+   "compat": {
+    "uses": [
+     "memory:DDR5"
+    ],
+    "supports": []
+   }
+  },
+  {
+   "_id": "RAM-KINGSTON-FURY-16-3200",
+   "name": "Kingston Fury Beast DDR4 16 Go (2x8) 3200 MHz CL16",
+   "slug": "kingston-fury-beast-ddr4-16-go-2x8-3200-mhz-cl16",
+   "category": "ram",
+   "brand": "kingston",
+   "range": "Fury Beast",
+   "price": 44.95,
+   "stock": {
+    "status": "in_stock",
+    "qty": 120
+   },
+   "specs": [
+    {
+     "k": "memory_type",
+     "label": "Type de mémoire",
+     "v": "DDR4"
+    },
+    {
+     "k": "capacity",
+     "label": "Capacité",
+     "v": 16,
+     "u": "Go"
+    },
+    {
+     "k": "modules",
+     "label": "Modules",
+     "v": 2
+    },
+    {
+     "k": "speed",
+     "label": "Fréquence",
+     "v": 3200,
+     "u": "MHz"
+    },
+    {
+     "k": "cas_latency",
+     "label": "Latence CAS",
+     "v": 16
+    }
+   ],
+   "compat": {
+    "uses": [
+     "memory:DDR4"
+    ],
+    "supports": []
+   }
+  },
+  {
+   "_id": "GPU-ASUS-RTX5080-PRIME",
+   "name": "ASUS Prime GeForce RTX 5080 16 Go OC",
+   "slug": "asus-prime-geforce-rtx-5080-16-go-oc",
+   "category": "gpu",
+   "brand": "asus",
+   "range": "GeForce RTX 50",
+   "price": 1299.95,
+   "stock": {
+    "status": "low_stock",
+    "qty": 5
+   },
+   "specs": [
+    {
+     "k": "gpu_chip",
+     "label": "Puce graphique",
+     "v": "GeForce RTX 5080"
+    },
+    {
+     "k": "vram",
+     "label": "VRAM",
+     "v": 16,
+     "u": "Go"
+    },
+    {
+     "k": "length",
+     "label": "Longueur",
+     "v": 304,
+     "u": "mm"
+    },
+    {
+     "k": "tdp",
+     "label": "TDP",
+     "v": 360,
+     "u": "W"
+    }
+   ],
+   "compat": {
+    "uses": [],
+    "supports": []
+   }
+  },
+  {
+   "_id": "GPU-MSI-RTX5070TI-VENTUS",
+   "name": "MSI GeForce RTX 5070 Ti 16G VENTUS 3X OC",
+   "slug": "msi-geforce-rtx-5070-ti-16g-ventus-3x-oc",
+   "category": "gpu",
+   "brand": "msi",
+   "range": "GeForce RTX 50",
+   "price": 889.95,
+   "stock": {
+    "status": "in_stock",
+    "qty": 12
+   },
+   "specs": [
+    {
+     "k": "gpu_chip",
+     "label": "Puce graphique",
+     "v": "GeForce RTX 5070 Ti"
+    },
+    {
+     "k": "vram",
+     "label": "VRAM",
+     "v": 16,
+     "u": "Go"
+    },
+    {
+     "k": "length",
+     "label": "Longueur",
+     "v": 308,
+     "u": "mm"
+    },
+    {
+     "k": "tdp",
+     "label": "TDP",
+     "v": 300,
+     "u": "W"
+    }
+   ],
+   "compat": {
+    "uses": [],
+    "supports": []
+   }
+  },
+  {
+   "_id": "GPU-GIGABYTE-RTX5060-WINDFORCE",
+   "name": "Gigabyte GeForce RTX 5060 WINDFORCE OC 8G",
+   "slug": "gigabyte-geforce-rtx-5060-windforce-oc-8g",
+   "category": "gpu",
+   "brand": "gigabyte",
+   "range": "GeForce RTX 50",
+   "price": 319.95,
+   "stock": {
+    "status": "in_stock",
+    "qty": 38
+   },
+   "specs": [
+    {
+     "k": "gpu_chip",
+     "label": "Puce graphique",
+     "v": "GeForce RTX 5060"
+    },
+    {
+     "k": "vram",
+     "label": "VRAM",
+     "v": 8,
+     "u": "Go"
+    },
+    {
+     "k": "length",
+     "label": "Longueur",
+     "v": 240,
+     "u": "mm"
+    },
+    {
+     "k": "tdp",
+     "label": "TDP",
+     "v": 145,
+     "u": "W"
+    }
+   ],
+   "compat": {
+    "uses": [],
+    "supports": []
+   }
+  },
+  {
+   "_id": "GPU-ASUS-RX9070XT-TUF",
+   "name": "ASUS TUF Gaming Radeon RX 9070 XT OC 16 Go",
+   "slug": "asus-tuf-gaming-radeon-rx-9070-xt-oc-16-go",
+   "category": "gpu",
+   "brand": "asus",
+   "range": "Radeon RX 9000",
+   "price": 739.95,
+   "stock": {
+    "status": "in_stock",
+    "qty": 9
+   },
+   "specs": [
+    {
+     "k": "gpu_chip",
+     "label": "Puce graphique",
+     "v": "Radeon RX 9070 XT"
+    },
+    {
+     "k": "vram",
+     "label": "VRAM",
+     "v": 16,
+     "u": "Go"
+    },
+    {
+     "k": "length",
+     "label": "Longueur",
+     "v": 325,
+     "u": "mm"
+    },
+    {
+     "k": "tdp",
+     "label": "TDP",
+     "v": 304,
+     "u": "W"
+    }
+   ],
+   "compat": {
+    "uses": [],
+    "supports": []
+   }
+  },
+  {
+   "_id": "SSD-SAMSUNG-990PRO-2TB",
+   "name": "Samsung 990 PRO 2 To NVMe PCIe 4.0",
+   "slug": "samsung-990-pro-2-to-nvme-pcie-4-0",
+   "category": "ssd",
+   "brand": "samsung",
+   "range": "990 PRO",
+   "price": 179.95,
+   "stock": {
+    "status": "in_stock",
+    "qty": 55
+   },
+   "specs": [
+    {
+     "k": "capacity",
+     "label": "Capacité",
+     "v": 2000,
+     "u": "Go"
+    },
+    {
+     "k": "interface",
+     "label": "Interface",
+     "v": "M.2 NVMe PCIe 4.0"
+    },
+    {
+     "k": "read_speed",
+     "label": "Lecture séquentielle",
+     "v": 7450,
+     "u": "Mo/s"
+    }
+   ],
+   "compat": {
+    "uses": [],
+    "supports": []
+   }
+  },
+  {
+   "_id": "SSD-WD-SN850X-1TB",
+   "name": "WD Black SN850X 1 To NVMe PCIe 4.0",
+   "slug": "wd-black-sn850x-1-to-nvme-pcie-4-0",
+   "category": "ssd",
+   "brand": "wd",
+   "range": "WD Black",
+   "price": 94.95,
+   "stock": {
+    "status": "in_stock",
+    "qty": 70
+   },
+   "specs": [
+    {
+     "k": "capacity",
+     "label": "Capacité",
+     "v": 1000,
+     "u": "Go"
+    },
+    {
+     "k": "interface",
+     "label": "Interface",
+     "v": "M.2 NVMe PCIe 4.0"
+    },
+    {
+     "k": "read_speed",
+     "label": "Lecture séquentielle",
+     "v": 7300,
+     "u": "Mo/s"
+    }
+   ],
+   "compat": {
+    "uses": [],
+    "supports": []
+   }
+  },
+  {
+   "_id": "SSD-CRUCIAL-P3-500GB",
+   "name": "Crucial P3 500 Go NVMe PCIe 3.0",
+   "slug": "crucial-p3-500-go-nvme-pcie-3-0",
+   "category": "ssd",
+   "brand": "crucial",
+   "range": "P3",
+   "price": 39.95,
+   "stock": {
+    "status": "in_stock",
+    "qty": 150
+   },
+   "specs": [
+    {
+     "k": "capacity",
+     "label": "Capacité",
+     "v": 500,
+     "u": "Go"
+    },
+    {
+     "k": "interface",
+     "label": "Interface",
+     "v": "M.2 NVMe PCIe 3.0"
+    },
+    {
+     "k": "read_speed",
+     "label": "Lecture séquentielle",
+     "v": 3500,
+     "u": "Mo/s"
+    }
+   ],
+   "compat": {
+    "uses": [],
+    "supports": []
+   }
+  },
+  {
+   "_id": "PSU-CORSAIR-RM850X",
+   "name": "Corsair RM850x (2024) 850 W 80+ Gold",
+   "slug": "corsair-rm850x-2024-850-w-80-gold",
+   "category": "psu",
+   "brand": "corsair",
+   "range": "RMx",
+   "price": 149.95,
+   "stock": {
+    "status": "in_stock",
+    "qty": 33
+   },
+   "specs": [
+    {
+     "k": "wattage",
+     "label": "Puissance",
+     "v": 850,
+     "u": "W"
+    },
+    {
+     "k": "format",
+     "label": "Format",
+     "v": "ATX"
+    },
+    {
+     "k": "certification",
+     "label": "Certification 80+",
+     "v": "Gold"
+    }
+   ],
+   "compat": {
+    "uses": [
+     "psu_format:ATX"
+    ],
+    "supports": []
+   }
+  },
+  {
+   "_id": "PSU-BEQUIET-PUREPOWER12-750",
+   "name": "be quiet! Pure Power 12 M 750 W 80+ Gold",
+   "slug": "be-quiet-pure-power-12-m-750-w-80-gold",
+   "category": "psu",
+   "brand": "bequiet",
+   "range": "Pure Power",
+   "price": 109.95,
+   "stock": {
+    "status": "in_stock",
+    "qty": 40
+   },
+   "specs": [
+    {
+     "k": "wattage",
+     "label": "Puissance",
+     "v": 750,
+     "u": "W"
+    },
+    {
+     "k": "format",
+     "label": "Format",
+     "v": "ATX"
+    },
+    {
+     "k": "certification",
+     "label": "Certification 80+",
+     "v": "Gold"
+    }
+   ],
+   "compat": {
+    "uses": [
+     "psu_format:ATX"
+    ],
+    "supports": []
+   }
+  },
+  {
+   "_id": "PSU-CORSAIR-SF750",
+   "name": "Corsair SF750 750 W SFX 80+ Platinum",
+   "slug": "corsair-sf750-750-w-sfx-80-platinum",
+   "category": "psu",
+   "brand": "corsair",
+   "range": "SF",
+   "price": 179.95,
+   "stock": {
+    "status": "low_stock",
+    "qty": 7
+   },
+   "specs": [
+    {
+     "k": "wattage",
+     "label": "Puissance",
+     "v": 750,
+     "u": "W"
+    },
+    {
+     "k": "format",
+     "label": "Format",
+     "v": "SFX"
+    },
+    {
+     "k": "certification",
+     "label": "Certification 80+",
+     "v": "Platinum"
+    }
+   ],
+   "compat": {
+    "uses": [
+     "psu_format:SFX"
+    ],
+    "supports": []
+   }
+  },
+  {
+   "_id": "CASE-NZXT-H5-FLOW",
+   "name": "NZXT H5 Flow (2024) Noir",
+   "slug": "nzxt-h5-flow-2024-noir",
+   "category": "case",
+   "brand": "nzxt",
+   "range": "H5",
+   "price": 99.95,
+   "stock": {
+    "status": "in_stock",
+    "qty": 44
+   },
+   "specs": [
+    {
+     "k": "supported_form_factors",
+     "label": "Formats supportés",
+     "v": [
+      "ATX",
+      "mATX",
+      "ITX"
+     ]
+    },
+    {
+     "k": "max_gpu_length",
+     "label": "Longueur GPU max",
+     "v": 365,
+     "u": "mm"
+    },
+    {
+     "k": "psu_formats",
+     "label": "Formats alim.",
+     "v": [
+      "ATX"
+     ]
+    }
+   ],
+   "compat": {
+    "uses": [],
+    "supports": [
+     "form_factor:ATX",
+     "form_factor:mATX",
+     "form_factor:ITX",
+     "psu_format:ATX"
+    ]
+   }
+  },
+  {
+   "_id": "CASE-FRACTAL-NORTH",
+   "name": "Fractal Design North Charcoal Black",
+   "slug": "fractal-design-north-charcoal-black",
+   "category": "case",
+   "brand": "fractal",
+   "range": "North",
+   "price": 149.95,
+   "stock": {
+    "status": "in_stock",
+    "qty": 18
+   },
+   "specs": [
+    {
+     "k": "supported_form_factors",
+     "label": "Formats supportés",
+     "v": [
+      "ATX",
+      "mATX",
+      "ITX"
+     ]
+    },
+    {
+     "k": "max_gpu_length",
+     "label": "Longueur GPU max",
+     "v": 355,
+     "u": "mm"
+    },
+    {
+     "k": "psu_formats",
+     "label": "Formats alim.",
+     "v": [
+      "ATX"
+     ]
+    }
+   ],
+   "compat": {
+    "uses": [],
+    "supports": [
+     "form_factor:ATX",
+     "form_factor:mATX",
+     "form_factor:ITX",
+     "psu_format:ATX"
+    ]
+   }
+  },
+  {
+   "_id": "CASE-COOLERMASTER-NR200P",
+   "name": "Cooler Master NR200P Noir",
+   "slug": "cooler-master-nr200p-noir",
+   "category": "case",
+   "brand": "coolermaster",
+   "range": "NR200",
+   "price": 109.95,
+   "stock": {
+    "status": "in_stock",
+    "qty": 22
+   },
+   "specs": [
+    {
+     "k": "supported_form_factors",
+     "label": "Formats supportés",
+     "v": [
+      "ITX"
+     ]
+    },
+    {
+     "k": "max_gpu_length",
+     "label": "Longueur GPU max",
+     "v": 330,
+     "u": "mm"
+    },
+    {
+     "k": "psu_formats",
+     "label": "Formats alim.",
+     "v": [
+      "SFX"
+     ]
+    }
+   ],
+   "compat": {
+    "uses": [],
+    "supports": [
+     "form_factor:ITX",
+     "psu_format:SFX"
+    ]
+   }
+  },
+  {
+   "_id": "COOLER-NOCTUA-NHD15",
+   "name": "Noctua NH-D15 G2",
+   "slug": "noctua-nh-d15-g2",
+   "category": "cooler",
+   "brand": "noctua",
+   "range": "NH-D15",
+   "price": 149.95,
+   "stock": {
+    "status": "in_stock",
+    "qty": 25
+   },
+   "specs": [
+    {
+     "k": "type",
+     "label": "Type",
+     "v": "Ventirad"
+    },
+    {
+     "k": "sockets",
+     "label": "Sockets compatibles",
+     "v": [
+      "AM5",
+      "LGA1700",
+      "LGA1851"
+     ]
+    },
+    {
+     "k": "height",
+     "label": "Hauteur",
+     "v": 168,
+     "u": "mm"
+    }
+   ],
+   "compat": {
+    "uses": [],
+    "supports": [
+     "socket:AM5",
+     "socket:LGA1700",
+     "socket:LGA1851"
+    ]
+   }
+  },
+  {
+   "_id": "COOLER-NOCTUA-NHL12S",
+   "name": "Noctua NH-L12S",
+   "slug": "noctua-nh-l12s",
+   "category": "cooler",
+   "brand": "noctua",
+   "range": "NH-L",
+   "price": 64.95,
+   "stock": {
+    "status": "in_stock",
+    "qty": 30
+   },
+   "specs": [
+    {
+     "k": "type",
+     "label": "Type",
+     "v": "Ventirad"
+    },
+    {
+     "k": "sockets",
+     "label": "Sockets compatibles",
+     "v": [
+      "AM5",
+      "LGA1700",
+      "LGA1851"
+     ]
+    },
+    {
+     "k": "height",
+     "label": "Hauteur",
+     "v": 70,
+     "u": "mm"
+    }
+   ],
+   "compat": {
+    "uses": [],
+    "supports": [
+     "socket:AM5",
+     "socket:LGA1700",
+     "socket:LGA1851"
+    ]
+   }
+  },
+  {
+   "_id": "COOLER-COOLERMASTER-HYPER212",
+   "name": "Cooler Master Hyper 212 Black",
+   "slug": "cooler-master-hyper-212-black",
+   "category": "cooler",
+   "brand": "coolermaster",
+   "range": "Hyper 212",
+   "price": 34.95,
+   "stock": {
+    "status": "in_stock",
+    "qty": 85
+   },
+   "specs": [
+    {
+     "k": "type",
+     "label": "Type",
+     "v": "Ventirad"
+    },
+    {
+     "k": "sockets",
+     "label": "Sockets compatibles",
+     "v": [
+      "AM5",
+      "LGA1700"
+     ]
+    },
+    {
+     "k": "height",
+     "label": "Hauteur",
+     "v": 159,
+     "u": "mm"
+    }
+   ],
+   "compat": {
+    "uses": [],
+    "supports": [
+     "socket:AM5",
+     "socket:LGA1700"
+    ]
+   }
+  },
+  {
+   "_id": "MOUSE-LOGITECH-GPRO-X2",
+   "name": "Logitech G PRO X SUPERLIGHT 2",
+   "slug": "logitech-g-pro-x-superlight-2",
+   "category": "mouse",
+   "brand": "logitech",
+   "range": "G PRO",
+   "price": 169.95,
+   "stock": {
+    "status": "in_stock",
+    "qty": 48
+   },
+   "specs": [
+    {
+     "k": "dpi",
+     "label": "DPI max",
+     "v": 44000
+    },
+    {
+     "k": "weight",
+     "label": "Poids",
+     "v": 60,
+     "u": "g"
+    },
+    {
+     "k": "wireless",
+     "label": "Sans fil",
+     "v": true
+    }
+   ],
+   "compat": {
+    "uses": [],
+    "supports": []
+   }
+  },
+  {
+   "_id": "MOUSE-RAZER-DEATHADDER-V4",
+   "name": "Razer DeathAdder V4 Pro",
+   "slug": "razer-deathadder-v4-pro",
+   "category": "mouse",
+   "brand": "razer",
+   "range": "DeathAdder",
+   "price": 159.95,
+   "stock": {
+    "status": "in_stock",
+    "qty": 27
+   },
+   "specs": [
+    {
+     "k": "dpi",
+     "label": "DPI max",
+     "v": 30000
+    },
+    {
+     "k": "weight",
+     "label": "Poids",
+     "v": 63,
+     "u": "g"
+    },
+    {
+     "k": "wireless",
+     "label": "Sans fil",
+     "v": true
+    }
+   ],
+   "compat": {
+    "uses": [],
+    "supports": []
+   }
+  },
+  {
+   "_id": "MOUSE-LOGITECH-M185",
+   "name": "Logitech M185 Sans fil",
+   "slug": "logitech-m185-sans-fil",
+   "category": "mouse",
+   "brand": "logitech",
+   "range": "M",
+   "price": 14.95,
+   "stock": {
+    "status": "in_stock",
+    "qty": 200
+   },
+   "specs": [
+    {
+     "k": "dpi",
+     "label": "DPI max",
+     "v": 1000
+    },
+    {
+     "k": "weight",
+     "label": "Poids",
+     "v": 75,
+     "u": "g"
+    },
+    {
+     "k": "wireless",
+     "label": "Sans fil",
+     "v": true
+    }
+   ],
+   "compat": {
+    "uses": [],
+    "supports": []
+   }
+  },
+  {
+   "_id": "KB-CORSAIR-K70-PRO",
+   "name": "Corsair K70 PRO MINI Wireless",
+   "slug": "corsair-k70-pro-mini-wireless",
+   "category": "keyboard",
+   "brand": "corsair",
+   "range": "K70",
+   "price": 149.95,
+   "stock": {
+    "status": "in_stock",
+    "qty": 19
+   },
+   "specs": [
+    {
+     "k": "switch",
+     "label": "Switch",
+     "v": "Cherry MX Speed"
+    },
+    {
+     "k": "layout",
+     "label": "Disposition",
+     "v": "AZERTY"
+    },
+    {
+     "k": "wireless",
+     "label": "Sans fil",
+     "v": true
+    }
+   ],
+   "compat": {
+    "uses": [],
+    "supports": []
+   }
+  },
+  {
+   "_id": "KB-STEELSERIES-APEX-PRO",
+   "name": "SteelSeries Apex Pro TKL (2023)",
+   "slug": "steelseries-apex-pro-tkl-2023",
+   "category": "keyboard",
+   "brand": "steelseries",
+   "range": "Apex Pro",
+   "price": 219.95,
+   "stock": {
+    "status": "low_stock",
+    "qty": 8
+   },
+   "specs": [
+    {
+     "k": "switch",
+     "label": "Switch",
+     "v": "OmniPoint 2.0 magnétique"
+    },
+    {
+     "k": "layout",
+     "label": "Disposition",
+     "v": "AZERTY"
+    },
+    {
+     "k": "wireless",
+     "label": "Sans fil",
+     "v": false
+    }
+   ],
+   "compat": {
+    "uses": [],
+    "supports": []
+   }
+  },
+  {
+   "_id": "KB-LOGITECH-MXKEYS",
+   "name": "Logitech MX Keys S",
+   "slug": "logitech-mx-keys-s",
+   "category": "keyboard",
+   "brand": "logitech",
+   "range": "MX",
+   "price": 119.95,
+   "stock": {
+    "status": "in_stock",
+    "qty": 52
+   },
+   "specs": [
+    {
+     "k": "switch",
+     "label": "Switch",
+     "v": "Membrane à ciseaux"
+    },
+    {
+     "k": "layout",
+     "label": "Disposition",
+     "v": "AZERTY"
+    },
+    {
+     "k": "wireless",
+     "label": "Sans fil",
+     "v": true
+    }
+   ],
+   "compat": {
+    "uses": [],
+    "supports": []
+   }
+  },
+  {
+   "_id": "MON-LG-27GR95QE",
+   "name": "LG UltraGear 27GR95QE-B 27\" OLED QHD 240 Hz",
+   "slug": "lg-ultragear-27gr95qe-b-27-oled-qhd-240-hz",
+   "category": "monitor",
+   "brand": "lg",
+   "range": "UltraGear",
+   "price": 599.95,
+   "stock": {
+    "status": "in_stock",
+    "qty": 11
+   },
+   "specs": [
+    {
+     "k": "size",
+     "label": "Taille",
+     "v": 27,
+     "u": "pouces"
+    },
+    {
+     "k": "resolution",
+     "label": "Résolution",
+     "v": "2560x1440"
+    },
+    {
+     "k": "refresh_rate",
+     "label": "Fréquence",
+     "v": 240,
+     "u": "Hz"
+    },
+    {
+     "k": "panel",
+     "label": "Dalle",
+     "v": "OLED"
+    }
+   ],
+   "compat": {
+    "uses": [],
+    "supports": []
+   }
+  },
+  {
+   "_id": "MON-LG-32GS95UE",
+   "name": "LG UltraGear 32GS95UE-B 32\" OLED 4K 240 Hz",
+   "slug": "lg-ultragear-32gs95ue-b-32-oled-4k-240-hz",
+   "category": "monitor",
+   "brand": "lg",
+   "range": "UltraGear",
+   "price": 899.95,
+   "stock": {
+    "status": "preorder",
+    "qty": 0
+   },
+   "specs": [
+    {
+     "k": "size",
+     "label": "Taille",
+     "v": 32,
+     "u": "pouces"
+    },
+    {
+     "k": "resolution",
+     "label": "Résolution",
+     "v": "3840x2160"
+    },
+    {
+     "k": "refresh_rate",
+     "label": "Fréquence",
+     "v": 240,
+     "u": "Hz"
+    },
+    {
+     "k": "panel",
+     "label": "Dalle",
+     "v": "OLED"
+    }
+   ],
+   "compat": {
+    "uses": [],
+    "supports": []
+   }
+  },
+  {
+   "_id": "HS-STEELSERIES-ARCTIS-NOVA7",
+   "name": "SteelSeries Arctis Nova 7 Wireless",
+   "slug": "steelseries-arctis-nova-7-wireless",
+   "category": "headset",
+   "brand": "steelseries",
+   "range": "Arctis Nova",
+   "price": 179.95,
+   "stock": {
+    "status": "in_stock",
+    "qty": 31
+   },
+   "specs": [
+    {
+     "k": "wireless",
+     "label": "Sans fil",
+     "v": true
+    },
+    {
+     "k": "microphone",
+     "label": "Microphone",
+     "v": true
+    }
+   ],
+   "compat": {
+    "uses": [],
+    "supports": []
+   }
+  },
+  {
+   "_id": "HS-RAZER-BLACKSHARK-V2",
+   "name": "Razer BlackShark V2 X",
+   "slug": "razer-blackshark-v2-x",
+   "category": "headset",
+   "brand": "razer",
+   "range": "BlackShark",
+   "price": 49.95,
+   "stock": {
+    "status": "out_of_stock",
+    "qty": 0
+   },
+   "specs": [
+    {
+     "k": "wireless",
+     "label": "Sans fil",
+     "v": false
+    },
+    {
+     "k": "microphone",
+     "label": "Microphone",
+     "v": true
+    }
+   ],
+   "compat": {
+    "uses": [],
+    "supports": []
+   }
+  },
+  {
+   "_id": "OS-MICROSOFT-WIN11-PRO",
+   "name": "Microsoft Windows 11 Professionnel 64 bits",
+   "slug": "microsoft-windows-11-professionnel-64-bits",
+   "category": "os",
+   "brand": "microsoft",
+   "range": "Windows 11",
+   "price": 139.95,
+   "stock": {
+    "status": "in_stock",
+    "qty": 500
+   },
+   "specs": [
+    {
+     "k": "platform",
+     "label": "Plateforme",
+     "v": "Windows"
+    },
+    {
+     "k": "licence",
+     "label": "Licence",
+     "v": "Perpétuelle"
+    },
+    {
+     "k": "delivery",
+     "label": "Livraison",
+     "v": "Clé numérique"
+    }
+   ],
+   "compat": {
+    "uses": [],
+    "supports": []
+   }
+  },
+  {
+   "_id": "OS-MICROSOFT-WIN11-HOME",
+   "name": "Microsoft Windows 11 Famille 64 bits",
+   "slug": "microsoft-windows-11-famille-64-bits",
+   "category": "os",
+   "brand": "microsoft",
+   "range": "Windows 11",
+   "price": 119.95,
+   "stock": {
+    "status": "in_stock",
+    "qty": 500
+   },
+   "specs": [
+    {
+     "k": "platform",
+     "label": "Plateforme",
+     "v": "Windows"
+    },
+    {
+     "k": "licence",
+     "label": "Licence",
+     "v": "Perpétuelle"
+    },
+    {
+     "k": "delivery",
+     "label": "Livraison",
+     "v": "Clé numérique"
+    }
+   ],
+   "compat": {
+    "uses": [],
+    "supports": []
+   }
+  },
+  {
+   "_id": "OFFICE-MICROSOFT-365-FAMILLE",
+   "name": "Microsoft 365 Famille (1 an, 6 utilisateurs)",
+   "slug": "microsoft-365-famille-1-an-6-utilisateurs",
+   "category": "office",
+   "brand": "microsoft",
+   "range": "Microsoft 365",
+   "price": 99.99,
+   "stock": {
+    "status": "in_stock",
+    "qty": 500
+   },
+   "specs": [
+    {
+     "k": "platform",
+     "label": "Plateforme",
+     "v": "Windows / macOS"
+    },
+    {
+     "k": "licence",
+     "label": "Licence",
+     "v": "Abonnement 1 an"
+    },
+    {
+     "k": "delivery",
+     "label": "Livraison",
+     "v": "Clé numérique"
+    }
+   ],
+   "compat": {
+    "uses": [],
+    "supports": []
+   }
+  },
+  {
+   "_id": "OFFICE-MICROSOFT-2024-HOME",
+   "name": "Microsoft Office 2024 Famille",
+   "slug": "microsoft-office-2024-famille",
+   "category": "office",
+   "brand": "microsoft",
+   "range": "Office 2024",
+   "price": 149.99,
+   "stock": {
+    "status": "in_stock",
+    "qty": 500
+   },
+   "specs": [
+    {
+     "k": "platform",
+     "label": "Plateforme",
+     "v": "Windows / macOS"
+    },
+    {
+     "k": "licence",
+     "label": "Licence",
+     "v": "Perpétuelle"
+    },
+    {
+     "k": "delivery",
+     "label": "Livraison",
+     "v": "Clé numérique"
+    }
+   ],
+   "compat": {
+    "uses": [],
+    "supports": []
+   }
+  }
+ ],
+ "reviews": [
+  {
+   "product_id": "CPU-AMD-R7-9800X3D",
+   "customer_id": "C0001",
+   "author": "Julien M.",
+   "rating": 5,
+   "title": "Le roi du gaming",
+   "comment": "Des performances de dingue en jeu, il reste frais avec un bon ventirad.",
+   "verified_purchase": true,
+   "created_at": "2025-06-05T19:41:00Z"
+  },
+  {
+   "product_id": "CPU-AMD-R7-9800X3D",
+   "customer_id": "C0014",
+   "author": "Sophie L.",
+   "rating": 5,
+   "title": "Excellent",
+   "comment": "Meilleur achat de ma config, 3D V-Cache impressionnant.",
+   "verified_purchase": true,
+   "created_at": "2025-01-03T10:23:00Z"
+  },
+  {
+   "product_id": "CPU-AMD-R7-9800X3D",
+   "customer_id": "C0027",
+   "author": "Karim B.",
+   "rating": 4,
+   "title": "Très bon mais cher",
+   "comment": "Super CPU, le prix reste élevé.",
+   "verified_purchase": true,
+   "created_at": "2025-10-02T13:02:00Z"
+  },
+  {
+   "product_id": "CPU-AMD-R5-9600X",
+   "customer_id": "C0003",
+   "author": "Camille R.",
+   "rating": 4,
+   "title": "Bon rapport qualité/prix",
+   "comment": "Parfait pour une config milieu de gamme, silencieux.",
+   "verified_purchase": true,
+   "created_at": "2025-02-14T20:04:00Z"
+  },
+  {
+   "product_id": "CPU-AMD-R5-9600X",
+   "customer_id": "C0031",
+   "author": "Thomas D.",
+   "rating": 5,
+   "title": "Rien à redire",
+   "comment": "Rapide et peu gourmand en énergie.",
+   "verified_purchase": false,
+   "created_at": "2025-04-03T20:03:00Z"
+  },
+  {
+   "product_id": "CPU-INTEL-I5-12400F",
+   "customer_id": "C0005",
+   "author": "Nicolas P.",
+   "rating": 4,
+   "title": "Valeur sûre",
+   "comment": "Toujours efficace pour une config budget DDR4.",
+   "verified_purchase": true,
+   "created_at": "2025-10-04T14:40:00Z"
+  },
+  {
+   "product_id": "CPU-INTEL-I5-12400F",
+   "customer_id": "C0042",
+   "author": "Léa V.",
+   "rating": 3,
+   "title": "Correct",
+   "comment": "Bien mais pas de graphique intégré, à savoir.",
+   "verified_purchase": true,
+   "created_at": "2025-11-19T08:36:00Z"
+  },
+  {
+   "product_id": "MB-MSI-X870-TOMAHAWK",
+   "customer_id": "C0008",
+   "author": "Antoine G.",
+   "rating": 5,
+   "title": "Solide",
+   "comment": "Carte robuste, BIOS stable et Wi-Fi 7 fiable.",
+   "verified_purchase": true,
+   "created_at": "2025-10-13T08:14:00Z"
+  },
+  {
+   "product_id": "MB-MSI-X870-TOMAHAWK",
+   "customer_id": "C0019",
+   "author": "Emma T.",
+   "rating": 4,
+   "title": "Bonne carte",
+   "comment": "Bonne connectique, VRM costaud.",
+   "verified_purchase": true,
+   "created_at": "2025-01-18T11:18:00Z"
+  },
+  {
+   "product_id": "RAM-CORSAIR-VENGEANCE-32-6000",
+   "customer_id": "C0002",
+   "author": "Hugo F.",
+   "rating": 5,
+   "title": "Profil EXPO OK",
+   "comment": "Activé en un clic dans le BIOS, aucun souci.",
+   "verified_purchase": true,
+   "created_at": "2025-07-05T10:36:00Z"
+  },
+  {
+   "product_id": "RAM-CORSAIR-VENGEANCE-32-6000",
+   "customer_id": "C0023",
+   "author": "Chloé S.",
+   "rating": 4,
+   "title": "Bon kit",
+   "comment": "Fonctionne bien, design sobre.",
+   "verified_purchase": true,
+   "created_at": "2025-05-18T12:06:00Z"
+  },
+  {
+   "product_id": "RAM-CORSAIR-VENGEANCE-32-6000",
+   "customer_id": "C0050",
+   "author": "Maxime C.",
+   "rating": 5,
+   "title": "Parfait",
+   "comment": "Stable à 6000 MHz depuis des mois.",
+   "verified_purchase": true,
+   "created_at": "2025-10-19T13:23:00Z"
+  },
+  {
+   "product_id": "GPU-ASUS-RTX5080-PRIME",
+   "customer_id": "C0006",
+   "author": "Pierre H.",
+   "rating": 5,
+   "title": "Puissante",
+   "comment": "4K fluide avec DLSS 4, très silencieuse.",
+   "verified_purchase": true,
+   "created_at": "2025-02-18T09:36:00Z"
+  },
+  {
+   "product_id": "GPU-ASUS-RTX5080-PRIME",
+   "customer_id": "C0035",
+   "author": "Manon D.",
+   "rating": 4,
+   "title": "Très bien",
+   "comment": "Excellente mais le prix pique.",
+   "verified_purchase": true,
+   "created_at": "2025-01-20T13:31:00Z"
+  },
+  {
+   "product_id": "GPU-ASUS-RTX5080-PRIME",
+   "customer_id": "C0055",
+   "author": "Lucas A.",
+   "rating": 2,
+   "title": "Coil whine",
+   "comment": "Sifflement audible sous charge, dommage.",
+   "verified_purchase": true,
+   "created_at": "2025-11-18T20:49:00Z"
+  },
+  {
+   "product_id": "GPU-GIGABYTE-RTX5060-WINDFORCE",
+   "customer_id": "C0010",
+   "author": "Inès B.",
+   "rating": 4,
+   "title": "Parfaite en 1080p",
+   "comment": "Compacte, entrée de gamme efficace.",
+   "verified_purchase": true,
+   "created_at": "2025-06-15T21:23:00Z"
+  },
+  {
+   "product_id": "GPU-GIGABYTE-RTX5060-WINDFORCE",
+   "customer_id": "C0044",
+   "author": "Alexandre R.",
+   "rating": 4,
+   "title": "Bon choix",
+   "comment": "Tient dans mon boîtier ITX sans problème.",
+   "verified_purchase": true,
+   "created_at": "2025-05-08T12:44:00Z"
+  },
+  {
+   "product_id": "GPU-ASUS-RX9070XT-TUF",
+   "customer_id": "C0012",
+   "author": "Julie M.",
+   "rating": 5,
+   "title": "Très bon rapport perfs/prix",
+   "comment": "Une alternative sérieuse, très bien refroidie.",
+   "verified_purchase": true,
+   "created_at": "2025-04-03T16:33:00Z"
+  },
+  {
+   "product_id": "SSD-SAMSUNG-990PRO-2TB",
+   "customer_id": "C0004",
+   "author": "Romain K.",
+   "rating": 5,
+   "title": "Rapide",
+   "comment": "Les 2 To sont très appréciables, aucune chauffe anormale.",
+   "verified_purchase": true,
+   "created_at": "2025-08-11T21:18:00Z"
+  },
+  {
+   "product_id": "SSD-SAMSUNG-990PRO-2TB",
+   "customer_id": "C0038",
+   "author": "Marine L.",
+   "rating": 5,
+   "title": "Sans surprise",
+   "comment": "Fiable, comme toujours chez Samsung.",
+   "verified_purchase": true,
+   "created_at": "2025-10-03T10:32:00Z"
+  },
+  {
+   "product_id": "SSD-WD-SN850X-1TB",
+   "customer_id": "C0015",
+   "author": "Baptiste N.",
+   "rating": 4,
+   "title": "Efficace",
+   "comment": "Vitesses conformes à l'annonce.",
+   "verified_purchase": true,
+   "created_at": "2025-07-06T17:09:00Z"
+  },
+  {
+   "product_id": "PSU-CORSAIR-RM850X",
+   "customer_id": "C0020",
+   "author": "Valérie P.",
+   "rating": 5,
+   "title": "Silencieuse",
+   "comment": "Ventilateur à l'arrêt en usage normal, câbles de qualité.",
+   "verified_purchase": true,
+   "created_at": "2025-08-14T08:42:00Z"
+  },
+  {
+   "product_id": "CASE-NZXT-H5-FLOW",
+   "customer_id": "C0009",
+   "author": "Florian J.",
+   "rating": 4,
+   "title": "Flux d'air excellent",
+   "comment": "Facile à monter, belles températures.",
+   "verified_purchase": true,
+   "created_at": "2025-02-25T17:21:00Z"
+  },
+  {
+   "product_id": "CASE-NZXT-H5-FLOW",
+   "customer_id": "C0047",
+   "author": "Clara E.",
+   "rating": 4,
+   "title": "Joli et pratique",
+   "comment": "Rien à dire, le prix est correct.",
+   "verified_purchase": true,
+   "created_at": "2025-12-12T22:37:00Z"
+  },
+  {
+   "product_id": "COOLER-NOCTUA-NHD15",
+   "customer_id": "C0017",
+   "author": "Sébastien O.",
+   "rating": 5,
+   "title": "Le meilleur à air",
+   "comment": "Quasi aussi bon qu'un AIO et ultra silencieux.",
+   "verified_purchase": true,
+   "created_at": "2025-08-03T09:17:00Z"
+  },
+  {
+   "product_id": "COOLER-NOCTUA-NHD15",
+   "customer_id": "C0052",
+   "author": "Audrey Q.",
+   "rating": 4,
+   "title": "Imposant",
+   "comment": "Très efficace mais attention à la compatibilité RAM.",
+   "verified_purchase": true,
+   "created_at": "2025-08-23T09:03:00Z"
+  },
+  {
+   "product_id": "MOUSE-LOGITECH-GPRO-X2",
+   "customer_id": "C0007",
+   "author": "Dylan W.",
+   "rating": 5,
+   "title": "Ultra légère",
+   "comment": "Sensation incroyable, autonomie au top.",
+   "verified_purchase": true,
+   "created_at": "2025-12-23T16:41:00Z"
+  },
+  {
+   "product_id": "MOUSE-LOGITECH-GPRO-X2",
+   "customer_id": "C0033",
+   "author": "Pauline Z.",
+   "rating": 5,
+   "title": "Je recommande",
+   "comment": "Précise et agréable pour le FPS.",
+   "verified_purchase": true,
+   "created_at": "2025-10-22T21:18:00Z"
+  },
+  {
+   "product_id": "MOUSE-LOGITECH-M185",
+   "customer_id": "C0058",
+   "author": "Gérard V.",
+   "rating": 3,
+   "title": "Basique",
+   "comment": "Fait le travail pour la bureautique.",
+   "verified_purchase": false,
+   "created_at": "2025-12-13T18:01:00Z"
+  },
+  {
+   "product_id": "KB-CORSAIR-K70-PRO",
+   "customer_id": "C0022",
+   "author": "Mathieu Y.",
+   "rating": 4,
+   "title": "Compact et solide",
+   "comment": "Bon clavier 60%, frappe agréable.",
+   "verified_purchase": true,
+   "created_at": "2025-08-12T12:39:00Z"
+  },
+  {
+   "product_id": "MON-LG-27GR95QE",
+   "customer_id": "C0011",
+   "author": "Océane F.",
+   "rating": 5,
+   "title": "OLED magnifique",
+   "comment": "Noirs parfaits et fluidité exceptionnelle.",
+   "verified_purchase": true,
+   "created_at": "2025-02-16T08:13:00Z"
+  },
+  {
+   "product_id": "MON-LG-27GR95QE",
+   "customer_id": "C0040",
+   "author": "Vincent H.",
+   "rating": 4,
+   "title": "Superbe",
+   "comment": "Un peu de reflets en pleine journée.",
+   "verified_purchase": true,
+   "created_at": "2025-05-05T14:25:00Z"
+  },
+  {
+   "product_id": "HS-STEELSERIES-ARCTIS-NOVA7",
+   "customer_id": "C0025",
+   "author": "Elodie C.",
+   "rating": 5,
+   "title": "Confortable",
+   "comment": "Je le porte des heures sans gêne, son précis.",
+   "verified_purchase": true,
+   "created_at": "2025-07-28T22:05:00Z"
+  },
+  {
+   "product_id": "OS-MICROSOFT-WIN11-PRO",
+   "customer_id": "C0030",
+   "author": "David I.",
+   "rating": 4,
+   "title": "Livraison immédiate",
+   "comment": "Clé reçue en quelques minutes, activation OK.",
+   "verified_purchase": true,
+   "created_at": "2025-03-15T19:35:00Z"
+  },
+  {
+   "product_id": "OFFICE-MICROSOFT-365-FAMILLE",
+   "customer_id": "C0036",
+   "author": "Nathalie U.",
+   "rating": 4,
+   "title": "Pratique",
+   "comment": "Pratique pour toute la famille avec le cloud inclus.",
+   "verified_purchase": true,
+   "created_at": "2025-05-05T20:55:00Z"
+  }
+ ],
+ "bundles": [
+  [
+   "CPU-AMD-R7-9800X3D",
+   "MB-MSI-X870-TOMAHAWK",
+   "RAM-CORSAIR-VENGEANCE-32-6000",
+   "GPU-ASUS-RTX5080-PRIME",
+   "SSD-SAMSUNG-990PRO-2TB",
+   "PSU-CORSAIR-RM850X",
+   "CASE-NZXT-H5-FLOW",
+   "COOLER-NOCTUA-NHD15"
+  ],
+  [
+   "CPU-AMD-R5-9600X",
+   "MB-ASUS-B650M-PRIME",
+   "RAM-GSKILL-TRIDENTZ5-32-6000",
+   "GPU-ASUS-RX9070XT-TUF",
+   "SSD-WD-SN850X-1TB",
+   "PSU-BEQUIET-PUREPOWER12-750",
+   "CASE-NZXT-H5-FLOW",
+   "COOLER-COOLERMASTER-HYPER212"
+  ],
+  [
+   "CPU-INTEL-U7-265K",
+   "MB-GIGABYTE-Z890-AORUS-ELITE",
+   "RAM-CRUCIAL-PRO-32-5600",
+   "GPU-MSI-RTX5070TI-VENTUS",
+   "SSD-SAMSUNG-990PRO-2TB",
+   "PSU-BEQUIET-PUREPOWER12-750",
+   "CASE-FRACTAL-NORTH",
+   "COOLER-NOCTUA-NHD15"
+  ],
+  [
+   "CPU-INTEL-I5-12400F",
+   "MB-MSI-PRO-B760M-DDR4",
+   "RAM-KINGSTON-FURY-16-3200",
+   "GPU-GIGABYTE-RTX5060-WINDFORCE",
+   "SSD-CRUCIAL-P3-500GB",
+   "PSU-BEQUIET-PUREPOWER12-750",
+   "CASE-NZXT-H5-FLOW",
+   "COOLER-COOLERMASTER-HYPER212"
+  ],
+  [
+   "CPU-AMD-R5-9600X",
+   "MB-ASUS-B850I-STRIX",
+   "RAM-GSKILL-TRIDENTZ5-32-6000",
+   "GPU-GIGABYTE-RTX5060-WINDFORCE",
+   "SSD-WD-SN850X-1TB",
+   "PSU-CORSAIR-SF750",
+   "CASE-COOLERMASTER-NR200P",
+   "COOLER-NOCTUA-NHL12S"
+  ],
+  [
+   "CPU-AMD-R9-9950X3D",
+   "MB-MSI-X870-TOMAHAWK",
+   "RAM-GSKILL-TRIDENTZ5-32-6000",
+   "GPU-ASUS-RTX5080-PRIME",
+   "SSD-SAMSUNG-990PRO-2TB",
+   "PSU-CORSAIR-RM850X",
+   "CASE-FRACTAL-NORTH",
+   "COOLER-NOCTUA-NHD15"
+  ],
+  [
+   "MOUSE-LOGITECH-GPRO-X2",
+   "KB-CORSAIR-K70-PRO",
+   "HS-STEELSERIES-ARCTIS-NOVA7",
+   "MON-LG-27GR95QE"
+  ],
+  [
+   "MOUSE-RAZER-DEATHADDER-V4",
+   "KB-STEELSERIES-APEX-PRO",
+   "HS-RAZER-BLACKSHARK-V2"
+  ],
+  [
+   "OS-MICROSOFT-WIN11-PRO",
+   "OFFICE-MICROSOFT-365-FAMILLE",
+   "MOUSE-LOGITECH-M185",
+   "KB-LOGITECH-MXKEYS"
+  ],
+  [
+   "OS-MICROSOFT-WIN11-HOME",
+   "OFFICE-MICROSOFT-2024-HOME",
+   "MOUSE-LOGITECH-M185"
+  ]
+ ]
+}

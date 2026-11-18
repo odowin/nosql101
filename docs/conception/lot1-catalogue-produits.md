@@ -79,10 +79,10 @@ db.createCollection("products", { validationLevel: "moderate", validator: { $jso
     schema_version: { bsonType: "int" },
     stock: { bsonType: "object", properties: { status: { enum: ["in_stock", "low_stock", "out_of_stock", "preorder"] } } },
     specs: { bsonType: "array", items: { bsonType: "object", required: ["k", "v"], properties: {
-      k: { bsonType: "string" }, v: { bsonType: ["string", "int", "double", "bool", "decimal"] }, u: { bsonType: "string" } } } } } } } })
+      k: { bsonType: "string" }, v: { bsonType: ["string", "int", "double", "bool", "decimal", "array"] }, u: { bsonType: "string" } } } } } } } })
 ```
 
-Convention : une valeur numérique n'est jamais une chaîne avec unité (`v: 120, u: "W"`, pas `v: "120 W"`), sinon `$gte`/`$lte` sur `specs.v` ne fonctionnent plus.
+Convention : une valeur numérique n'est jamais une chaîne avec unité (`v: 120, u: "W"`, pas `v: "120 W"`), sinon `$gte`/`$lte` sur `specs.v` ne fonctionnent plus. Un attribut multi-valué est un tableau (`{ k: "sockets", v: ["AM5", "LGA1851"] }`) : `$elemMatch: { k: "sockets", v: "AM5" }` le trouve, car MongoDB compare la valeur à chaque élément du tableau.
 
 Index `products` : `{category._id:1, price:1}` (liste triée par prix), `{category._id:1, specs.k:1, specs.v:1}` (facettes), `{brand._id:1}`, `{slug:1}` unique, texte `{name:"text"}`. Index `reviews` : `{product_id:1, created_at:-1}`. Index `categories` : `{ancestors:1}`.
 
