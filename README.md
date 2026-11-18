@@ -38,16 +38,17 @@ Hors périmètre : la prise de commande et le paiement restent dans une base rel
 | Schémas de données | [MongoDB](db/mongodb/init.js) · [Cassandra](db/cassandra/schema.cql) · [Neo4j](db/neo4j/schema.cypher) · Redis : modèle de clés dans [le Lot 2](docs/conception/lot2-panier-sessions.md) |
 | Requêtes types | [MongoDB](db/mongodb/queries.js) · [Redis](db/redis/queries.redis) · [Cassandra](db/cassandra/queries.cql) · [Neo4j](db/neo4j/queries.cypher) |
 | Environnement local des 4 bases | [docker-compose.yml](docker-compose.yml) |
-| Bonus : prototype d'API | [api/](api/) |
+| Bonus : prototype d'API | [api/README.md](api/README.md) (FastAPI, Swagger, tests) |
 
 ## Lancer les bases et les schémas
 
 Prérequis : Docker et Docker Compose, environ 3 Go de RAM libres.
 
 ```bash
-docker compose up -d        # 1er démarrage ≈ 2 min (Cassandra) ; les schémas sont appliqués par les jobs d'init
+docker compose up -d --build   # 1er démarrage ≈ 2 min (Cassandra) ; schémas appliqués par les jobs d'init, API seedée
 ```
 
+- API (bonus) : <http://localhost:8000/docs> — voir [api/README.md](api/README.md)
 - Neo4j Browser : <http://localhost:7474> (`neo4j` / `ldlc-password`)
 - Réinitialiser (efface les volumes) : `docker compose down -v`
 
@@ -62,7 +63,7 @@ docker compose exec -T cassandra cqlsh -k ldlc < db/cassandra/queries.cql
 docker compose exec -T neo4j cypher-shell -u neo4j -p ldlc-password < db/neo4j/queries.cypher
 ```
 
-Les requêtes s'exécutent sur les schémas vides ; les lectures renvoient des résultats une fois des données insérées (les exemples d'écriture de chaque fichier en créent puis les nettoient).
+Avec l'API démarrée, les lectures portent sur le jeu de démonstration ; les exemples d'écriture de chaque fichier créent leurs données puis les nettoient.
 
 ## Structure du dépôt
 
@@ -77,7 +78,7 @@ Les requêtes s'exécutent sur les schémas vides ; les lectures renvoient des r
 │   └── conception/         # contexte et synthèse, un fichier par lot
 ├── architecture/           # schéma d'architecture globale (Mermaid + draw.io)
 ├── db/                     # schémas et requêtes types : mongodb/, redis/, cassandra/, neo4j/
-└── api/                    # prototype d'API (bonus)
+└── api/                    # prototype d'API FastAPI (bonus)
 ```
 
 ## Contribuer
