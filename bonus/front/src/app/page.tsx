@@ -156,7 +156,7 @@ export default async function Home() {
         ) : (
           <ol className="stagger grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
             {top.items.map((i) => (
-              <li key={i.sku}>
+              <li key={i.sku} className="min-w-0">
                 <Link
                   href={`/produits/${encodeURIComponent(i.sku)}`}
                   className="flex min-h-11 items-center gap-3 rounded-xl bg-header p-4 transition-colors hover:bg-neutral-900 hover:text-link"
