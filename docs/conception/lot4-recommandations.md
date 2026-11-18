@@ -40,6 +40,8 @@ graph LR
 
 **Compatibilité par nœuds `Standard`.** A est compatible avec B si un standard S vérifie `(A)-[:USES]->(S)<-[:SUPPORTS]-(B)`, ou l'inverse. Un nouveau produit crée **une arête par standard** (2 à 4) au lieu de centaines d'arêtes produit↔produit (modèle N×M). La règle est déclarative et toujours à jour. Une carte mère et un ventirad qui *supportent* tous deux AM5 ne sont pas déclarés compatibles entre eux, grâce à `type(r1) <> type(r2)`.
 
+**Contraintes et index.** Les contraintes d'unicité (`Product.sku`, `Standard.id`…) garantissent l'absence de doublons et servent d'index au `MERGE`. Script complet : [`db/neo4j/schema.cypher`](../../db/neo4j/schema.cypher).
+
 ## Requêtes types
 
 _À compléter._
