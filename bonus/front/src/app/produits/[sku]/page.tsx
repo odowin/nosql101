@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { Star } from "lucide-react";
-import { AddToCart } from "@/components/add-to-cart";
+import { Store, Truck } from "lucide-react";
 import { Breadcrumb } from "@/components/breadcrumb";
+import { BuyBox } from "@/components/buy-box";
+import { CategoryIcon } from "@/components/category-icon";
 import { StockLabel } from "@/components/product-card";
-import { Price } from "@/components/price";
+import { Stars } from "@/components/stars";
 import { RecoSection } from "@/components/reco-section";
 import { ReviewForm } from "@/components/review-form";
 import { TrackEvent } from "@/components/track-event";
@@ -16,7 +17,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ApiError, getCategories, getDailyViews, getProduct, getRecommendations, listReviews } from "@/lib/api/client";
 import { categoryHref, categoryTrail } from "@/lib/categories";
-import { formatDate } from "@/lib/format";
+import { formatDate, priceParts, priceView, specSummary } from "@/lib/format";
 
 type Props = { params: Promise<{ sku: string }>; searchParams: Promise<{ avis?: string }> };
 
@@ -37,6 +38,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return { title: `${p?.name ?? "Produit"} · LDLC NoSQL` };
 }
 
+const DELIVERY: Record<string, string> = {
+  in_stock: "Livré après-demain",
+  low_stock: "Livré sous 3 jours",
+  preorder: "Expédié à réception",
+};
+
 const recos = [
   { kind: "compatible", title: "Compatibles" },
   { kind: "bought-together", title: "Souvent achetés ensemble" },
@@ -56,6 +63,9 @@ export default async function ProductPage({ params, searchParams }: Props) {
   const trail = categoryTrail(categories, p.category._id);
   const reviewPages = reviews ? Math.max(1, Math.ceil(reviews.total / REVIEWS_PER_PAGE)) : 1;
   const outOfStock = p.stock?.status === "out_of_stock";
+  const v = priceView(p);
+  const { units, cents } = priceParts(v.was ? p.effective_price : p.price);
+  const delivery = DELIVERY[p.stock?.status ?? ""];
 
   return (
     <main className="flex flex-col gap-10">
@@ -70,30 +80,63 @@ export default async function ProductPage({ params, searchParams }: Props) {
         ]}
       />
 
-      <section className="grid gap-8 md:grid-cols-[1fr_20rem]">
-        <div>
-          <p className="text-sm text-muted-foreground">
-            {p.brand.name}
-            {p.range && ` · ${p.range}`} · <span className="font-mono">{p._id}</span>
-          </p>
-          <h1 className="mt-1 text-3xl font-bold">{p.name}</h1>
-          <p className="mt-2 flex flex-wrap items-center gap-2 text-sm">
-            <span className="tabular inline-flex items-center gap-1">
-              <Star className="size-4 fill-current text-promo" aria-hidden />
-              {p.rating.count ? `${p.rating.avg.toFixed(1)} / 5 (${p.rating.count} avis)` : "Pas encore d'avis"}
-            </span>
-            <Badge variant="outline">MongoDB · cache Redis</Badge>
-          </p>
+      <section className="bloc grid gap-[30px] lg:grid-cols-2" aria-label="Produit">
+        {/* Galerie : pas de photo produit, placeholder neutre à ratio fixe avec le picto de la catégorie. */}
+        <div className="grid aspect-square w-full max-w-[655px] place-items-center self-start justify-self-center bg-[oklch(95%_0_0)]" aria-hidden>
+          <CategoryIcon id={p.category._id} className="size-1/3 text-[oklch(68%_0_0)]" />
         </div>
-        <aside className="flex flex-col gap-3 self-start rounded-lg bg-card p-5">
-          <Price p={p} detailed className="text-3xl [&>span:first-child]:font-bold" />
-          {p.stock && <StockLabel status={p.stock.status} qty={p.stock.qty} />}
-          <AddToCart sku={sku} disabled={outOfStock} />
-          <p className="tabular flex items-center justify-between gap-2 text-sm text-muted-foreground">
-            {views === null ? "Vues du jour indisponibles" : `${views} vue${views > 1 ? "s" : ""} aujourd'hui`}
-            <Badge variant="outline">Cassandra</Badge>
-          </p>
-        </aside>
+
+        <div className="flex min-w-0 flex-col gap-5">
+          <div className="flex flex-col gap-2">
+            <h1 className="text-[22px] font-bold tracking-normal text-ldlc-text">{p.name}</h1>
+            <h2 className="text-[13px] font-medium tracking-normal text-muted-foreground">
+              {[p.brand.name, p.range, specSummary(p.specs ?? [])].filter(Boolean).join(" - ")}
+            </h2>
+            <a href="#avis" className="inline-flex min-h-11 w-fit items-center hover:underline">
+              <Stars avg={p.rating.avg} count={p.rating.count} />
+            </a>
+          </div>
+
+          {/* Encadré prix bleu pâle ; à droite, les vues du jour à la place du paiement fractionné (omis). */}
+          <div className="tabular flex flex-wrap items-center justify-between gap-4 rounded-lg bg-ldlc-pale px-5 py-4">
+            <div className="flex flex-col gap-1">
+              <span className="sr-only">Prix : {v.now}{v.was && `, au lieu de ${v.was}`}</span>
+              <span aria-hidden className="text-[28px] leading-none font-bold whitespace-nowrap text-ldlc-price">
+                {units}€<sup className="text-base font-bold">{cents}</sup>
+              </span>
+              {v.was && (
+                <span aria-hidden className="flex items-center gap-2">
+                  <del className="text-sm text-muted-foreground">{v.was}</del>
+                  {v.badge && <Badge variant="promo">{v.badge}</Badge>}
+                </span>
+              )}
+              {v.label && <span className="text-xs text-ldlc-text">{v.label} · {v.until}</span>}
+            </div>
+            <p className="text-xs text-ldlc-text lg:border-l lg:border-white lg:pl-4">
+              {views === null ? "Vues du jour indisponibles" : `${views} vue${views > 1 ? "s" : ""} aujourd'hui`}
+              <span className="block text-muted-foreground">Compteur Cassandra</span>
+            </p>
+          </div>
+
+          {/* Disponibilité et livraison simulées d'après stock.status (pas de transporteur ni de boutiques). */}
+          <div className="divide-y rounded-lg border border-border">
+            <div className="flex min-h-[65px] flex-wrap items-center gap-3 px-4 py-2">
+              <Truck className="size-6 shrink-0 text-ldlc-text" strokeWidth={1.5} aria-hidden />
+              <div className="flex-1">
+                <p className="font-bold text-ldlc-strong">Livraison à domicile ou en relais</p>
+                {p.stock && <StockLabel status={p.stock.status} qty={p.stock.qty} />}
+              </div>
+              {delivery && <span className="rounded-[15px] bg-primary px-3 py-1 text-[13px] font-bold text-white">{delivery}</span>}
+            </div>
+            <div className="flex min-h-[65px] items-center gap-3 px-4 py-2">
+              <Store className="size-6 shrink-0 text-ldlc-text" strokeWidth={1.5} aria-hidden />
+              <p className="flex-1 font-bold text-ldlc-strong">Retrait en boutique</p>
+              <span className="text-ldlc-price">Non disponible</span>
+            </div>
+          </div>
+
+          <BuyBox sku={sku} maxQty={p.stock?.qty ?? 1} disabled={outOfStock} />
+        </div>
       </section>
 
       {p.specs?.length > 0 && (
