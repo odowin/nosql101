@@ -82,7 +82,29 @@ Schéma complet : [`db/cassandra/schema.cql`](../../db/cassandra/schema.cql). Ke
 
 ## Requêtes types
 
-_À compléter._
+```sql
+-- Ingestion d'un product_view (pré-agrégé par le consommateur)
+INSERT INTO ldlc.events_by_hour (day, hour, shard, event_id, event_type, session_id, sku)
+  VALUES ('2026-11-18', 14, 3, now(), 'product_view', '9f2c', 'CPU-AMD-R7-9800X3D');
+UPDATE ldlc.product_views_by_day SET views = views + 1 WHERE sku = 'CPU-AMD-R7-9800X3D' AND day = '2026-11-18';
+UPDATE ldlc.daily_views_by_shard SET views = views + 1 WHERE day = '2026-11-18' AND shard = 5 AND sku = 'CPU-AMD-R7-9800X3D';
+-- Q1 : vues aujourd'hui, puis série sur 7 jours
+SELECT views FROM ldlc.product_views_by_day WHERE sku = 'CPU-AMD-R7-9800X3D' AND day = '2026-11-18';
+SELECT day, views FROM ldlc.product_views_by_day WHERE sku = 'CPU-AMD-R7-9800X3D' AND day >= '2026-11-12';
+-- Q2 : top 10 de la semaine
+SELECT rank, sku, views FROM ldlc.top_products_by_period WHERE period = 'week:2026-W47' LIMIT 10;
+-- Top recherches du jour : 8 partitions lues, fusion et tri côté application
+SELECT search_query, searches FROM ldlc.searches_by_day WHERE day = '2026-11-18' AND shard = 0;  -- … shard 7
+-- Q3 : 20 dernières commandes d'un client
+SELECT order_date, order_id, status, total FROM ldlc.orders_by_customer WHERE customer_id = 'C0001' LIMIT 20;
+-- Enregistrement d'une commande
+BEGIN BATCH
+  INSERT INTO ldlc.orders_by_customer (customer_id, order_date, order_id, status, total, items) VALUES (...);
+  INSERT INTO ldlc.orders_by_id (order_id, customer_id, order_date, status, total, items) VALUES (...);
+APPLY BATCH;
+```
+
+Requêtes complètes : [`db/cassandra/queries.cql`](../../db/cassandra/queries.cql).
 
 ## Justification des compromis
 
