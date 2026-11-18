@@ -1,7 +1,8 @@
 """Lot 4 — recommandations (Neo4j) : co-achats, compatibilité, similarité, filtrage collaboratif."""
 from fastapi import APIRouter, HTTPException, Query
 
-from app.db import neo4j_driver, to_json
+from app.catalog import price_fields
+from app.db import mongo_db, neo4j_driver, to_json
 
 router = APIRouter(prefix="/recommendations", tags=["Lot 4 — Recommandations (Neo4j)"])
 
@@ -9,6 +10,14 @@ router = APIRouter(prefix="/recommendations", tags=["Lot 4 — Recommandations (
 def _rows(cypher: str, **params) -> list[dict]:
     records, _, _ = neo4j_driver().execute_query(cypher, parameters_=params, database_="neo4j")
     return [to_json(r.data()) for r in records]
+
+
+def _products(cypher: str, **params) -> list[dict]:
+    """Lignes produit Neo4j complétées des champs de promo (MongoDB, source du prix effectif)."""
+    rows = _rows(cypher, **params)
+    docs = {d["_id"]: d for d in mongo_db().products.find({"_id": {"$in": [r["sku"] for r in rows]}},
+                                                          {"price": 1, "promo": 1})}
+    return [{**r, **price_fields(docs[r["sku"]])} if r["sku"] in docs else r for r in rows]
 
 
 def _require(label: str, key: str, value: str):
@@ -20,7 +29,7 @@ def _require(label: str, key: str, value: str):
 def for_customer(customer_id: str, limit: int = Query(5, ge=1, le=50)):
     """Filtrage collaboratif (3 sauts) : produits achetés par des clients aux achats communs, hors déjà achetés."""
     _require("Customer", "id", customer_id)
-    return _rows(
+    return _products(
         """MATCH (me:Customer {id: $cid})-[:PURCHASED]->(:Product)<-[:PURCHASED]-(peer:Customer)-[:PURCHASED]->(reco:Product)
            WHERE peer <> me AND NOT (me)-[:PURCHASED]->(reco)
            RETURN reco.sku AS sku, reco.name AS name, reco.price AS price, count(DISTINCT peer) AS score
@@ -31,7 +40,7 @@ def for_customer(customer_id: str, limit: int = Query(5, ge=1, le=50)):
 def also_bought(sku: str, category: str | None = None, limit: int = Query(5, ge=1, le=50)):
     """« Ont aussi acheté » : 2 sauts via les clients, filtre de catégorie optionnel."""
     _require("Product", "sku", sku)
-    return _rows(
+    return _products(
         """MATCH (p:Product {sku: $sku})<-[:PURCHASED]-(c:Customer)-[:PURCHASED]->(o:Product)
            WHERE o <> p AND ($category IS NULL OR o.category = $category)
            RETURN o.sku AS sku, o.name AS name, o.price AS price, count(DISTINCT c) AS buyers
@@ -42,7 +51,7 @@ def also_bought(sku: str, category: str | None = None, limit: int = Query(5, ge=
 def bought_together(sku: str, limit: int = Query(5, ge=1, le=50)):
     """Achetés dans la même commande (BOUGHT_WITH pré-calculé, 1 saut, sans direction)."""
     _require("Product", "sku", sku)
-    return _rows(
+    return _products(
         """MATCH (:Product {sku: $sku})-[r:BOUGHT_WITH]-(o:Product)
            RETURN o.sku AS sku, o.name AS name, o.price AS price, r.count AS count
            ORDER BY count DESC, sku LIMIT $limit""", sku=sku, limit=limit)
@@ -52,7 +61,7 @@ def bought_together(sku: str, limit: int = Query(5, ge=1, le=50)):
 def compatible(sku: str, category: str | None = None):
     """Produits compatibles : un standard commun avec des rôles opposés (USES / SUPPORTS)."""
     _require("Product", "sku", sku)
-    return _rows(
+    return _products(
         """MATCH (a:Product {sku: $sku})-[r1:USES|SUPPORTS]->(s:Standard)<-[r2:USES|SUPPORTS]-(b:Product)
            WHERE type(r1) <> type(r2) AND ($category IS NULL OR b.category = $category)
            RETURN b.category AS category, b.sku AS sku, b.name AS name, b.price AS price, collect(s.id) AS via
@@ -63,7 +72,7 @@ def compatible(sku: str, category: str | None = None):
 def similar(sku: str, limit: int = Query(5, ge=1, le=50)):
     """Similaires : même catégorie, score 2*marque + 3*gamme + standards communs, puis écart de prix."""
     _require("Product", "sku", sku)
-    return _rows(
+    return _products(
         """MATCH (p:Product {sku: $sku})-[:IN_CATEGORY]->(:Category)<-[:IN_CATEGORY]-(o:Product) WHERE o <> p
            OPTIONAL MATCH (p)-[:MADE_BY]->(b)<-[:MADE_BY]-(o)
            OPTIONAL MATCH (p)-[:IN_RANGE]->(r)<-[:IN_RANGE]-(o)

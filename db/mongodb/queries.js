@@ -101,3 +101,38 @@ const wp = JSON.stringify(plan.queryPlanner.winningPlan);
 print('étapes du plan : ' + wp.match(/"(IXSCAN|COLLSCAN|FETCH)"/g).join(' '));
 print('index utilisé  : ' + wp.match(/"indexName":"([^"]+)"/)[1]);
 print('docs examinés / retournés : ' + plan.executionStats.totalDocsExamined + ' / ' + plan.executionStats.nReturned);
+
+// 9. Promotions (promo embarquée) : « promos en cours » + prix effectif calculé à la lecture, sur des produits TEMPORAIRES.
+// Une promo est en cours ssi starts_at <= now < ends_at : aucun drapeau, aucune purge. Prix effectif = promo.price,
+// sinon round(price * (1 - percent/100), 2) en Decimal128, seulement si la promo est en cours.
+titre('9. Promos en cours + prix effectif');
+const jour = 86400000;
+const base = { category: { _id: 'cpu', name: 'Processeurs' }, brand: { _id: 'amd', name: 'AMD' },
+  price: NumberDecimal('100.00'), schema_version: 1, created_at: now, updated_at: now };
+db.products.insertMany([
+  { ...base, _id: 'TEST-PROMO-PCT', name: 'promo en cours (percent)',
+    promo: { label: 'Black Friday', percent: 15, starts_at: new Date(now - 2 * jour), ends_at: new Date(+now + 9 * jour) } },
+  { ...base, _id: 'TEST-PROMO-PRIX', name: 'promo en cours (prix fixe)',
+    promo: { label: 'Flash', price: NumberDecimal('79.90'), starts_at: new Date(now - jour), ends_at: new Date(+now + jour) } },
+  { ...base, _id: 'TEST-PROMO-FUTURE', name: 'promo à venir',
+    promo: { label: 'Soldes', percent: 20, starts_at: new Date(+now + 3 * jour), ends_at: new Date(+now + 10 * jour) } },
+  { ...base, _id: 'TEST-PROMO-EXPIREE', name: 'promo expirée',
+    promo: { label: 'Rentrée', percent: 10, starts_at: new Date(now - 10 * jour), ends_at: new Date(now - jour) } },
+  { ...base, _id: 'TEST-PROMO-AUCUNE', name: 'sans promo' } ].map(p => ({ ...p, slug: p._id.toLowerCase() })));
+const enCours = { 'promo.starts_at': { $lte: now }, 'promo.ends_at': { $gt: now } };
+print('promos en cours : ' + db.products.find({ _id: /^TEST-PROMO-/, ...enCours }).toArray().map(p => p._id).join(', '));
+db.products.aggregate([
+  { $match: { _id: /^TEST-PROMO-/ } },
+  { $addFields: { on_sale: { $and: [ { $lte: ['$promo.starts_at', now] }, { $gt: ['$promo.ends_at', now] } ] } } },
+  { $addFields: { effective_price: { $cond: [ '$on_sale',
+      { $ifNull: ['$promo.price', { $round: [{ $multiply: ['$price', { $subtract: [1, { $divide: [{ $toDecimal: { $ifNull: ['$promo.percent', 0] } }, 100] }] }] }, 2] }] },
+      '$price' ] } } },
+  { $project: { price: 1, effective_price: 1, on_sale: 1 } }, { $sort: { _id: 1 } }
+]).forEach(printjson);
+// Attendu : PCT 85.00 (on_sale), PRIX 79.90 (on_sale), FUTURE/EXPIREE/AUCUNE 100.00
+try {
+  db.products.insertOne({ ...base, _id: 'TEST-PROMO-BAD', name: 'x', slug: 'test-promo-bad', promo: { label: 'x', percent: 10, price: NumberDecimal('1'),
+    starts_at: now, ends_at: now } });
+  print('ERREUR : promo avec percent ET price acceptée'); db.products.deleteOne({ _id: 'TEST-PROMO-BAD' });
+} catch (e) { print('validateur : promo percent+price refusée (' + e.code + ')'); }
+db.products.deleteMany({ _id: /^TEST-PROMO-/ });

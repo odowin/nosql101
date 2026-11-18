@@ -21,6 +21,7 @@ export function parseCatalogFilters(sp: SearchParams): ProductQuery {
     q: first(sp.q),
     min_price: price(sp.min_price),
     max_price: price(sp.max_price),
+    on_sale: first(sp.on_sale) === "true" || undefined,
     // Une spec sans « k:v » ferait répondre 400 à l'API : on l'ignore.
     spec: [sp.spec ?? []].flat().map((s) => s.trim()).filter((s) => /^[^:]+:.+$/.test(s)),
     limit: PAGE_SIZE,

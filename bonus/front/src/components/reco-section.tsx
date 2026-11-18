@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Recommendation } from "@/lib/api/types";
-import { formatPrice } from "@/lib/format";
+import { Price } from "@/components/price";
 
 /** Une section de recommandations Neo4j ; vide ou en erreur, elle le dit sans casser la page. */
 export async function RecoSection({ title, items: load }: { title: string; items: Promise<Recommendation[]> }) {
@@ -18,7 +18,7 @@ export async function RecoSection({ title, items: load }: { title: string; items
             <li key={r.sku}>
               <Link href={`/produits/${encodeURIComponent(r.sku)}`} className="flex min-h-11 items-center justify-between gap-3 py-2 text-sm hover:text-primary">
                 <span>{r.name}</span>
-                <span className="tabular shrink-0 text-muted-foreground">{formatPrice(r.price)}</span>
+                <Price p={r} className="shrink-0 justify-end text-muted-foreground" />
               </Link>
             </li>
           ))}

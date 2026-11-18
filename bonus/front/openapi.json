@@ -32,7 +32,7 @@
           "Lot 1 — Catalogue (MongoDB)"
         ],
         "summary": "List Products",
-        "description": "Liste filtrée (projection légère : sans specs ni avis).",
+        "description": "Liste filtrée (projection légère : sans specs ni avis). `min_price`/`max_price` portent sur le prix de référence.",
         "operationId": "list_products_products_get",
         "parameters": [
           {
@@ -139,6 +139,18 @@
             "description": "Filtre `k:v` répétable, ex. `socket:AM5`"
           },
           {
+            "name": "on_sale",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Seulement les promos en cours",
+              "default": false,
+              "title": "On Sale"
+            },
+            "description": "Seulement les promos en cours"
+          },
+          {
             "name": "limit",
             "in": "query",
             "required": false,
@@ -228,7 +240,7 @@
           "Lot 1 — Catalogue (MongoDB)"
         ],
         "summary": "Get Product",
-        "description": "Fiche complète. Cache-aside Redis `product:{sku}` (TTL 300 s), en-tête `X-Cache`.",
+        "description": "Fiche complète. Cache-aside Redis `product:{sku}` (TTL 300 s), en-tête `X-Cache`.\n\nLe cache garde la promo brute ; le prix effectif est recalculé à chaque lecture.",
         "operationId": "get_product_products__sku__get",
         "parameters": [
           {
@@ -913,7 +925,7 @@
           "Lot 2 — Panier & sessions (Redis)"
         ],
         "summary": "Read Cart",
-        "description": "Panier de la session, enrichi (nom, prix courant MongoDB), total et TTL.",
+        "description": "Panier de la session, enrichi (nom, prix effectif MongoDB), total et TTL.",
         "operationId": "read_cart_cart_get",
         "parameters": [
           {
@@ -1141,7 +1153,7 @@
           "Lot 2 — Panier & sessions (Redis)"
         ],
         "summary": "Checkout",
-        "description": "Transforme le panier en commande (client connecté requis ; prix courants MongoDB).\n\nEn production, la commande passe par le service transactionnel de commandes (base relationnelle) et un\noutbox publié sur Kafka alimente Cassandra et Neo4j ; ici, écritures directes (Cassandra puis Neo4j).",
+        "description": "Transforme le panier en commande (client connecté requis ; prix effectifs relus dans MongoDB).\n\nEn production, la commande passe par le service transactionnel de commandes (base relationnelle) et un\noutbox publié sur Kafka alimente Cassandra et Neo4j ; ici, écritures directes (Cassandra puis Neo4j).",
         "operationId": "checkout_cart_checkout_post",
         "parameters": [
           {
@@ -1697,6 +1709,16 @@
               "uses": [],
               "supports": []
             }
+          },
+          "promo": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Promo"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "additionalProperties": true,
@@ -1710,6 +1732,63 @@
         ],
         "title": "ProductIn",
         "description": "Champs libres acceptés : tout attribut supplémentaire est stocké tel quel (schéma ouvert)."
+      },
+      "Promo": {
+        "properties": {
+          "label": {
+            "type": "string",
+            "title": "Label",
+            "examples": [
+              "Black Friday"
+            ]
+          },
+          "percent": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 90.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Percent"
+          },
+          "price": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Price"
+          },
+          "starts_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Starts At"
+          },
+          "ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ends At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "label",
+          "starts_at",
+          "ends_at"
+        ],
+        "title": "Promo",
+        "description": "Promo embarquée : exactement un de `percent` / `price`, en cours sur [starts_at, ends_at)."
       },
       "QuantityIn": {
         "properties": {

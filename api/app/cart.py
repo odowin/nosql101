@@ -1,4 +1,4 @@
-"""Lot 2 — Sessions et paniers (Redis, TTL glissants) ; prix courants lus dans MongoDB."""
+"""Lot 2 — Sessions et paniers (Redis, TTL glissants) ; prix effectifs (promo comprise) lus dans MongoDB."""
 import uuid
 from datetime import datetime, timezone
 from decimal import Decimal
@@ -7,6 +7,7 @@ from fastapi import APIRouter, Header, HTTPException, Response
 from pydantic import BaseModel, Field
 
 from app import analytics, reco
+from app.catalog import effective_price, price_fields
 from app.db import mongo_db, redis_client, to_json
 
 router = APIRouter(tags=["Lot 2 — Panier & sessions (Redis)"])
@@ -48,7 +49,7 @@ def get_session(sid: str | None) -> dict:
 
 
 def _cart_view(session: dict) -> dict:
-    """Panier enrichi du prix courant MongoDB ; rafraîchit les TTL (glissant)."""
+    """Panier enrichi du prix effectif courant (MongoDB) ; rafraîchit les TTL (glissant)."""
     cart_id, key = session["cart_id"], f"cart:{session['cart_id']}"
     pipe = redis_client().pipeline()
     pipe.hgetall(key)
@@ -56,17 +57,17 @@ def _cart_view(session: dict) -> dict:
     pipe.expire(f"session:{session['session_id']}", SESSION_TTL)
     pipe.ttl(key)
     lines, _, _, ttl = pipe.execute()
-    products = {p["_id"]: p for p in mongo_db().products.find({"_id": {"$in": list(lines)}}, {"name": 1, "price": 1})}
+    products = {p["_id"]: p for p in mongo_db().products.find({"_id": {"$in": list(lines)}}, {"name": 1, "price": 1, "promo": 1})}
     items, total = [], Decimal(0)
     for sku, qty in sorted(lines.items()):
         p = products.get(sku)
         if p is None:  # produit retiré du catalogue : ligne ignorée
             continue
         qty = int(qty)
-        unit = p["price"].to_decimal()
+        unit = effective_price(p)[0]
         total += unit * qty
-        items.append({"sku": sku, "name": p["name"], "unit_price": float(unit),
-                      "quantity": qty, "line_total": float(unit * qty)})
+        items.append({"sku": sku, "name": p["name"], "price": float(p["price"].to_decimal()), **price_fields(p),
+                      "unit_price": float(unit), "quantity": qty, "line_total": float(unit * qty)})
     return {"cart_id": cart_id, "items": items, "total": float(total), "ttl": ttl}
 
 
@@ -129,7 +130,7 @@ def delete_session(sid: str):
 
 @router.get("/cart")
 def read_cart(x_session_id: str | None = Header(default=None, alias="X-Session-Id")):
-    """Panier de la session, enrichi (nom, prix courant MongoDB), total et TTL."""
+    """Panier de la session, enrichi (nom, prix effectif MongoDB), total et TTL."""
     return _cart_view(get_session(x_session_id))
 
 
@@ -174,7 +175,7 @@ def remove_item(sku: str, x_session_id: str | None = Header(default=None, alias=
 
 @router.post("/cart/checkout", status_code=201)
 def checkout(x_session_id: str | None = Header(default=None, alias="X-Session-Id")):
-    """Transforme le panier en commande (client connecté requis ; prix courants MongoDB).
+    """Transforme le panier en commande (client connecté requis ; prix effectifs relus dans MongoDB).
 
     En production, la commande passe par le service transactionnel de commandes (base relationnelle) et un
     outbox publié sur Kafka alimente Cassandra et Neo4j ; ici, écritures directes (Cassandra puis Neo4j).
@@ -184,9 +185,9 @@ def checkout(x_session_id: str | None = Header(default=None, alias="X-Session-Id
         raise HTTPException(403, "Connexion requise pour passer commande")
     key = f"cart:{s['cart_id']}"
     lines = redis_client().hgetall(key)
-    products = {p["_id"]: p for p in mongo_db().products.find({"_id": {"$in": list(lines)}}, {"name": 1, "price": 1})}
+    products = {p["_id"]: p for p in mongo_db().products.find({"_id": {"$in": list(lines)}}, {"name": 1, "price": 1, "promo": 1})}
     items = [{"sku": sku, "name": products[sku]["name"], "quantity": int(qty),
-              "unit_price": products[sku]["price"].to_decimal()}
+              "unit_price": effective_price(products[sku])[0]}
              for sku, qty in sorted(lines.items()) if sku in products]  # produit retiré : ligne ignorée
     if not items:
         raise HTTPException(400, "Panier vide")

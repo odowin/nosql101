@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { checkout, removeFromCart, setCartQuantity } from "@/app/actions";
 import { Button } from "@/components/ui/button";
 import type { CartLine } from "@/lib/api/types";
+import { Price } from "@/components/price";
 import { formatPrice } from "@/lib/format";
 
 type Change = { sku: string; quantity: number };
@@ -56,7 +57,9 @@ export function CartView({ items, loggedIn }: { items: CartLine[]; loggedIn: boo
               <Link href={`/produits/${encodeURIComponent(l.sku)}`} className="font-medium hover:text-primary">
                 {l.name}
               </Link>
-              <p className="tabular text-sm text-muted-foreground">{formatPrice(l.unit_price)} l&apos;unité</p>
+              <p className="text-sm text-muted-foreground">
+                <Price p={l} /> l&apos;unité
+              </p>
             </div>
             <div className="flex items-center" role="group" aria-label={`Quantité de ${l.name}`}>
               <Button variant="outline" size="icon" className="size-11" aria-label="Retirer un" onClick={() => change({ sku: l.sku, quantity: l.quantity - 1 })}>

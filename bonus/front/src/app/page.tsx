@@ -2,7 +2,8 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
-import { getTopProducts } from "@/lib/api/client";
+import { ProductCard } from "@/components/product-card";
+import { getTopProducts, listProducts } from "@/lib/api/client";
 
 const lots = [
   { n: 1, db: "MongoDB", title: "Catalogue", text: "Produits aux caractéristiques libres, filtres par specs, avis et cache Redis sur la fiche.", href: "/produits" },
@@ -12,7 +13,10 @@ const lots = [
 ];
 
 export default async function Home() {
-  const top = await getTopProducts("day", 5).catch(() => null);
+  const [top, promos] = await Promise.all([
+    getTopProducts("day", 5).catch(() => null),
+    listProducts({ on_sale: true, limit: 8 }).catch(() => null),
+  ]);
   return (
     <main className="flex flex-col gap-12">
       <section className="max-w-[65ch] pt-4">
@@ -25,6 +29,22 @@ export default async function Home() {
           Voir le catalogue
         </Link>
       </section>
+
+      {promos && promos.items.length > 0 && (
+        <section aria-labelledby="promos">
+          <h2 id="promos" className="flex flex-wrap items-center gap-2 text-xl font-semibold">
+            Promos en cours <Badge variant="outline">MongoDB</Badge>
+            <Link href="/produits?on_sale=true" className="ml-auto text-sm font-normal text-primary underline-offset-4 hover:underline">
+              Toutes les promos
+            </Link>
+          </h2>
+          <ul className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {promos.items.map((p) => (
+              <ProductCard key={p._id} p={p} />
+            ))}
+          </ul>
+        </section>
+      )}
 
       <section aria-labelledby="lots">
         <h2 id="lots" className="text-xl font-semibold">Les 4 lots</h2>

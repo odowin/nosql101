@@ -24,6 +24,7 @@ Collections : `products`, `categories`, `brands`, `reviews`. Script : [init.js](
   category: { _id: "cpu", name: "Processeurs", path: "informatique/composants/cpu" },
   brand: { _id: "amd", name: "AMD" }, range: "Ryzen 7", price: NumberDecimal("489.95"),
   stock: { status: "in_stock", qty: 42 },
+  promo: { label: "Black Friday", percent: 15, starts_at: ISODate("2026-11-16T00:00:00Z"), ends_at: ISODate("2026-12-01T00:00:00Z") },  // optionnel ; ou price: NumberDecimal("429.95") à la place de percent
   specs: [ { k: "socket", label: "Socket", v: "AM5" }, { k: "cores", label: "Cœurs", v: 8 },
            { k: "tdp", label: "TDP", v: 120, u: "W" } ],
   compat: { uses: ["socket:AM5"], supports: [] },
@@ -56,6 +57,7 @@ Un produit reconditionné garde sa catégorie d'origine et porte un attribut `co
 | `category` | **extended reference** `{_id, name, path}` | fil d'Ariane sans jointure ; l'arbre vit dans `categories` |
 | Avis | **référence** (collection `reviews`) + subset `top_reviews` + computed `rating` | 1-à-beaucoup **non borné** : l'embarquer gonflerait le document (limite 16 Mo, working set) alors que la fiche n'affiche que 3 avis |
 | Produits compatibles | clés `compat.uses/supports` (vérité côté catalogue) + **subset embedded** `compatible: [{sku, name}]` (≤ 5, extended reference) ; la liste complète vient du graphe ([Lot 4](lot4-recommandations.md)) | une liste complète embarquée est N×M : un nouveau boîtier ATX imposerait de réécrire des centaines de fiches (amplification d'écriture, listes périmées). Le subset de 5 suffit à la fiche, sans requête au graphe ; il est recalculé depuis les clés `compat` et peut être en retard, alors que le graphe fait foi pour la compatibilité complète |
+| `promo` | **embedded**, optionnel `{label, percent \| price, starts_at, ends_at}` | bornée, lue et modifiée avec la fiche ; `price` reste le prix de référence (prix barré). Pas de drapeau `active` : la promo est en cours ssi `starts_at <= now < ends_at`, une promo expirée disparaît d'elle-même, sans job de purge |
 | `stock` | **embedded**, instantané `{status, qty}` | affichage seulement ; la vérité reste dans le SI transactionnel, mise à jour par événement |
 
 **Patterns appliqués.**
@@ -78,13 +80,17 @@ db.createCollection("products", { validationLevel: "moderate", validator: { $jso
   properties: { name: { bsonType: "string" }, slug: { bsonType: "string" }, price: { bsonType: "decimal" },
     schema_version: { bsonType: "int" },
     stock: { bsonType: "object", properties: { status: { enum: ["in_stock", "low_stock", "out_of_stock", "preorder"] } } },
+    promo: { bsonType: "object", required: ["label", "starts_at", "ends_at"], properties: {
+      label: { bsonType: "string" }, percent: { bsonType: "int", minimum: 1, maximum: 90 }, price: { bsonType: "decimal" },
+      starts_at: { bsonType: "date" }, ends_at: { bsonType: "date" } },
+      oneOf: [ { required: ["percent"] }, { required: ["price"] } ] },   // exactement un des deux
     specs: { bsonType: "array", items: { bsonType: "object", required: ["k", "v"], properties: {
       k: { bsonType: "string" }, v: { bsonType: ["string", "int", "double", "bool", "decimal", "array"] }, u: { bsonType: "string" } } } } } } } })
 ```
 
 Convention : une valeur numérique n'est jamais une chaîne avec unité (`v: 120, u: "W"`, pas `v: "120 W"`), sinon `$gte`/`$lte` sur `specs.v` ne fonctionnent plus. Un attribut multi-valué est un tableau (`{ k: "sockets", v: ["AM5", "LGA1851"] }`) : `$elemMatch: { k: "sockets", v: "AM5" }` le trouve, car MongoDB compare la valeur à chaque élément du tableau.
 
-Index `products` : `{category._id:1, price:1}` (liste triée par prix), `{category._id:1, specs.k:1, specs.v:1}` (facettes), `{brand._id:1}`, `{slug:1}` unique, texte `{name:"text"}`. Index `reviews` : `{product_id:1, created_at:-1}`. Index `categories` : `{ancestors:1}`.
+Index `products` : `{category._id:1, price:1}` (liste triée par prix), `{category._id:1, specs.k:1, specs.v:1}` (facettes), `{brand._id:1}`, `{slug:1}` unique, texte `{name:"text"}`. Index partiel `{promo.ends_at:1}` (`partialFilterExpression: { promo: { $exists: true } }`) : seuls les produits en promo l'occupent. Index `reviews` : `{product_id:1, created_at:-1}`. Index `categories` : `{ancestors:1}`.
 
 ## Requêtes types
 
@@ -114,6 +120,9 @@ db.products.updateOne({ _id: r.product_id }, [
               [{ $literal: { _id: r._id, author: r.author, rating: r.rating, title: r.title, created_at: r.created_at } }] ] } } }, 3] } } },
   { $set: { "rating.avg": { $divide: ["$rating.sum", "$rating.count"] } } } ])   // + DEL product:{sku}
 
+// Promos en cours (page « En promo ») : l'intervalle [starts_at, ends_at) est testé à la lecture
+db.products.find({ "promo.starts_at": { $lte: now }, "promo.ends_at": { $gt: now } })
+
 // Évolution sans migration : nouvel attribut et nouvelle catégorie
 db.products.insertOne({ _id: "GPU-NVIDIA-RTX5090", /* … */ specs: [ { k: "dlss", label: "DLSS", v: "4" } ] })
 db.categories.insertOne({ _id: "vr", name: "Casques VR", parent: "peripheriques",
@@ -129,4 +138,5 @@ Le pipeline recalcule `count`, `sum`, `avg` et `top_reviews` (3 plus récents, s
 - **Cohérence (CP, PC/EC en écriture).** Replica set de 3 nœuds, écritures `w: "majority"` : un avis ou un prix acquitté survit à la perte du primaire. Risque accepté : écritures suspendues ~10 s pendant une élection.
 - **Latence en lecture (EL).** Navigation en `readPreference: secondaryPreferred` : on répartit la charge et on accepte quelques ms de retard de réplication. Le **prix au checkout** se lit sur le `primary` : le client paie le prix réel.
 - **Cache.** Cache-aside Redis 300 s devant la lecture de fiche : ~0 lecture MongoDB pour les fiches chaudes. Invalidation par `DEL` à l'écriture et par les Change Streams ; 300 s bornent l'obsolescence si une invalidation est perdue.
+- **Promotions.** Le prix effectif (`promo.price`, sinon `round(price × (1 − percent/100), 2)`, seulement si la promo est en cours) est **calculé à la lecture**, jamais stocké : la fiche en cache Redis contient `promo` avec ses dates, donc la promo commence et finit à l'heure exacte malgré le TTL de 300 s. Au checkout, le prix est recalculé depuis le primaire. Coût : un calcul par lecture et un filtre « en promo » sans index sur le prix effectif (l'index partiel borne seulement la recherche par date de fin).
 - **Limites.** Les `specs.v` hétérogènes (nombre ou texte) imposent des valeurs typées par clé côté application : le `type` de `categories.facets` dit quel type attendre pour chaque clé. La recherche plein texte (`$text`) reste basique ([contexte et synthèse](00-contexte-synthese.md)).
