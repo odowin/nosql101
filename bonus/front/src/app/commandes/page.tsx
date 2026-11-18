@@ -51,7 +51,7 @@ export default async function OrdersPage() {
         <p className="rounded-xl border border-dashed p-8 text-center text-muted-foreground">Aucune commande pour l&apos;instant.</p>
       )}
       <div className="flex flex-col gap-2">
-        <h2 className="flex items-center gap-2 text-lg font-semibold">
+        <h2 id="pour-vous" className="flex scroll-mt-4 items-center gap-2 text-lg font-semibold">
           Pour vous <Badge variant="outline">Neo4j</Badge>
         </h2>
         <Suspense fallback={<Skeleton className="h-40 rounded-xl" />}>

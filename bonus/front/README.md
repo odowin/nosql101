@@ -33,7 +33,7 @@ Avec l'API lancée : `curl http://localhost:8000/openapi.json -o openapi.json &&
 
 ## Organisation
 
-- `src/app/` : routes (`/`, `/produits`, `/produits/[sku]`, `/panier`, `/commandes`, `/analytics`).
+- `src/app/` : routes (`/`, `/produits`, `/produits/[sku]`, `/panier`, `/compte`, `/commandes`, `/analytics`).
 - `src/components/` : composants métier (en-tête, méga-menu des catégories, pied de page…) ; `ui/` : composants shadcn.
 - Thème : sombre unique, tokens `oklch()` dans `globals.css`. Dans l'en-tête, BOUTIQUES mène à `/analytics` (pas de boutique physique) et AIDE au Swagger publié sur `localhost:8000`.
 - `src/lib/api/` : client `openapi-fetch` typé ; `src/lib/session.ts` : session (cookie) ; `format.ts`, `daily-views.ts` : utilitaires testés.

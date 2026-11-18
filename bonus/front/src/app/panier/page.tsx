@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { CartView } from "@/components/cart-view";
 import { LoginForm } from "@/components/login-form";
 import { Badge } from "@/components/ui/badge";
@@ -22,7 +23,10 @@ export default async function CartPage() {
         <h2 className="font-semibold">Compte client</h2>
         {session?.customer_id ? (
           <p className="text-sm">
-            Connecté en tant que <span className="font-mono font-semibold">{session.customer_id}</span>.
+            Connecté en tant que <span className="font-mono font-semibold">{session.customer_id}</span>.{" "}
+            <Link href="/compte" className="inline-flex min-h-11 items-center text-link underline-offset-4 hover:underline">
+              Gérer mon compte
+            </Link>
           </p>
         ) : (
           <>
