@@ -33,7 +33,7 @@ export interface paths {
         };
         /**
          * List Products
-         * @description Liste filtrée (projection légère : sans specs ni avis).
+         * @description Liste filtrée (projection légère : sans specs ni avis). `min_price`/`max_price` portent sur le prix de référence.
          */
         get: operations["list_products_products_get"];
         put?: never;
@@ -58,6 +58,8 @@ export interface paths {
         /**
          * Get Product
          * @description Fiche complète. Cache-aside Redis `product:{sku}` (TTL 300 s), en-tête `X-Cache`.
+         *
+         *     Le cache garde la promo brute ; le prix effectif est recalculé à chaque lecture.
          */
         get: operations["get_product_products__sku__get"];
         put?: never;
@@ -325,7 +327,7 @@ export interface paths {
         };
         /**
          * Read Cart
-         * @description Panier de la session, enrichi (nom, prix courant MongoDB), total et TTL.
+         * @description Panier de la session, enrichi (nom, prix effectif MongoDB), total et TTL.
          */
         get: operations["read_cart_cart_get"];
         put?: never;
@@ -391,7 +393,7 @@ export interface paths {
         put?: never;
         /**
          * Checkout
-         * @description Transforme le panier en commande (client connecté requis ; prix courants MongoDB).
+         * @description Transforme le panier en commande (client connecté requis ; prix effectifs relus dans MongoDB).
          *
          *     En production, la commande passe par le service transactionnel de commandes (base relationnelle) et un
          *     outbox publié sur Kafka alimente Cassandra et Neo4j ; ici, écritures directes (Cassandra puis Neo4j).
@@ -610,8 +612,34 @@ export interface components {
             compat: {
                 [key: string]: unknown;
             };
+            promo?: components["schemas"]["Promo"] | null;
         } & {
             [key: string]: unknown;
+        };
+        /**
+         * Promo
+         * @description Promo embarquée : exactement un de `percent` / `price`, en cours sur [starts_at, ends_at).
+         */
+        Promo: {
+            /**
+             * Label
+             * @example Black Friday
+             */
+            label: string;
+            /** Percent */
+            percent?: number | null;
+            /** Price */
+            price?: number | string | null;
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
         };
         /** QuantityIn */
         QuantityIn: {
@@ -696,6 +724,8 @@ export interface operations {
                 max_price?: number | string | null;
                 /** @description Filtre `k:v` répétable, ex. `socket:AM5` */
                 spec?: string[];
+                /** @description Seulement les promos en cours */
+                on_sale?: boolean;
                 limit?: number;
                 skip?: number;
             };
