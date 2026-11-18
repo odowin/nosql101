@@ -58,7 +58,7 @@ Schéma d'architecture globale (Mermaid, flux numérotés et légende) : [archit
 | MongoDB | CP | PC/EC (écritures), EL (navigation) | `w: majority`, `secondaryPreferred` sauf prix au checkout (`primary`) | écritures suspendues ~10 s pendant une élection ; fiche périmée ≤ 300 s via le cache |
 | Redis Cluster | AP | PA/EL | réplication asynchrone, AOF `everysec`, `volatile-ttl` | perte des dernières lignes de panier au basculement ; fusion au login non atomique |
 | Cassandra | AP (réglable) | PA/EL (événements), PC/EC local (commandes) | `LOCAL_ONE` / `LOCAL_QUORUM`, RF=3 × 2 DC, BATCH loggé | compteurs approximatifs ; agrégats en retard de 5 min |
-| Neo4j | CP (Raft) | PC/EC (primaires), EL (replicas) | lectures sur replicas, bookmarks si besoin | recommandations en retard de quelques secondes ; repli sur le top ventes |
+| Neo4j | CP (Raft) | PC/EC (primaires), EL (replicas) | lectures sur replicas, bookmarks si besoin | recommandations en retard de quelques secondes ; repli sur le top des produits consultés |
 | Kafka | CP | — | `acks=all`, `min.insync.replicas=2`, consommateurs idempotents | doublons (absorbés par l'idempotence), délai de propagation |
 
 **Risques et limites.**
