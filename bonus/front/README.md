@@ -1,6 +1,6 @@
 # Front LDLC
 
-Interface Next.js (App Router) de la refonte : catalogue, panier, commandes, analytics. Elle consomme uniquement l'[API FastAPI](../api/README.md), jamais les bases.
+Interface Next.js (App Router) de la refonte : catalogue, panier, commandes, analytics. Elle consomme uniquement l'[API FastAPI](../../api/README.md), jamais les bases.
 
 ## Lancer
 
@@ -13,7 +13,7 @@ docker compose up -d --build   # front sur http://localhost:3000, Swagger sur ht
 En local, contre une API déjà lancée sur `localhost:8000` :
 
 ```bash
-cd front
+cd bonus/front
 cp .env.example .env.local     # API_URL=http://localhost:8000
 npm ci
 npm run dev

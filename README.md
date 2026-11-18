@@ -40,7 +40,7 @@ Hors périmètre : la prise de commande et le paiement restent dans une base rel
 | Requêtes types | [MongoDB](db/mongodb/queries.js) · [Redis](db/redis/queries.redis) · [Cassandra](db/cassandra/queries.cql) · [Neo4j](db/neo4j/queries.cypher) |
 | Environnement local des 4 bases | [docker-compose.yml](docker-compose.yml) |
 | Bonus : prototype d'API | [api/README.md](api/README.md) (FastAPI, Swagger, tests) |
-| Bonus : front | [front/README.md](front/README.md) (Next.js, port 3000) |
+| Bonus : front | [bonus/front/README.md](bonus/front/README.md) (Next.js, port 3000) |
 
 ## Lancer les bases et les schémas
 
@@ -56,7 +56,7 @@ docker compose up -d --build   # 1er démarrage ≈ 2 min (Cassandra) ; schémas
 
 ## Front
 
-Un front Next.js consomme l'API : `docker compose up -d --build` puis http://localhost:3000 (catalogue, panier, commandes, analytics). Détails : [front/README.md](front/README.md).
+Un front Next.js consomme l'API : `docker compose up -d --build` puis http://localhost:3000 (catalogue, panier, commandes, analytics). Détails : [bonus/front/README.md](bonus/front/README.md).
 
 ## Exécuter les requêtes types
 

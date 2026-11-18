@@ -115,7 +115,7 @@ services:
 
   # Front Next.js (http://localhost:3000), consomme l'API
   front:
-    build: ./front
+    build: ./bonus/front
     ports:
       - "3000:3000"
     environment:

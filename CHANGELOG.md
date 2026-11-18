@@ -6,7 +6,7 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), ver
 
 ### Ajouté
 
-- Front Next.js (`front/`) : catalogue, fiche produit, panier optimiste, commandes, analytics ; service `front` dans `docker-compose.yml` (port 3000).
+- Front Next.js (`bonus/front/`) : catalogue, fiche produit, panier optimiste, commandes, analytics ; service `front` dans `docker-compose.yml` (port 3000).
 
 ## [1.0.1] — 2026-11-18
 
