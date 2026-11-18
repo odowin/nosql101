@@ -58,6 +58,28 @@ Cassandra impose le **query-driven** : une table par requête, des données dupl
 - `orders_by_customer` : quelques dizaines de commandes par particulier, partition bornée. Pour un client B2B (milliers de commandes), on ajouterait un bucket `year` à la clé de partition.
 
 
+```sql
+CREATE TABLE ldlc.events_by_hour (
+  day date, hour tinyint, shard tinyint, event_id timeuuid,
+  event_type text, session_id text, customer_id text, sku text, url text, search_query text,
+  PRIMARY KEY ((day, hour, shard), event_id)
+) WITH CLUSTERING ORDER BY (event_id DESC)
+  AND compaction = {'class': 'TimeWindowCompactionStrategy', 'compaction_window_unit': 'DAYS', 'compaction_window_size': 7}
+  AND default_time_to_live = 34214400;                          -- 396 j ≈ 13 mois
+
+CREATE TABLE ldlc.product_views_by_day (sku text, day date, views counter,
+  PRIMARY KEY ((sku), day)) WITH CLUSTERING ORDER BY (day DESC);
+
+CREATE TYPE ldlc.order_line (sku text, name text, quantity int, unit_price decimal);
+CREATE TABLE ldlc.orders_by_customer (
+  customer_id text, order_date timestamp, order_id text,
+  status text, total decimal, items list<frozen<order_line>>,
+  PRIMARY KEY ((customer_id), order_date, order_id)
+) WITH CLUSTERING ORDER BY (order_date DESC, order_id ASC);
+```
+
+Schéma complet : [`db/cassandra/schema.cql`](../../db/cassandra/schema.cql). Keyspace de production : `NetworkTopologyStrategy {'dc_paris': 3, 'dc_lyon': 3}`.
+
 ## Requêtes types
 
 _À compléter._
