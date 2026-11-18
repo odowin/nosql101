@@ -11,6 +11,7 @@
 | `lot3/logs-analytics`        | Lot 3 — Cassandra                                                                         |
 | `lot4/recommandations`       | Lot 4 — Neo4j                                                                             |
 | `architecture/schema-global` | Schéma d'architecture globale                                                             |
+| `release/vX.Y.Z`             | Préparation d'un rendu : créée depuis `develop`, met à jour `CHANGELOG.md`, PR vers `main`, puis tag `vX.Y.Z`. |
 
 Pour un nouveau sujet : `git switch develop && git pull && git switch -c <type>/<sujet>`.
 
@@ -20,7 +21,7 @@ Pour un nouveau sujet : `git switch develop && git pull && git switch -c <type>/
 2. Commiter souvent, par petites étapes (l'historique est noté).
 3. Pousser : `git push`.
 4. Fusionner dans `develop` (merge direct ou Pull Request, au choix).
-5. Une fois `develop` stable, PR `develop` → `main` pour le rendu.
+5. Une fois `develop` stable : `git switch -c release/vX.Y.Z develop`, mise à jour de `CHANGELOG.md`, PR `release/vX.Y.Z` → `main` pour le rendu, puis tag `vX.Y.Z` sur `main`.
 
 ## Messages de commit
 
