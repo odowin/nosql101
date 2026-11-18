@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { Star } from "lucide-react";
 import { AddToCart } from "@/components/add-to-cart";
+import { Breadcrumb } from "@/components/breadcrumb";
 import { StockLabel } from "@/components/product-card";
 import { Price } from "@/components/price";
 import { RecoSection } from "@/components/reco-section";
@@ -13,7 +14,8 @@ import { SectionHeading } from "@/components/section-heading";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ApiError, getDailyViews, getProduct, getRecommendations, listReviews } from "@/lib/api/client";
+import { ApiError, getCategories, getDailyViews, getProduct, getRecommendations, listReviews } from "@/lib/api/client";
+import { categoryHref, categoryTrail } from "@/lib/categories";
 import { formatDate } from "@/lib/format";
 
 type Props = { params: Promise<{ sku: string }>; searchParams: Promise<{ avis?: string }> };
@@ -45,23 +47,28 @@ const recos = [
 export default async function ProductPage({ params, searchParams }: Props) {
   const sku = decodeURIComponent((await params).sku);
   const page = Math.max(1, Math.trunc(Number((await searchParams).avis)) || 1);
-  const [p, reviews, views] = await Promise.all([
+  const [p, reviews, views, categories] = await Promise.all([
     loadProduct(sku),
     listReviews(sku, REVIEWS_PER_PAGE, (page - 1) * REVIEWS_PER_PAGE).catch(() => null),
     getDailyViews(sku, 1).then((d) => d[0]?.views ?? 0).catch(() => null),
+    getCategories().catch(() => []),
   ]);
+  const trail = categoryTrail(categories, p.category._id);
   const reviewPages = reviews ? Math.max(1, Math.ceil(reviews.total / REVIEWS_PER_PAGE)) : 1;
   const outOfStock = p.stock?.status === "out_of_stock";
 
   return (
     <main className="flex flex-col gap-10">
       <TrackEvent event_type="product_view" sku={sku} />
-      <nav aria-label="Fil d'Ariane" className="text-sm text-muted-foreground">
-        <Link href="/produits" className="underline-offset-4 hover:underline">Catalogue</Link> /{" "}
-        <Link href={`/produits?category=${encodeURIComponent(p.category._id)}`} className="underline-offset-4 hover:underline">
-          {p.category.name}
-        </Link>
-      </nav>
+      <Breadcrumb
+        items={[
+          // Sans arbre des catégories (API en erreur), seule la catégorie du produit reste.
+          ...(trail.length
+            ? trail.map((c) => ({ label: c.name, href: categoryHref(c) }))
+            : [{ label: p.category.name, href: `/produits?category=${encodeURIComponent(p.category._id)}` }]),
+          { label: p.name },
+        ]}
+      />
 
       <section className="grid gap-8 md:grid-cols-[1fr_20rem]">
         <div>
