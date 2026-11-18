@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -16,10 +17,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="fr" className={inter.variable}>
       <body className="flex min-h-dvh flex-col">
         <SiteHeader />
-        <div className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">{children}</div>
-        <footer className="border-t py-6 text-center text-sm text-muted-foreground">
-          Projet scolaire NoSQL — refonte LDLC
-        </footer>
+        <div className="mx-auto w-full max-w-7xl flex-1 px-safe py-8">{children}</div>
+        <SiteFooter />
         <Toaster />
       </body>
     </html>
