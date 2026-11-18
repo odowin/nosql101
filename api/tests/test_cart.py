@@ -3,7 +3,7 @@ import uuid
 import pytest
 from bson import Decimal128
 
-from app.db import mongo_db, redis_client
+from app.db import cassandra_session, mongo_db, neo4j_driver, redis_client
 
 SKU_A, SKU_B = "CPU-TEST-CART-A", "CPU-TEST-CART-B"
 PRICES = {SKU_A: "100.10", SKU_B: "20.05"}
@@ -101,3 +101,40 @@ def test_delete_session(client, session):
     sid = session["session_id"]
     assert client.delete(f"/sessions/{sid}").status_code == 204
     assert client.get(f"/sessions/{sid}").status_code == 404
+
+
+def test_checkout(client, session):
+    h, cust, sid = session["headers"], session["customer_id"], session["session_id"]
+    a, b = sorted(["CPU-AMD-R7-9800X3D", "MB-MSI-X870-TOMAHAWK"])
+    pair = "MATCH (:Product {sku: $a})-[w:BOUGHT_WITH]-(:Product {sku: $b}) "
+
+    def count():
+        with neo4j_driver().session(database="neo4j") as n:
+            rec = n.run(pair + "RETURN w.count AS c", a=a, b=b).single()
+        return rec["c"] if rec else 0
+
+    assert client.post("/cart/checkout", headers=h).status_code == 403  # anonyme
+    before = count()
+    order_id = None
+    try:
+        client.post(f"/sessions/{sid}/login", json={"customer_id": cust})
+        assert client.post("/cart/checkout", headers=h).status_code == 400  # panier vide
+        for sku in (a, b):
+            client.post("/cart/items", json={"sku": sku, "quantity": 1}, headers=h)
+        r = client.post("/cart/checkout", headers=h)
+        assert r.status_code == 201
+        order = r.json()
+        order_id = order["order_id"]
+        assert order["status"] == "paid" and order["customer_id"] == cust and len(order["items"]) == 2
+        assert order_id in [o["order_id"] for o in client.get(f"/customers/{cust}/orders").json()]
+        assert client.get(f"/orders/{order_id}").json()["total"] == pytest.approx(order["total"])
+        assert count() == before + 1
+        assert client.get("/cart", headers=h).json()["items"] == []
+    finally:
+        with neo4j_driver().session(database="neo4j") as n:
+            n.run("MATCH (c:Customer {id: $c}) DETACH DELETE c", c=cust).consume()
+            n.run(pair + "SET w.count = w.count - 1 WITH w WHERE w.count <= 0 DELETE w", a=a, b=b).consume() \
+                if order_id else None
+        if order_id:
+            cassandra_session().execute("DELETE FROM orders_by_id WHERE order_id=%s", (order_id,))
+            cassandra_session().execute("DELETE FROM orders_by_customer WHERE customer_id=%s", (cust,))

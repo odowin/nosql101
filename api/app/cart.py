@@ -6,7 +6,8 @@ from decimal import Decimal
 from fastapi import APIRouter, Header, HTTPException, Response
 from pydantic import BaseModel, Field
 
-from app.db import mongo_db, redis_client
+from app import analytics, reco
+from app.db import mongo_db, redis_client, to_json
 
 router = APIRouter(tags=["Lot 2 — Panier & sessions (Redis)"])
 
@@ -169,3 +170,31 @@ def remove_item(sku: str, x_session_id: str | None = Header(default=None, alias=
     if not redis_client().hdel(f"cart:{s['cart_id']}", sku):
         raise HTTPException(404, "Ligne absente du panier")
     return _cart_view(s)
+
+
+@router.post("/cart/checkout", status_code=201)
+def checkout(x_session_id: str | None = Header(default=None, alias="X-Session-Id")):
+    """Transforme le panier en commande (client connecté requis ; prix courants MongoDB).
+
+    En production, la commande passe par le service transactionnel de commandes (base relationnelle) et un
+    outbox publié sur Kafka alimente Cassandra et Neo4j ; ici, écritures directes (Cassandra puis Neo4j).
+    """
+    s = get_session(x_session_id)
+    if not s.get("customer_id"):
+        raise HTTPException(403, "Connexion requise pour passer commande")
+    key = f"cart:{s['cart_id']}"
+    lines = redis_client().hgetall(key)
+    products = {p["_id"]: p for p in mongo_db().products.find({"_id": {"$in": list(lines)}}, {"name": 1, "price": 1})}
+    items = [{"sku": sku, "name": products[sku]["name"], "quantity": int(qty),
+              "unit_price": products[sku]["price"].to_decimal()}
+             for sku, qty in sorted(lines.items()) if sku in products]  # produit retiré : ligne ignorée
+    if not items:
+        raise HTTPException(400, "Panier vide")
+    now = datetime.now(timezone.utc)
+    order = {"customer_id": s["customer_id"], "order_id": f"CMD-{now:%Y%m%d}-{uuid.uuid4().hex[:6]}",
+             "order_date": now, "status": "paid",
+             "total": sum((i["quantity"] * i["unit_price"] for i in items), Decimal(0)), "items": items}
+    analytics.record_order(order)
+    reco.record_purchase(order)
+    redis_client().delete(key)
+    return to_json(order)
