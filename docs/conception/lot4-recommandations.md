@@ -44,7 +44,36 @@ graph LR
 
 ## Requêtes types
 
-_À compléter._
+```cypher
+// « Ont aussi acheté » : 2 sauts via les clients, filtre de catégorie optionnel
+MATCH (p:Product {sku: $sku})<-[:PURCHASED]-(c:Customer)-[:PURCHASED]->(o:Product)
+WHERE o <> p AND ($category IS NULL OR o.category = $category)
+RETURN o.sku, o.name, count(DISTINCT c) AS buyers ORDER BY buyers DESC LIMIT 5;
+
+// Achetés ensemble (pré-calculé, 1 saut)
+MATCH (:Product {sku: $sku})-[r:BOUGHT_WITH]-(o:Product)
+RETURN o.sku, o.name, r.count ORDER BY r.count DESC LIMIT 5;
+
+// Compatibles avec ce boîtier (form_factor, psu_format…)
+MATCH (a:Product {sku: $sku})-[r1:USES|SUPPORTS]->(s:Standard)<-[r2:USES|SUPPORTS]-(b:Product)
+WHERE type(r1) <> type(r2) AND ($category IS NULL OR b.category = $category)
+RETURN b.category, b.sku, b.name, collect(s.id) AS via ORDER BY b.category;
+
+// Similaires : même catégorie, score marque + gamme + standards communs
+MATCH (p:Product {sku: $sku})-[:IN_CATEGORY]->(:Category)<-[:IN_CATEGORY]-(o:Product) WHERE o <> p
+OPTIONAL MATCH (p)-[:MADE_BY]->(b)<-[:MADE_BY]-(o)
+OPTIONAL MATCH (p)-[:IN_RANGE]->(r)<-[:IN_RANGE]-(o)
+OPTIONAL MATCH (p)-[:USES|SUPPORTS]->(s:Standard)<-[:USES|SUPPORTS]-(o)
+WITH p, o, 2 * count(DISTINCT b) + 3 * count(DISTINCT r) + count(DISTINCT s) AS score
+RETURN o.sku, o.name, score ORDER BY score DESC, abs(o.price - p.price) LIMIT 5;
+
+// Filtrage collaboratif personnalisé (3 sauts, « amis d'amis »)
+MATCH (me:Customer {id: $cid})-[:PURCHASED]->(:Product)<-[:PURCHASED]-(peer:Customer)-[:PURCHASED]->(reco:Product)
+WHERE peer <> me AND NOT (me)-[:PURCHASED]->(reco)
+RETURN reco.sku, reco.name, count(DISTINCT peer) AS score ORDER BY score DESC LIMIT 5;
+```
+
+Script complet, exécutable sur les données de démonstration (valeurs littérales, lecture seule) : [`db/neo4j/queries.cypher`](../../db/neo4j/queries.cypher).
 
 ## Justification des compromis
 
