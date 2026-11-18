@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatPeriod, formatPrice, formatTtl, priceView, withParams } from "./format";
+import { formatPeriod, formatPrice, formatTtl, priceParts, priceView, specSummary, withParams } from "./format";
 
 describe("format", () => {
   it("formate un prix en euros fr-FR, qu'il arrive en nombre ou en chaîne", () => {
@@ -52,5 +52,25 @@ describe("priceView", () => {
     expect(v.label).toBe("Black Friday");
     // ends_at 2 déc. 00:00 à Paris, exclusif → jusqu'au 1 déc.
     expect(v.until).toBe("jusqu'au 1 déc.");
+  });
+
+  it("découpe un prix en partie entière et centimes en exposant", () => {
+    expect(priceParts(59.95)).toEqual({ units: "59", cents: "95" });
+    expect(priceParts(1299.9).units.replace(/\s/g, " ")).toBe("1 299");
+    expect(priceParts(1299.9).cents).toBe("90");
+    expect(priceParts("7")).toEqual({ units: "7", cents: "00" });
+  });
+
+  it("résume les specs : unité, décimale française, booléen vrai = libellé, faux omis", () => {
+    expect(
+      specSummary([
+        { k: "socket", label: "Socket", v: "AM5" },
+        { k: "base_clock", label: "Fréquence de base", v: 4.7, u: "GHz" },
+        { k: "igpu", label: "Graphique intégré", v: true },
+        { k: "rgb", v: false },
+        { k: "cores", v: 8 },
+      ]),
+    ).toBe("Socket AM5 - Fréquence de base 4,7 GHz - Graphique intégré - cores 8");
+    expect(specSummary([{ k: "a", v: 1 }, { k: "b", v: 2 }], 1)).toBe("a 1");
   });
 });

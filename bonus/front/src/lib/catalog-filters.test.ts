@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { listProducts } from "./api/client";
-import { parseCatalogFilters } from "./catalog-filters";
+import { pageList, parseCatalogFilters } from "./catalog-filters";
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -34,5 +34,35 @@ describe("parseCatalogFilters", () => {
       ["limit", "20"],
       ["skip", "20"],
     ]);
+  });
+
+  it("valide le tri, lit en stock et garde plusieurs marques", () => {
+    expect(parseCatalogFilters({ sort: "price_desc", in_stock: "true", brand: ["amd", " intel ", ""] })).toMatchObject({
+      sort: "price_desc",
+      in_stock: true,
+      brand: ["amd", "intel"],
+    });
+    expect(parseCatalogFilters({ sort: "nope" }).sort).toBeUndefined();
+    expect(parseCatalogFilters({ sort: "" }).sort).toBeUndefined();
+  });
+
+  it("envoie tri, marques répétées et en stock à GET /products", async () => {
+    const fetchMock = vi.fn<(req: Request) => Promise<Response>>(async () => Response.json({ total: 0, items: [] }));
+    vi.stubGlobal("fetch", fetchMock);
+    await listProducts(parseCatalogFilters({ brand: ["amd", "intel"], in_stock: "true", sort: "rating" }));
+    const url = new URL(fetchMock.mock.calls[0][0].url);
+    expect(url.searchParams.getAll("brand")).toEqual(["amd", "intel"]);
+    expect(url.searchParams.get("in_stock")).toBe("true");
+    expect(url.searchParams.get("sort")).toBe("rating");
+  });
+});
+
+describe("pageList", () => {
+  it("liste tout jusqu'à 7 pages, sinon resserre autour de la page courante", () => {
+    expect(pageList(1, 3)).toEqual([1, 2, 3]);
+    expect(pageList(1, 10)).toEqual([1, 2, "…", 10]);
+    expect(pageList(5, 10)).toEqual([1, "…", 4, 5, 6, "…", 10]);
+    expect(pageList(10, 10)).toEqual([1, "…", 9, 10]);
+    expect(pageList(3, 10)).toEqual([1, 2, 3, 4, "…", 10]);
   });
 });

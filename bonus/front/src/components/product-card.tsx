@@ -29,7 +29,7 @@ export function ProductCard({ p }: { p: ProductSummary }) {
   );
 }
 
-const STOCK: Record<string, [string, string]> = {
+export const STOCK: Record<string, [string, string]> = {
   in_stock: ["En stock", "text-success"],
   low_stock: ["Stock faible", "text-warning"],
   preorder: ["En précommande", "text-muted-foreground"],

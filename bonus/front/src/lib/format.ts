@@ -1,10 +1,31 @@
-import type { PriceInfo } from "./api/types";
+import type { PriceInfo, Spec } from "./api/types";
 
 const eur = new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" });
 const day = new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium" });
 
 /** Prix API (Decimal sérialisé en nombre ou en chaîne) → « 1 299,90 € ». */
 export const formatPrice = (v: number | string) => eur.format(Number(v));
+/** Prix LDLC « 1 299€<sup>90</sup> » : partie entière (séparateur de milliers compris) et centimes. */
+export function priceParts(v: number | string) {
+  const parts = eur.formatToParts(Number(v));
+  const pick = (...types: string[]) => parts.filter((x) => types.includes(x.type)).map((x) => x.value).join("");
+  return { units: pick("minusSign", "integer", "group"), cents: pick("fraction") };
+}
+
+const num = new Intl.NumberFormat("fr-FR");
+
+/** Description courte d'un produit depuis ses specs : « Socket AM5 - Cœurs 8 - Fréquence de base 4,7 GHz ». Un booléen faux est omis. */
+export const specSummary = (specs: Spec[], max = 6) =>
+  specs
+    .filter((s) => s.v !== false)
+    .slice(0, max)
+    .map((s) => {
+      const label = s.label ?? s.k;
+      if (s.v === true) return label;
+      return `${label} ${typeof s.v === "number" ? num.format(s.v) : s.v}${s.u ? ` ${s.u}` : ""}`;
+    })
+    .join(" - ");
+
 export const formatDate = (iso: string) => day.format(new Date(iso));
 // Fuseau fixé : le rendu serveur (UTC dans Docker) et les tests donnent la même date.
 const dayMonth = new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "short", timeZone: "Europe/Paris" });

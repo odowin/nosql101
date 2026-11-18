@@ -246,4 +246,34 @@
     opacity: 1;
     @starting-style { opacity: 0; }
   }
+
+  /* Curseur double : les pistes natives sont transparentes et laissent passer le pointeur, seules les poignées le captent. */
+  .dual-range {
+    appearance: none;
+    background: none;
+    pointer-events: none;
+    padding: 0 4px;
+  }
+  .dual-range::-webkit-slider-thumb {
+    appearance: none;
+    pointer-events: auto;
+    width: 22px;
+    height: 34px;
+    border-radius: 6px;
+    background: var(--ldlc-price);
+    border: 2px solid white;
+    cursor: grab;
+  }
+  .dual-range::-moz-range-thumb {
+    pointer-events: auto;
+    width: 18px;
+    height: 30px;
+    border-radius: 6px;
+    background: var(--ldlc-price);
+    border: 2px solid white;
+    cursor: grab;
+  }
+  .dual-range:focus-visible { outline: none; }
+  .dual-range:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--ring); outline-offset: 2px; }
+  .dual-range:focus-visible::-moz-range-thumb { outline: 2px solid var(--ring); outline-offset: 2px; }
 }
