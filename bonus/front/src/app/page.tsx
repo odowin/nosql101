@@ -3,12 +3,14 @@ import { ChartNoAxesColumn, ChevronRight, UserRound } from "lucide-react";
 import { ProductCard } from "@/components/product-card";
 import { SectionHeading } from "@/components/section-heading";
 import { getCategories, getTopProducts, listProducts } from "@/lib/api/client";
+import type { Category } from "@/lib/api/types";
 import { formatPeriod } from "@/lib/format";
 import { currentSession } from "@/lib/session";
 
 const pill =
   "caps inline-flex min-h-11 items-center gap-1 rounded-full px-5 text-sm font-bold transition-[background-color,transform] active:translate-y-px";
 const whitePill = `${pill} bg-white text-black hover:bg-white/85`;
+const leaves = (cats: Category[]): Category[] => cats.flatMap((c) => (c.children.length ? leaves(c.children) : [c]));
 const tile = "relative flex flex-col gap-4 overflow-hidden rounded-xl bg-header p-6 sm:p-8";
 
 export default async function Home() {
@@ -21,8 +23,8 @@ export default async function Home() {
   // La bannière reprend la première promo en cours renvoyée par l'API ; sans promo, un titre générique.
   const promo = promos?.items.find((p) => p.promo)?.promo;
   const customer = session?.customer_id || undefined;
-  // Une seule racine (« Informatique ») ne ferait qu'une tuile : on montre alors ses sous-catégories.
-  const univers = categories.flatMap((c) => (c.children.length ? c.children : [c]));
+  // Les produits ne sont rattachés qu'aux feuilles (cpu, gpu…) : filtrer sur une catégorie parente ne renvoie rien.
+  const univers = leaves(categories);
 
   const tabs = [
     { href: "/produits?on_sale=true", label: promo?.label ?? "Black Days" },
@@ -115,12 +117,9 @@ export default async function Home() {
               <li key={c._id}>
                 <Link
                   href={`/produits?category=${encodeURIComponent(c._id)}`}
-                  className="surface-light flex min-h-24 flex-col items-center justify-center gap-1 rounded-xl p-4 text-center transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/40 active:translate-y-0"
+                  className="surface-light flex min-h-20 items-center justify-center rounded-xl p-4 text-center transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/40 active:translate-y-0"
                 >
                   <span className="text-lg">{c.name}</span>
-                  {c.children.length > 0 && (
-                    <span className="line-clamp-1 text-xs text-muted-foreground">{c.children.map((s) => s.name).join(" · ")}</span>
-                  )}
                 </Link>
               </li>
             ))}
